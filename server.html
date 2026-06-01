@@ -10,244 +10,201 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #121212;
-            color: #c0c0c0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background: #0a0a0a;
+            background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e0e0e0;
             padding: 2rem;
+            position: relative;
         }
-
-        .dashboard {
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 700px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 0;
+        }
+        .dashboard {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .user-greeting {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #e0e0e0;
-        }
-
-        .user-greeting span { color: #3b6e4f; }
-
-        .logout {
-            color: #909090;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: 1px solid #333;
-            padding: 0.6rem 1.2rem;
-            border-radius: 10px;
-            transition: all 0.2s;
-            cursor: pointer;
-            background: none;
-            font-family: inherit;
-        }
-
-        .logout:hover { border-color: #3b6e4f; color: #d4d4d4; }
-
-        .card {
-            background: #1c1c1c;
+            background: rgba(20,20,20,0.8);
+            backdrop-filter: blur(4px);
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
             border: 1px solid #2c2c2c;
-            border-radius: 16px;
+        }
+        .user-greeting {
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        .user-greeting span { color: #3b6e4f; }
+        .logout {
+            background: none;
+            border: 1px solid #3b6e4f;
+            padding: 0.5rem 1.2rem;
+            border-radius: 12px;
+            color: #ccc;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .logout:hover { background: #3b6e4f20; border-color: #5a8e4a; color: white; }
+        .card {
+            background: rgba(20,20,20,0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid #2c2c2c;
+            border-radius: 20px;
             padding: 1.8rem;
         }
-
         .card h3 {
             font-weight: 500;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-bottom: 1rem;
-            color: #d4d4d4;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #ddd;
         }
-
         .accent { color: #3b6e4f; }
-
         .ip-box {
             display: flex;
             align-items: center;
-            background: #242424;
-            border-radius: 10px;
+            background: #1e1e1e;
+            border-radius: 14px;
             padding: 0.8rem 1rem;
-            font-size: 1.1rem;
             gap: 1rem;
         }
-
         .ip-text {
             flex: 1;
-            color: #d4d4d4;
-            font-family: 'Courier New', monospace;
+            font-family: monospace;
+            font-size: 1rem;
         }
-
         .copy-btn {
             background: none;
             border: 1px solid #3b6e4f;
             color: #3b6e4f;
             padding: 0.4rem 0.8rem;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            font-family: inherit;
         }
-
-        .copy-btn:hover { background: #3b6e4f20; }
-
         .modpack-link {
-            display: inline-block;
-            margin-top: 0.5rem;
             color: #3b6e4f;
             text-decoration: none;
-            font-weight: 500;
             border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
         }
-
         .modpack-link:hover { border-bottom-color: #3b6e4f; }
-
-        .lore p {
-            line-height: 1.7;
-            margin-bottom: 1rem;
-            color: #b0b0b0;
-        }
-
         .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 0.8rem;
-            margin-top: 0.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
-
         .link-item {
-            display: block;
-            background: #242424;
-            padding: 0.8rem;
-            border-radius: 10px;
+            background: #1e1e1e;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
             text-decoration: none;
-            color: #c0c0c0;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            border: 1px solid #2c2c2c;
-            text-align: center;
+            color: #ccc;
+            border: 1px solid #333;
+            transition: 0.2s;
         }
-
         .link-item:hover { background: #2a2a2a; border-color: #3b6e4f; }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">
-            <div class="user-greeting">Привет, <span id="display-nick">...</span>!</div>
-            <button class="logout" id="logout-btn">Выйти</button>
-        </div>
+<div class="dashboard">
+    <div class="header">
+        <div class="user-greeting">Привет, <span id="display-nick">...</span></div>
+        <button class="logout" id="logout-btn">Выйти</button>
+    </div>
 
-        <!-- IP-адрес -->
-        <div class="card">
-            <h3><span class="accent">◈</span> Адрес сервера</h3>
-            <div class="ip-box">
-                <span class="ip-text">play.rp-minecraft.ru</span>
-                <button class="copy-btn" onclick="copyIP()">Копировать</button>
-            </div>
-        </div>
-
-        <!-- Сборка модов -->
-        <div class="card">
-            <h3><span class="accent">◈</span> Сборка модов</h3>
-            <p>Скачайте готовую сборку для версии 1.20.1 (Forge).</p>
-            <a href="#" class="modpack-link">Скачать ModPack (Google Диск)</a>
-        </div>
-
-        <!-- Лор проекта -->
-        <div class="card">
-            <h3><span class="accent">◈</span> Лор проекта</h3>
-            <div class="lore">
-                <p>Мир Этерион погрузился в хаос после Падения Небесного Камня. Королевства борются за осколки древней магии, а гильдии искателей отправляются в забытые земли в поисках истины. Ваша история начинается здесь.</p>
-                <p>Скоро: интерактивная карта, квесты и полный таймлайн.</p>
-            </div>
-        </div>
-
-        <!-- Социальные ссылки + персонаж -->
-        <div class="card">
-            <h3><span class="accent">◈</span> Сообщество</h3>
-            <div class="links-grid">
-                <a href="https://discord.gg/hyJUUckQMh" class="link-item" target="_blank">Discord</a>
-                <a href="https://t.me/Omega1RolePlay" class="link-item" target="_blank">Telegram</a>
-                <a href="character.html" class="link-item">Создать персонажа</a>
-            </div>
+    <div class="card">
+        <h3>Адрес сервера</h3>
+        <div class="ip-box">
+            <span class="ip-text">play.rp-minecraft.ru</span>
+            <button class="copy-btn" onclick="copyIP()">Копировать</button>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <div class="card">
+        <h3>Сборка модов</h3>
+        <p>Скачайте сборку для версии 1.20.1 (Forge)</p>
+        <a href="#" class="modpack-link">Скачать ModPack (Google Диск)</a>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
-            authDomain: "omega-5de05.firebaseapp.com",
-            projectId: "omega-5de05",
-            storageBucket: "omega-5de05.firebasestorage.app",
-            messagingSenderId: "438319801454",
-            appId: "1:438319801454:web:775924ab8ef4417760b27f",
-            measurementId: "G-L4YK90EMXZ"
-        };
+    <div class="card">
+        <h3>Лор проекта</h3>
+        <p>Мир Этерион погрузился в хаос после Падения Небесного Камня. Королевства борются за осколки древней магии, а гильдии искателей отправляются в забытые земли в поисках истины. Ваша история начинается здесь.</p>
+    </div>
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    <div class="card">
+        <h3>Сообщество</h3>
+        <div class="links-grid">
+            <a href="https://discord.gg/hyJUUckQMh" class="link-item" target="_blank">Discord</a>
+            <a href="https://t.me/Omega1RolePlay" class="link-item" target="_blank">Telegram</a>
+            <a href="character.html" class="link-item">Создать персонажа</a>
+        </div>
+    </div>
+</div>
 
-        const displayNick = document.getElementById('display-nick');
-        const logoutBtn = document.getElementById('logout-btn');
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
-            }
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-            let nickname = "Игрок";
-            // Пытаемся получить ник из Firestore профиля
-            const profileRef = doc(db, "profiles", user.uid);
-            const profileSnap = await getDoc(profileRef);
-            if (profileSnap.exists()) {
-                nickname = profileSnap.data().nickname || nickname;
-            } else {
-                // Если профиль не найден, пытаемся извлечь ник из email
-                const email = user.email || "";
-                const match = email.match(/^user_(.+)@rp\.local$/i);
-                if (match) {
-                    nickname = match[1];
-                }
-            }
-            displayNick.textContent = nickname;
-        });
+    const displayNick = document.getElementById('display-nick');
+    const logoutBtn = document.getElementById('logout-btn');
 
-        logoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
             window.location.href = 'index.html';
-        });
+            return;
+        }
+        const profileRef = doc(db, "profiles", user.uid);
+        const profileSnap = await getDoc(profileRef);
+        if (profileSnap.exists()) {
+            displayNick.textContent = profileSnap.data().nickname;
+        } else {
+            displayNick.textContent = "Игрок";
+        }
+    });
 
-        window.copyIP = function() {
-            const ip = document.querySelector('.ip-text').textContent;
-            navigator.clipboard.writeText(ip).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                btn.textContent = 'Скопировано!';
-                setTimeout(() => btn.textContent = 'Копировать', 1500);
-            });
-        };
-    </script>
+    logoutBtn.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'index.html';
+    });
+
+    window.copyIP = function() {
+        const ip = document.querySelector('.ip-text').textContent;
+        navigator.clipboard.writeText(ip).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Скопировано';
+            setTimeout(() => btn.textContent = 'Копировать', 1500);
+        });
+    };
+</script>
 </body>
 </html>
