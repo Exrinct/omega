@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RP Server — Вход</title>
+    <title>RP Server — Вход (отладка)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: #121212;
             color: #b0b0b0;
             display: flex;
@@ -18,7 +17,6 @@
             min-height: 100vh;
             padding: 2rem;
         }
-
         .card {
             background: #1c1c1c;
             border: 1px solid #2c2c2c;
@@ -26,60 +24,15 @@
             padding: 3rem 2.5rem;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
         }
-
-        .tabs {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #2c2c2c;
-            padding-bottom: 0.8rem;
-        }
-
-        .tab {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #707070;
-            cursor: pointer;
-            padding-bottom: 0.8rem;
-            margin-bottom: -0.8rem;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab.active {
-            color: #e0e0e0;
-            border-bottom-color: #3b6e4f;
-        }
-
-        .form {
-            display: none;
-        }
-
-        .form.active {
-            display: block;
-        }
-
-        h2 {
-            font-size: 1.6rem;
-            font-weight: 500;
-            color: #e0e0e0;
-            margin-bottom: 1.5rem;
-        }
-
-        .field {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #909090;
-            margin-bottom: 0.4rem;
-        }
-
+        .tabs { display: flex; gap: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid #2c2c2c; padding-bottom: 0.8rem; }
+        .tab { font-size: 0.9rem; font-weight: 500; color: #707070; cursor: pointer; padding-bottom: 0.8rem; margin-bottom: -0.8rem; border-bottom: 2px solid transparent; }
+        .tab.active { color: #e0e0e0; border-bottom-color: #3b6e4f; }
+        .form { display: none; }
+        .form.active { display: block; }
+        h2 { font-size: 1.6rem; font-weight: 500; color: #e0e0e0; margin-bottom: 1.5rem; }
+        .field { margin-bottom: 1.5rem; }
+        label { display: block; font-size: 0.8rem; font-weight: 500; color: #909090; margin-bottom: 0.4rem; }
         input {
             width: 100%;
             background: #242424;
@@ -89,22 +42,10 @@
             font-size: 0.95rem;
             color: #d4d4d4;
             font-family: inherit;
-            transition: all 0.2s;
             outline: none;
         }
-
-        input:focus {
-            border-color: #3b6e4f;
-            box-shadow: 0 0 0 3px rgba(59,110,79,0.15);
-        }
-
-        .error {
-            color: #d9706a;
-            font-size: 0.75rem;
-            margin-top: 0.4rem;
-            display: none;
-        }
-
+        input:focus { border-color: #3b6e4f; box-shadow: 0 0 0 3px rgba(59,110,79,0.15); }
+        .error { color: #d9706a; font-size: 0.75rem; margin-top: 0.4rem; display: none; }
         button {
             width: 100%;
             background: #2d5a27;
@@ -115,15 +56,9 @@
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
             margin-top: 0.8rem;
-            font-family: inherit;
         }
-
         button:hover { background: #3a6e34; }
-        button:active { transform: scale(0.98); }
-        button:disabled { background: #444; cursor: not-allowed; }
-
         .captcha-block {
             background: #242424;
             border-radius: 12px;
@@ -133,258 +68,188 @@
             align-items: center;
             gap: 1rem;
         }
-
-        .captcha-question {
-            font-size: 1rem;
-            color: #d4d4d4;
-            white-space: nowrap;
-        }
-
-        .captcha-input {
-            width: 70px;
-            padding: 0.5rem;
-            font-size: 1rem;
-            text-align: center;
-        }
+        .captcha-input { width: 70px; padding: 0.5rem; text-align: center; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="tabs">
-            <div class="tab active" data-tab="login">Вход</div>
-            <div class="tab" data-tab="register">Регистрация</div>
-        </div>
-
-        <!-- Форма входа -->
-        <div class="form active" id="login-form">
-            <h2>Войти</h2>
-            <div class="field">
-                <label for="login-nick">Ник в Minecraft</label>
-                <input type="text" id="login-nick" placeholder="Введите ник">
-                <div class="error" id="login-nick-error">Пользователь не найден</div>
-            </div>
-            <div class="field">
-                <label for="login-pass">Пароль</label>
-                <input type="password" id="login-pass" placeholder="Введите пароль">
-                <div class="error" id="login-pass-error">Неверный пароль</div>
-            </div>
-            <button id="login-btn">Войти</button>
-        </div>
-
-        <!-- Форма регистрации -->
-        <div class="form" id="register-form">
-            <h2>Регистрация</h2>
-            <div class="field">
-                <label for="reg-nick">Ник в Minecraft</label>
-                <input type="text" id="reg-nick" placeholder="Придумайте ник">
-                <div class="error" id="reg-nick-error">Ник уже занят</div>
-            </div>
-            <div class="field">
-                <label for="reg-pass">Пароль (мин. 8 символов)</label>
-                <input type="password" id="reg-pass" placeholder="Минимум 8 символов">
-                <div class="error" id="reg-pass-error">Пароль слишком короткий</div>
-            </div>
-
-            <!-- Капча -->
-            <div class="captcha-block">
-                <span class="captcha-question" id="captcha-question"></span>
-                <input type="text" class="captcha-input" id="captcha-answer" placeholder="Ответ" maxlength="3">
-            </div>
-            <div class="error" id="captcha-error">Неверный ответ</div>
-
-            <button id="register-btn">Зарегистрироваться</button>
-        </div>
+<div class="card">
+    <div class="tabs">
+        <div class="tab active" data-tab="login">Вход</div>
+        <div class="tab" data-tab="register">Регистрация</div>
     </div>
+    <div class="form active" id="login-form">
+        <h2>Войти</h2>
+        <div class="field">
+            <label for="login-nick">Ник в Minecraft</label>
+            <input type="text" id="login-nick" placeholder="Введите ник">
+            <div class="error" id="login-nick-error">Пользователь не найден</div>
+        </div>
+        <div class="field">
+            <label for="login-pass">Пароль</label>
+            <input type="password" id="login-pass" placeholder="Введите пароль">
+            <div class="error" id="login-pass-error">Неверный пароль</div>
+        </div>
+        <button id="login-btn">Войти</button>
+    </div>
+    <div class="form" id="register-form">
+        <h2>Регистрация</h2>
+        <div class="field">
+            <label for="reg-nick">Ник в Minecraft</label>
+            <input type="text" id="reg-nick" placeholder="Придумайте ник">
+            <div class="error" id="reg-nick-error">Ник уже занят</div>
+        </div>
+        <div class="field">
+            <label for="reg-pass">Пароль (мин. 8 символов)</label>
+            <input type="password" id="reg-pass" placeholder="Минимум 8 символов">
+            <div class="error" id="reg-pass-error">Пароль слишком короткий</div>
+        </div>
+        <div class="captcha-block">
+            <span id="captcha-question"></span>
+            <input type="text" class="captcha-input" id="captcha-answer" placeholder="?">
+        </div>
+        <div class="error" id="captcha-error">Неверный ответ</div>
+        <button id="register-btn">Зарегистрироваться</button>
+    </div>
+</div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {
-            getAuth,
-            signInWithEmailAndPassword,
-            createUserWithEmailAndPassword,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            setDoc,
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
-            authDomain: "omega-5de05.firebaseapp.com",
-            projectId: "omega-5de05",
-            storageBucket: "omega-5de05.firebasestorage.app",
-            messagingSenderId: "438319801454",
-            appId: "1:438319801454:web:775924ab8ef4417760b27f",
-            measurementId: "G-L4YK90EMXZ"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    let captchaNum1, captchaNum2;
+    function generateCaptcha() {
+        captchaNum1 = Math.floor(Math.random() * 10) + 1;
+        captchaNum2 = Math.floor(Math.random() * 10) + 1;
+        document.getElementById('captcha-question').textContent = `${captchaNum1} + ${captchaNum2} = ?`;
+        document.getElementById('captcha-answer').value = '';
+    }
+    generateCaptcha();
 
-        // --- Капча ---
-        let captchaNum1, captchaNum2;
-        function generateCaptcha() {
-            captchaNum1 = Math.floor(Math.random() * 10) + 1;
-            captchaNum2 = Math.floor(Math.random() * 10) + 1;
-            document.getElementById('captcha-question').textContent = `${captchaNum1} + ${captchaNum2} = ?`;
-            document.getElementById('captcha-answer').value = '';
-            document.getElementById('captcha-error').style.display = 'none';
-        }
-        generateCaptcha();
-
-        // --- UI переключение вкладок ---
-        const tabs = document.querySelectorAll('.tab');
-        const forms = document.querySelectorAll('.form');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                const target = tab.dataset.tab;
-                forms.forEach(f => f.classList.remove('active'));
-                document.getElementById(target === 'login' ? 'login-form' : 'register-form').classList.add('active');
-            });
+    // переключение вкладок
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.dataset.tab;
+            document.getElementById('login-form').classList.toggle('active', target === 'login');
+            document.getElementById('register-form').classList.toggle('active', target === 'register');
         });
+    });
 
-        // Скрытие ошибок при вводе
-        document.getElementById('login-nick').addEventListener('input', () => {
-            document.getElementById('login-nick-error').style.display = 'none';
-        });
-        document.getElementById('login-pass').addEventListener('input', () => {
-            document.getElementById('login-pass-error').style.display = 'none';
-        });
-        document.getElementById('reg-nick').addEventListener('input', () => {
-            document.getElementById('reg-nick-error').style.display = 'none';
-        });
-        document.getElementById('reg-pass').addEventListener('input', () => {
-            document.getElementById('reg-pass-error').style.display = 'none';
-        });
+    // ВХОД С ОТЛАДКОЙ
+    document.getElementById('login-btn').addEventListener('click', async () => {
+        const nick = document.getElementById('login-nick').value.trim();
+        const pass = document.getElementById('login-pass').value;
+        const nickErr = document.getElementById('login-nick-error');
+        const passErr = document.getElementById('login-pass-error');
+        nickErr.style.display = 'none';
+        passErr.style.display = 'none';
 
-        // --- Вход ---
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            const nick = document.getElementById('login-nick').value.trim();
-            const pass = document.getElementById('login-pass').value;
-            const nickErr = document.getElementById('login-nick-error');
-            const passErr = document.getElementById('login-pass-error');
-            nickErr.style.display = 'none';
-            passErr.style.display = 'none';
+        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
 
-            if (!nick) {
-                nickErr.textContent = 'Введите ник';
+        console.log("🔍 Ищем ник:", nick.toLowerCase());
+
+        try {
+            const nickDocRef = doc(db, "nicknames", nick.toLowerCase());
+            const nickDocSnap = await getDoc(nickDocRef);
+            console.log("📄 Документ nicknames существует?", nickDocSnap.exists());
+
+            if (!nickDocSnap.exists()) {
+                nickErr.textContent = 'Пользователь не найден (нет в nicknames)';
                 nickErr.style.display = 'block';
                 return;
             }
 
-            try {
-                const nickDocRef = doc(db, "nicknames", nick.toLowerCase());
-                const nickDocSnap = await getDoc(nickDocRef);
+            const ownerUid = nickDocSnap.data().ownerUid;
+            console.log("🆔 ownerUid:", ownerUid);
 
-                if (!nickDocSnap.exists()) {
-                    nickErr.textContent = 'Пользователь не найден';
-                    nickErr.style.display = 'block';
-                    return;
-                }
+            const profileRef = doc(db, "profiles", ownerUid);
+            const profileSnap = await getDoc(profileRef);
+            console.log("📄 Профиль существует?", profileSnap.exists());
 
-                const ownerUid = nickDocSnap.data().ownerUid;
-                const profileRef = doc(db, "profiles", ownerUid);
-                const profileSnap = await getDoc(profileRef);
-                if (!profileSnap.exists()) {
-                    nickErr.textContent = 'Ошибка профиля';
-                    nickErr.style.display = 'block';
-                    return;
-                }
-                const email = profileSnap.data().email;
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (error) {
-                if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials') {
-                    passErr.style.display = 'block';
-                } else {
-                    nickErr.textContent = 'Ошибка входа: ' + error.message;
-                    nickErr.style.display = 'block';
-                }
-            }
-        });
-
-        // --- Регистрация ---
-        document.getElementById('register-btn').addEventListener('click', async () => {
-            const nick = document.getElementById('reg-nick').value.trim();
-            const pass = document.getElementById('reg-pass').value;
-            const captchaAnswer = document.getElementById('captcha-answer').value.trim();
-            const nickErr = document.getElementById('reg-nick-error');
-            const passErr = document.getElementById('reg-pass-error');
-            const captchaErr = document.getElementById('captcha-error');
-
-            nickErr.style.display = 'none';
-            passErr.style.display = 'none';
-            captchaErr.style.display = 'none';
-
-            // Валидация капчи
-            if (parseInt(captchaAnswer) !== captchaNum1 + captchaNum2) {
-                captchaErr.style.display = 'block';
-                generateCaptcha();
-                return;
-            }
-
-            if (!nick) {
-                nickErr.textContent = 'Введите ник';
+            if (!profileSnap.exists()) {
+                nickErr.textContent = 'Ошибка: профиль не найден';
                 nickErr.style.display = 'block';
                 return;
             }
-            if (pass.length < 8) {
+
+            const email = profileSnap.data().email;
+            console.log("📧 Email для входа:", email);
+
+            await signInWithEmailAndPassword(auth, email, pass);
+            console.log("✅ Вход успешен!");
+        } catch (error) {
+            console.error("❌ Ошибка входа:", error);
+            if (error.code === 'auth/wrong-password') {
                 passErr.style.display = 'block';
-                return;
-            }
-
-            const registerBtn = document.getElementById('register-btn');
-            registerBtn.disabled = true;
-            registerBtn.textContent = 'Проверка...';
-
-            try {
-                const nickDocRef = doc(db, "nicknames", nick.toLowerCase());
-                const nickDocSnap = await getDoc(nickDocRef);
-                if (nickDocSnap.exists()) {
-                    nickErr.textContent = 'Ник уже занят';
-                    nickErr.style.display = 'block';
-                    registerBtn.disabled = false;
-                    registerBtn.textContent = 'Зарегистрироваться';
-                    generateCaptcha();
-                    return;
-                }
-
-                const email = `user_${nick.toLowerCase()}@rp.local`;
-                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                const uid = userCredential.user.uid;
-
-                await setDoc(doc(db, "profiles", uid), {
-                    nickname: nick,
-                    email: email,
-                    createdAt: new Date()
-                });
-
-                await setDoc(doc(db, "nicknames", nick.toLowerCase()), {
-                    ownerUid: uid
-                });
-
-                // После успешной регистрации редирект произойдет через onAuthStateChanged
-            } catch (error) {
+            } else {
                 nickErr.textContent = 'Ошибка: ' + error.message;
                 nickErr.style.display = 'block';
-                registerBtn.disabled = false;
-                registerBtn.textContent = 'Зарегистрироваться';
-                generateCaptcha();
             }
-        });
+        }
+    });
 
-        // Перенаправление при авторизации
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                window.location.href = 'server.html';
+    // РЕГИСТРАЦИЯ (без изменений, но оставим)
+    document.getElementById('register-btn').addEventListener('click', async () => {
+        const nick = document.getElementById('reg-nick').value.trim();
+        const pass = document.getElementById('reg-pass').value;
+        const answer = document.getElementById('captcha-answer').value.trim();
+        const nickErr = document.getElementById('reg-nick-error');
+        const passErr = document.getElementById('reg-pass-error');
+        const captchaErr = document.getElementById('captcha-error');
+        nickErr.style.display = 'none';
+        passErr.style.display = 'none';
+        captchaErr.style.display = 'none';
+
+        if (parseInt(answer) !== captchaNum1 + captchaNum2) {
+            captchaErr.style.display = 'block';
+            generateCaptcha();
+            return;
+        }
+        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
+        if (pass.length < 8) { passErr.style.display = 'block'; return; }
+
+        const btn = document.getElementById('register-btn');
+        btn.disabled = true;
+        btn.textContent = 'Проверка...';
+
+        try {
+            const nickDocRef = doc(db, "nicknames", nick.toLowerCase());
+            if ((await getDoc(nickDocRef)).exists()) {
+                nickErr.textContent = 'Ник уже занят';
+                nickErr.style.display = 'block';
+                btn.disabled = false; btn.textContent = 'Зарегистрироваться';
+                generateCaptcha();
+                return;
             }
-        });
-    </script>
+            const email = `user_${nick.toLowerCase()}@rp.local`;
+            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            const uid = userCredential.user.uid;
+            await setDoc(doc(db, "profiles", uid), { nickname: nick, email, createdAt: new Date() });
+            await setDoc(doc(db, "nicknames", nick.toLowerCase()), { ownerUid: uid });
+            console.log("✅ Регистрация успешна!");
+        } catch (error) {
+            nickErr.textContent = 'Ошибка: ' + error.message;
+            nickErr.style.display = 'block';
+            btn.disabled = false; btn.textContent = 'Зарегистрироваться';
+            generateCaptcha();
+        }
+    });
+
+    onAuthStateChanged(auth, (user) => { if (user) window.location.href = 'server.html'; });
+</script>
 </body>
 </html>
