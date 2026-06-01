@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RP Server — Вход (исправлен)</title>
+    <title>RP Server — Вход</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -155,9 +155,7 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // ------------------------------------------------------------------
-    // НОВЫЙ ВХОД: ищем пользователя в коллекции "profiles" по полю "nickname"
-    // ------------------------------------------------------------------
+    // --- Вход (ПРОСТОЙ): формируем email из ника и пробуем войти ---
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -167,38 +165,21 @@
         passErr.style.display = 'none';
 
         if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
+        if (!pass) { passErr.textContent = 'Введите пароль'; passErr.style.display = 'block'; return; }
 
-        console.log("🔍 Ищем ник в profiles:", nick);
+        const email = `user_${nick.toLowerCase()}@rp.local`;
+        console.log("Попытка входа с email:", email);
 
         try {
-            // Поиск документа в коллекции profiles, где nickname равно введённому (без учёта регистра – используем lower case)
-            const profilesRef = collection(db, "profiles");
-            const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                // Возможно, старый пользователь, у которого нет поля nickname_lower – попробуем найти по nickname напрямую (чувствительно к регистру)
-                const q2 = query(profilesRef, where("nickname", "==", nick));
-                const snap2 = await getDocs(q2);
-                if (snap2.empty) {
-                    nickErr.textContent = 'Пользователь не найден';
-                    nickErr.style.display = 'block';
-                    return;
-                }
-                var profileDoc = snap2.docs[0];
-            } else {
-                var profileDoc = querySnapshot.docs[0];
-            }
-
-            const userData = profileDoc.data();
-            const email = userData.email;
-            console.log("📧 Найден email:", email);
-
             await signInWithEmailAndPassword(auth, email, pass);
-            console.log("✅ Вход выполнен");
+            console.log("Вход успешен");
         } catch (error) {
-            console.error("❌ Ошибка входа:", error);
-            if (error.code === 'auth/wrong-password') {
+            console.error("Ошибка входа:", error);
+            if (error.code === 'auth/user-not-found') {
+                nickErr.textContent = 'Пользователь с таким ником не найден. Зарегистрируйтесь.';
+                nickErr.style.display = 'block';
+            } else if (error.code === 'auth/wrong-password') {
+                passErr.textContent = 'Неверный пароль';
                 passErr.style.display = 'block';
             } else {
                 nickErr.textContent = error.message;
@@ -207,9 +188,7 @@
         }
     });
 
-    // ------------------------------------------------------------------
-    // РЕГИСТРАЦИЯ: проверка уникальности через profiles, запись с полем nickname_lower
-    // ------------------------------------------------------------------
+    // --- Регистрация: проверяем уникальность ника в Firestore (коллекция profiles) ---
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -234,7 +213,7 @@
         btn.textContent = 'Проверка...';
 
         try {
-            // Проверяем, нет ли уже такого ника (регистронезависимо)
+            // Проверяем, не занят ли ник (смотрим в profiles)
             const profilesRef = collection(db, "profiles");
             const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
             const existing = await getDocs(q);
@@ -251,7 +230,7 @@
             const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
             const uid = userCredential.user.uid;
 
-            // Сохраняем профиль с полем nickname_lower для быстрого поиска
+            // Сохраняем профиль в Firestore
             await setDoc(doc(db, "profiles", uid), {
                 nickname: nick,
                 nickname_lower: nick.toLowerCase(),
@@ -259,10 +238,14 @@
                 createdAt: new Date()
             });
 
-            console.log("✅ Регистрация успешна, профиль создан");
+            console.log("Регистрация успешна");
         } catch (error) {
-            console.error("❌ Ошибка регистрации:", error);
-            nickErr.textContent = error.message;
+            console.error("Ошибка регистрации:", error);
+            if (error.code === 'auth/email-already-in-use') {
+                nickErr.textContent = 'Этот ник уже используется (аккаунт существует)';
+            } else {
+                nickErr.textContent = error.message;
+            }
             nickErr.style.display = 'block';
             btn.disabled = false;
             btn.textContent = 'Зарегистрироваться';
@@ -270,9 +253,7 @@
         }
     });
 
-    // ------------------------------------------------------------------
-    // Вход через Google
-    // ------------------------------------------------------------------
+    // --- Вход через Google (оставляем как было, но тоже упростим) ---
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
@@ -288,7 +269,7 @@
                 }
                 nickname = nickname.trim();
 
-                // Проверка уникальности через nickname_lower
+                // Проверка уникальности
                 const profilesRef = collection(db, "profiles");
                 const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
                 const existing = await getDocs(q);
