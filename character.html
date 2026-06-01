@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание персонажа — RP Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #121212;
+            color: #c0c0c0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .card {
+            background: #1c1c1c;
+            border: 1px solid #2c2c2c;
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+        }
+
+        h1 {
+            font-weight: 500;
+            font-size: 1.8rem;
+            color: #e0e0e0;
+            margin-bottom: 1rem;
+        }
+
+        .accent { color: #3b6e4f; }
+
+        p {
+            margin: 1rem 0 2rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #2d5a27;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 12px;
+            padding: 0.95rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: inherit;
+            margin-bottom: 2rem;
+        }
+
+        .btn:hover { background: #3a6e34; }
+        .btn:active { transform: scale(0.98); }
+
+        .back-link {
+            color: #909090;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid #333;
+            padding: 0.6rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .back-link:hover { border-color: #3b6e4f; color: #d4d4d4; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Создание персонажа<span class="accent">.</span></h1>
+        <p>Чтобы присоединиться к миру Этерион, необходимо заполнить анкету персонажа. Опишите его историю, характер и имя.</p>
+        <a href="https://forms.gle/C9xFskgkDuPWiNMW6" target="_blank" class="btn">Заполнить анкету</a>
+        <br>
+        <a href="server.html" class="back-link">← Назад в панель</a>
+    </div>
+</body>
+</html>
