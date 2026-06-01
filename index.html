@@ -7,69 +7,129 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: #121212;
-            color: #b0b0b0;
+            background: #0a0a0a;
+            background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 2rem;
+            position: relative;
         }
-        .card {
-            background: #1c1c1c;
-            border: 1px solid #2c2c2c;
-            border-radius: 20px;
-            padding: 2.5rem;
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 420px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 0;
         }
-        h1 { font-size: 1.8rem; font-weight: 500; margin-bottom: 1.5rem; text-align: center; }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(4px);
+            border: 1px solid #2c2c2c;
+            border-radius: 24px;
+            padding: 2rem 2rem;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+        }
+
+        .logo-img {
+            display: block;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin: 0 auto 1rem auto;
+            border: 1px solid #3b6e4f;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: -0.3px;
+        }
         .accent { color: #3b6e4f; }
+
         .google-btn {
             width: 100%;
             background: #2c2c2c;
             border: 1px solid #3b6e4f;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 0.8rem;
             font-size: 1rem;
             font-weight: 500;
             color: #e0e0e0;
             cursor: pointer;
             margin-bottom: 1.5rem;
+            transition: background 0.2s;
         }
         .google-btn:hover { background: #3b6e4f20; }
-        .divider { text-align: center; font-size: 0.75rem; color: #707070; margin: 1rem 0; }
+
+        .divider {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #909090;
+            margin: 1rem 0;
+        }
+
         .field { margin-bottom: 1.2rem; }
-        label { display: block; font-size: 0.8rem; font-weight: 500; color: #909090; margin-bottom: 0.4rem; }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #c0c0c0;
+            margin-bottom: 0.4rem;
+        }
         input {
             width: 100%;
-            background: #242424;
+            background: #1e1e1e;
             border: 1px solid #333;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 0.8rem 1rem;
             font-size: 0.95rem;
-            color: #d4d4d4;
+            color: #f0f0f0;
             outline: none;
         }
         input:focus { border-color: #3b6e4f; }
-        .error { color: #d9706a; font-size: 0.75rem; margin-top: 0.4rem; display: none; }
+        .error {
+            color: #e06c6c;
+            font-size: 0.7rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
         button[type="submit"], .reg-btn {
             width: 100%;
             background: #2d5a27;
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 0.8rem;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
         }
         button[type="submit"]:hover, .reg-btn:hover { background: #3a6e34; }
+
         .captcha-block {
-            background: #242424;
-            border-radius: 12px;
+            background: #1e1e1e;
+            border-radius: 14px;
             padding: 0.8rem;
             margin: 1rem 0;
             display: flex;
@@ -77,13 +137,21 @@
             gap: 1rem;
         }
         .captcha-input { width: 70px; padding: 0.5rem; text-align: center; }
+
+        .register-link {
+            color: #3b6e4f;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .register-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 <div class="card">
+    <img class="logo-img" src="https://i.imgur.com/8L0UQ7R.png" alt="RP Logo" onerror="this.src='https://placehold.co/80x80?text=RP'">
     <h1>RP Server<span class="accent">.</span></h1>
 
-    <button id="google-login" class="google-btn">🔐 Войти через Google</button>
+    <button id="google-login" class="google-btn">Войти через Google</button>
 
     <div class="divider">или по паролю</div>
 
@@ -101,7 +169,7 @@
         <button type="submit" id="login-btn">Войти</button>
     </div>
 
-    <div class="divider">Нет аккаунта? <span id="show-register" style="color:#3b6e4f; cursor:pointer;">Зарегистрироваться</span></div>
+    <div class="divider">Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span></div>
 
     <div id="register-block" style="display:none; margin-top:1.5rem;">
         <div class="field">
@@ -155,7 +223,7 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // --- Вход (ПРОСТОЙ): формируем email из ника и пробуем войти ---
+    // Вход
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -168,15 +236,11 @@
         if (!pass) { passErr.textContent = 'Введите пароль'; passErr.style.display = 'block'; return; }
 
         const email = `user_${nick.toLowerCase()}@rp.local`;
-        console.log("Попытка входа с email:", email);
-
         try {
             await signInWithEmailAndPassword(auth, email, pass);
-            console.log("Вход успешен");
         } catch (error) {
-            console.error("Ошибка входа:", error);
             if (error.code === 'auth/user-not-found') {
-                nickErr.textContent = 'Пользователь с таким ником не найден. Зарегистрируйтесь.';
+                nickErr.textContent = 'Пользователь не найден. Зарегистрируйтесь.';
                 nickErr.style.display = 'block';
             } else if (error.code === 'auth/wrong-password') {
                 passErr.textContent = 'Неверный пароль';
@@ -188,7 +252,7 @@
         }
     });
 
-    // --- Регистрация: проверяем уникальность ника в Firestore (коллекция profiles) ---
+    // Регистрация
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -213,7 +277,6 @@
         btn.textContent = 'Проверка...';
 
         try {
-            // Проверяем, не занят ли ник (смотрим в profiles)
             const profilesRef = collection(db, "profiles");
             const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
             const existing = await getDocs(q);
@@ -230,7 +293,6 @@
             const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
             const uid = userCredential.user.uid;
 
-            // Сохраняем профиль в Firestore
             await setDoc(doc(db, "profiles", uid), {
                 nickname: nick,
                 nickname_lower: nick.toLowerCase(),
@@ -238,14 +300,8 @@
                 createdAt: new Date()
             });
 
-            console.log("Регистрация успешна");
         } catch (error) {
-            console.error("Ошибка регистрации:", error);
-            if (error.code === 'auth/email-already-in-use') {
-                nickErr.textContent = 'Этот ник уже используется (аккаунт существует)';
-            } else {
-                nickErr.textContent = error.message;
-            }
+            nickErr.textContent = error.message;
             nickErr.style.display = 'block';
             btn.disabled = false;
             btn.textContent = 'Зарегистрироваться';
@@ -253,12 +309,11 @@
         }
     });
 
-    // --- Вход через Google (оставляем как было, но тоже упростим) ---
+    // Google
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
-            const email = user.email;
             const profileRef = doc(db, "profiles", user.uid);
             const profileSnap = await getDoc(profileRef);
 
@@ -269,7 +324,6 @@
                 }
                 nickname = nickname.trim();
 
-                // Проверка уникальности
                 const profilesRef = collection(db, "profiles");
                 const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
                 const existing = await getDocs(q);
@@ -282,13 +336,12 @@
                 await setDoc(doc(db, "profiles", user.uid), {
                     nickname: nickname,
                     nickname_lower: nickname.toLowerCase(),
-                    email: email,
+                    email: user.email,
                     createdAt: new Date()
                 });
-                alert("Аккаунт создан! Добро пожаловать, " + nickname);
+                alert("Аккаунт создан. Добро пожаловать, " + nickname);
             }
         } catch (error) {
-            console.error("Google login error:", error);
             alert("Ошибка входа через Google: " + error.message);
         }
     });
