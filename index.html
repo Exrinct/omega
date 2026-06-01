@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RP Server — Вход</title>
+    <title>RP Server — Вход (исправлен)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,12 +25,7 @@
             width: 100%;
             max-width: 420px;
         }
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
+        h1 { font-size: 1.8rem; font-weight: 500; margin-bottom: 1.5rem; text-align: center; }
         .accent { color: #3b6e4f; }
         .google-btn {
             width: 100%;
@@ -43,26 +38,11 @@
             color: #e0e0e0;
             cursor: pointer;
             margin-bottom: 1.5rem;
-            transition: background 0.2s;
-            font-family: inherit;
         }
         .google-btn:hover { background: #3b6e4f20; }
-        .divider {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #707070;
-            margin: 1rem 0;
-        }
-        .field {
-            margin-bottom: 1.2rem;
-        }
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #909090;
-            margin-bottom: 0.4rem;
-        }
+        .divider { text-align: center; font-size: 0.75rem; color: #707070; margin: 1rem 0; }
+        .field { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 0.8rem; font-weight: 500; color: #909090; margin-bottom: 0.4rem; }
         input {
             width: 100%;
             background: #242424;
@@ -71,17 +51,11 @@
             padding: 0.8rem 1rem;
             font-size: 0.95rem;
             color: #d4d4d4;
-            font-family: inherit;
             outline: none;
         }
         input:focus { border-color: #3b6e4f; }
-        .error {
-            color: #d9706a;
-            font-size: 0.75rem;
-            margin-top: 0.4rem;
-            display: none;
-        }
-        button[type="submit"] {
+        .error { color: #d9706a; font-size: 0.75rem; margin-top: 0.4rem; display: none; }
+        button[type="submit"], .reg-btn {
             width: 100%;
             background: #2d5a27;
             color: white;
@@ -92,7 +66,7 @@
             font-weight: 500;
             cursor: pointer;
         }
-        button[type="submit"]:hover { background: #3a6e34; }
+        button[type="submit"]:hover, .reg-btn:hover { background: #3a6e34; }
         .captcha-block {
             background: #242424;
             border-radius: 12px;
@@ -102,6 +76,7 @@
             align-items: center;
             gap: 1rem;
         }
+        .captcha-input { width: 70px; padding: 0.5rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -128,7 +103,6 @@
 
     <div class="divider">Нет аккаунта? <span id="show-register" style="color:#3b6e4f; cursor:pointer;">Зарегистрироваться</span></div>
 
-    <!-- Скрытая форма регистрации -->
     <div id="register-block" style="display:none; margin-top:1.5rem;">
         <div class="field">
             <label>Ник в Minecraft</label>
@@ -142,17 +116,17 @@
         </div>
         <div class="captcha-block">
             <span id="captcha-question"></span>
-            <input type="text" id="captcha-answer" placeholder="?" style="width:60px;">
+            <input type="text" id="captcha-answer" class="captcha-input" placeholder="?">
         </div>
         <div class="error" id="captcha-error"></div>
-        <button id="register-btn">Зарегистрироваться</button>
+        <button id="register-btn" class="reg-btn">Зарегистрироваться</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -176,13 +150,14 @@
     }
     generateCaptcha();
 
-    // Показать форму регистрации
     document.getElementById('show-register').onclick = () => {
         const block = document.getElementById('register-block');
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // ---- Вход по паролю (без изменений) ----
+    // ------------------------------------------------------------------
+    // НОВЫЙ ВХОД: ищем пользователя в коллекции "profiles" по полю "nickname"
+    // ------------------------------------------------------------------
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -190,23 +165,51 @@
         const passErr = document.getElementById('pass-error');
         nickErr.style.display = 'none';
         passErr.style.display = 'none';
+
         if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
 
+        console.log("🔍 Ищем ник в profiles:", nick);
+
         try {
-            const nickDoc = await getDoc(doc(db, "nicknames", nick.toLowerCase()));
-            if (!nickDoc.exists()) { nickErr.textContent = 'Пользователь не найден'; nickErr.style.display = 'block'; return; }
-            const uid = nickDoc.data().ownerUid;
-            const profile = await getDoc(doc(db, "profiles", uid));
-            if (!profile.exists()) { nickErr.textContent = 'Ошибка профиля'; nickErr.style.display = 'block'; return; }
-            const email = profile.data().email;
+            // Поиск документа в коллекции profiles, где nickname равно введённому (без учёта регистра – используем lower case)
+            const profilesRef = collection(db, "profiles");
+            const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                // Возможно, старый пользователь, у которого нет поля nickname_lower – попробуем найти по nickname напрямую (чувствительно к регистру)
+                const q2 = query(profilesRef, where("nickname", "==", nick));
+                const snap2 = await getDocs(q2);
+                if (snap2.empty) {
+                    nickErr.textContent = 'Пользователь не найден';
+                    nickErr.style.display = 'block';
+                    return;
+                }
+                var profileDoc = snap2.docs[0];
+            } else {
+                var profileDoc = querySnapshot.docs[0];
+            }
+
+            const userData = profileDoc.data();
+            const email = userData.email;
+            console.log("📧 Найден email:", email);
+
             await signInWithEmailAndPassword(auth, email, pass);
-        } catch (err) {
-            if (err.code === 'auth/wrong-password') passErr.style.display = 'block';
-            else { nickErr.textContent = err.message; nickErr.style.display = 'block'; }
+            console.log("✅ Вход выполнен");
+        } catch (error) {
+            console.error("❌ Ошибка входа:", error);
+            if (error.code === 'auth/wrong-password') {
+                passErr.style.display = 'block';
+            } else {
+                nickErr.textContent = error.message;
+                nickErr.style.display = 'block';
+            }
         }
     });
 
-    // ---- Регистрация по паролю ----
+    // ------------------------------------------------------------------
+    // РЕГИСТРАЦИЯ: проверка уникальности через profiles, запись с полем nickname_lower
+    // ------------------------------------------------------------------
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -214,61 +217,95 @@
         const nickErr = document.getElementById('reg-nick-error');
         const passErr = document.getElementById('reg-pass-error');
         const captchaErr = document.getElementById('captcha-error');
-        nickErr.style.display = 'none'; passErr.style.display = 'none'; captchaErr.style.display = 'none';
+        nickErr.style.display = 'none';
+        passErr.style.display = 'none';
+        captchaErr.style.display = 'none';
 
-        if (parseInt(answer) !== captchaNum1 + captchaNum2) { captchaErr.style.display = 'block'; generateCaptcha(); return; }
+        if (parseInt(answer) !== captchaNum1 + captchaNum2) {
+            captchaErr.style.display = 'block';
+            generateCaptcha();
+            return;
+        }
         if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
         if (pass.length < 8) { passErr.style.display = 'block'; return; }
 
         const btn = document.getElementById('register-btn');
-        btn.disabled = true; btn.textContent = 'Проверка...';
+        btn.disabled = true;
+        btn.textContent = 'Проверка...';
+
         try {
-            const nickDoc = await getDoc(doc(db, "nicknames", nick.toLowerCase()));
-            if (nickDoc.exists()) { nickErr.textContent = 'Ник уже занят'; nickErr.style.display = 'block'; btn.disabled = false; btn.textContent = 'Зарегистрироваться'; generateCaptcha(); return; }
+            // Проверяем, нет ли уже такого ника (регистронезависимо)
+            const profilesRef = collection(db, "profiles");
+            const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
+            const existing = await getDocs(q);
+            if (!existing.empty) {
+                nickErr.textContent = 'Ник уже занят';
+                nickErr.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Зарегистрироваться';
+                generateCaptcha();
+                return;
+            }
+
             const email = `user_${nick.toLowerCase()}@rp.local`;
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            await setDoc(doc(db, "profiles", cred.user.uid), { nickname: nick, email, createdAt: new Date() });
-            await setDoc(doc(db, "nicknames", nick.toLowerCase()), { ownerUid: cred.user.uid });
-        } catch (err) {
-            nickErr.textContent = err.message; nickErr.style.display = 'block';
-            btn.disabled = false; btn.textContent = 'Зарегистрироваться'; generateCaptcha();
+            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            const uid = userCredential.user.uid;
+
+            // Сохраняем профиль с полем nickname_lower для быстрого поиска
+            await setDoc(doc(db, "profiles", uid), {
+                nickname: nick,
+                nickname_lower: nick.toLowerCase(),
+                email: email,
+                createdAt: new Date()
+            });
+
+            console.log("✅ Регистрация успешна, профиль создан");
+        } catch (error) {
+            console.error("❌ Ошибка регистрации:", error);
+            nickErr.textContent = error.message;
+            nickErr.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Зарегистрироваться';
+            generateCaptcha();
         }
     });
 
-    // ---- Вход через Google ----
+    // ------------------------------------------------------------------
+    // Вход через Google
+    // ------------------------------------------------------------------
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             const email = user.email;
-            // Ищем профиль по email в коллекции profiles (поле email)
-            const profilesRef = doc(db, "profiles", user.uid);
-            const profileSnap = await getDoc(profilesRef);
+            const profileRef = doc(db, "profiles", user.uid);
+            const profileSnap = await getDoc(profileRef);
 
             if (!profileSnap.exists()) {
-                // Первый вход через Google — просим придумать ник
                 let nickname = prompt("Придумайте ник в Minecraft (только латиница и цифры, без пробелов)");
                 while (!nickname || nickname.trim() === "") {
                     nickname = prompt("Ник не может быть пустым. Придумайте ник:");
                 }
                 nickname = nickname.trim();
-                // Проверка уникальности ника
-                const nickDoc = await getDoc(doc(db, "nicknames", nickname.toLowerCase()));
-                if (nickDoc.exists()) {
+
+                // Проверка уникальности через nickname_lower
+                const profilesRef = collection(db, "profiles");
+                const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
+                const existing = await getDocs(q);
+                if (!existing.empty) {
                     alert("Этот ник уже занят. Попробуйте другой.");
                     await signOut(auth);
                     return;
                 }
-                // Сохраняем профиль
+
                 await setDoc(doc(db, "profiles", user.uid), {
                     nickname: nickname,
+                    nickname_lower: nickname.toLowerCase(),
                     email: email,
                     createdAt: new Date()
                 });
-                await setDoc(doc(db, "nicknames", nickname.toLowerCase()), { ownerUid: user.uid });
                 alert("Аккаунт создан! Добро пожаловать, " + nickname);
             }
-            // Если профиль уже есть — просто пускаем (редирект сделает onAuthStateChanged)
         } catch (error) {
             console.error("Google login error:", error);
             alert("Ошибка входа через Google: " + error.message);
