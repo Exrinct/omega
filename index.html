@@ -16,6 +16,18 @@
             align-items: center;
             min-height: 100vh;
             padding: 2rem;
+            position: relative;
+        }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: #3b6e4f;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+            z-index: 100;
         }
         .card {
             background: #121212;
@@ -104,6 +116,7 @@
     </style>
 </head>
 <body>
+<div class="version">v1.0.0</div>
 <div class="card">
     <h1>Твоя легенда рождается здесь.<br><span class="accent">Omega RolePlay</span></h1>
     <button id="google-login" class="google-btn">Войти через Google</button>
@@ -186,7 +199,6 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // Функция создания профиля в Firestore (общая для всех способов входа)
     async function createProfileIfNotExists(user, nickname) {
         const profileRef = doc(db, "profiles", user.uid);
         const profileSnap = await getDoc(profileRef);
@@ -200,7 +212,7 @@
         }
     }
 
-    // --- Вход по email/паролю (ник преобразуется в email) ---
+    // Вход по паролю
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -213,11 +225,9 @@
         const email = `user_${nick.toLowerCase()}@rp.local`;
         try {
             const userCred = await signInWithEmailAndPassword(auth, email, pass);
-            // Проверяем, есть ли профиль
             const profileRef = doc(db, "profiles", userCred.user.uid);
             const profileSnap = await getDoc(profileRef);
             if (!profileSnap.exists()) {
-                // Если профиля нет (старый аккаунт), создаём
                 await setDoc(profileRef, {
                     nickname: nick,
                     nickname_lower: nick.toLowerCase(),
@@ -238,7 +248,7 @@
         }
     });
 
-    // --- Регистрация по email/паролю ---
+    // Регистрация по паролю
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -261,9 +271,7 @@
         const btn = document.getElementById('register-btn');
         btn.disabled = true;
         btn.textContent = 'Проверка...';
-
         try {
-            // Проверка уникальности ника
             const profilesRef = collection(db, "profiles");
             const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
             const existing = await getDocs(q);
@@ -292,7 +300,7 @@
         }
     });
 
-    // --- Вход через Google с запросом ника ---
+    // Google вход
     let pendingGoogleUser = null;
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
@@ -300,11 +308,7 @@
             const user = result.user;
             const profileRef = doc(db, "profiles", user.uid);
             const profileSnap = await getDoc(profileRef);
-            if (profileSnap.exists()) {
-                // Уже есть профиль — пускаем
-                return;
-            }
-            // Новый пользователь — показываем модалку
+            if (profileSnap.exists()) return;
             pendingGoogleUser = user;
             const modal = document.getElementById('nickname-modal');
             const input = document.getElementById('modal-nick');
@@ -331,7 +335,6 @@
             errorSpan.style.display = 'block';
             return;
         }
-        // Проверка уникальности
         const profilesRef = collection(db, "profiles");
         const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
         const existing = await getDocs(q);
@@ -352,11 +355,9 @@
     });
 
     document.getElementById('modal-cancel').addEventListener('click', async () => {
-        if (pendingGoogleUser) {
-            await signOut(auth);
-            pendingGoogleUser = null;
-        }
+        if (pendingGoogleUser) await signOut(auth);
         document.getElementById('nickname-modal').style.display = 'none';
+        pendingGoogleUser = null;
     });
 
     onAuthStateChanged(auth, (user) => {
