@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omega RolePlay — Вход</title>
+    <title>Создание персонажа — Omega RolePlay</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
@@ -18,308 +17,56 @@
             min-height: 100vh;
             padding: 2rem;
         }
-
         .card {
             background: #121212;
             border: 1px solid #2c2c2c;
-            border-radius: 24px;
-            padding: 2rem 2rem;
+            border-radius: 28px;
+            padding: 2.5rem 2rem;
+            max-width: 500px;
             width: 100%;
-            max-width: 460px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
-        }
-
-        h1 {
-            font-size: 1.6rem;
-            font-weight: 500;
-            margin-bottom: 2rem;
             text-align: center;
-            line-height: 1.4;
-            letter-spacing: -0.3px;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
         }
         .accent { color: #3b6e4f; }
-
-        .google-btn {
-            width: 100%;
-            background: #2c2c2c;
-            border: 1px solid #3b6e4f;
-            border-radius: 14px;
-            padding: 0.8rem;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #e0e0e0;
-            cursor: pointer;
-            margin-bottom: 1.5rem;
-            transition: background 0.2s;
+        p {
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            color: #bbb;
         }
-        .google-btn:hover { background: #3b6e4f20; }
-
-        .divider {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #909090;
-            margin: 1rem 0;
-        }
-
-        .field { margin-bottom: 1.2rem; }
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #c0c0c0;
-            margin-bottom: 0.4rem;
-        }
-        input {
-            width: 100%;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 14px;
-            padding: 0.8rem 1rem;
-            font-size: 0.95rem;
-            color: #f0f0f0;
-            outline: none;
-        }
-        input:focus { border-color: #3b6e4f; }
-        .error {
-            color: #e06c6c;
-            font-size: 0.7rem;
-            margin-top: 0.4rem;
-            display: none;
-        }
-        button[type="submit"], .reg-btn {
-            width: 100%;
+        .btn {
+            display: inline-block;
             background: #2d5a27;
             color: white;
-            border: none;
-            border-radius: 14px;
-            padding: 0.8rem;
-            font-size: 1rem;
+            text-decoration: none;
+            border-radius: 40px;
+            padding: 0.9rem 2rem;
             font-weight: 500;
-            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: background 0.2s;
         }
-        button[type="submit"]:hover, .reg-btn:hover { background: #3a6e34; }
-
-        .captcha-block {
-            background: #1e1e1e;
-            border-radius: 14px;
-            padding: 0.8rem;
-            margin: 1rem 0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .btn:hover { background: #3a6e34; }
+        .back-link {
+            color: #909090;
+            text-decoration: none;
+            border: 1px solid #3b6e4f;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            transition: 0.2s;
         }
-        .captcha-input { width: 70px; padding: 0.5rem; text-align: center; }
-
-        .register-link {
-            color: #3b6e4f;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .register-link:hover { text-decoration: underline; }
+        .back-link:hover { background: #3b6e4f20; }
     </style>
 </head>
 <body>
 <div class="card">
-    <h1>Твоя легенда рождается здесь.<br><span class="accent">Omega RolePlay</span></h1>
-
-    <button id="google-login" class="google-btn">Войти через Google</button>
-
-    <div class="divider">или по паролю</div>
-
-    <div>
-        <div class="field">
-            <label>Ник в Minecraft</label>
-            <input type="text" id="login-nick" placeholder="Введите ник">
-            <div class="error" id="nick-error"></div>
-        </div>
-        <div class="field">
-            <label>Пароль</label>
-            <input type="password" id="login-pass" placeholder="Введите пароль">
-            <div class="error" id="pass-error"></div>
-        </div>
-        <button type="submit" id="login-btn">Войти</button>
-    </div>
-
-    <div class="divider">Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span></div>
-
-    <div id="register-block" style="display:none; margin-top:1.5rem;">
-        <div class="field">
-            <label>Ник в Minecraft</label>
-            <input type="text" id="reg-nick" placeholder="Придумайте ник">
-            <div class="error" id="reg-nick-error"></div>
-        </div>
-        <div class="field">
-            <label>Пароль (мин. 8 символов)</label>
-            <input type="password" id="reg-pass" placeholder="Минимум 8 символов">
-            <div class="error" id="reg-pass-error"></div>
-        </div>
-        <div class="captcha-block">
-            <span id="captcha-question"></span>
-            <input type="text" id="captcha-answer" class="captcha-input" placeholder="?">
-        </div>
-        <div class="error" id="captcha-error"></div>
-        <button id="register-btn" class="reg-btn">Зарегистрироваться</button>
-    </div>
+    <h1>Анкета персонажа<span class="accent">.</span></h1>
+    <p>Заполните Google-форму, чтобы создать историю вашего героя.</p>
+    <a href="https://forms.gle/C9xFskgkDuPWiNMW6" target="_blank" class="btn">Заполнить анкету</a>
+    <br>
+    <a href="server.html" class="back-link">Назад в панель</a>
 </div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
-        authDomain: "omega-5de05.firebaseapp.com",
-        projectId: "omega-5de05",
-        storageBucket: "omega-5de05.firebasestorage.app",
-        messagingSenderId: "438319801454",
-        appId: "1:438319801454:web:775924ab8ef4417760b27f"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    let captchaNum1, captchaNum2;
-    function generateCaptcha() {
-        captchaNum1 = Math.floor(Math.random() * 10) + 1;
-        captchaNum2 = Math.floor(Math.random() * 10) + 1;
-        document.getElementById('captcha-question').textContent = `${captchaNum1} + ${captchaNum2} = ?`;
-        document.getElementById('captcha-answer').value = '';
-    }
-    generateCaptcha();
-
-    document.getElementById('show-register').onclick = () => {
-        const block = document.getElementById('register-block');
-        block.style.display = block.style.display === 'none' ? 'block' : 'none';
-    };
-
-    // Вход
-    document.getElementById('login-btn').addEventListener('click', async () => {
-        const nick = document.getElementById('login-nick').value.trim();
-        const pass = document.getElementById('login-pass').value;
-        const nickErr = document.getElementById('nick-error');
-        const passErr = document.getElementById('pass-error');
-        nickErr.style.display = 'none';
-        passErr.style.display = 'none';
-
-        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
-        if (!pass) { passErr.textContent = 'Введите пароль'; passErr.style.display = 'block'; return; }
-
-        const email = `user_${nick.toLowerCase()}@rp.local`;
-        try {
-            await signInWithEmailAndPassword(auth, email, pass);
-        } catch (error) {
-            if (error.code === 'auth/user-not-found') {
-                nickErr.textContent = 'Пользователь не найден. Зарегистрируйтесь.';
-                nickErr.style.display = 'block';
-            } else if (error.code === 'auth/wrong-password') {
-                passErr.textContent = 'Неверный пароль';
-                passErr.style.display = 'block';
-            } else {
-                nickErr.textContent = error.message;
-                nickErr.style.display = 'block';
-            }
-        }
-    });
-
-    // Регистрация
-    document.getElementById('register-btn').addEventListener('click', async () => {
-        const nick = document.getElementById('reg-nick').value.trim();
-        const pass = document.getElementById('reg-pass').value;
-        const answer = document.getElementById('captcha-answer').value.trim();
-        const nickErr = document.getElementById('reg-nick-error');
-        const passErr = document.getElementById('reg-pass-error');
-        const captchaErr = document.getElementById('captcha-error');
-        nickErr.style.display = 'none';
-        passErr.style.display = 'none';
-        captchaErr.style.display = 'none';
-
-        if (parseInt(answer) !== captchaNum1 + captchaNum2) {
-            captchaErr.style.display = 'block';
-            generateCaptcha();
-            return;
-        }
-        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
-        if (pass.length < 8) { passErr.style.display = 'block'; return; }
-
-        const btn = document.getElementById('register-btn');
-        btn.disabled = true;
-        btn.textContent = 'Проверка...';
-
-        try {
-            const profilesRef = collection(db, "profiles");
-            const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
-            const existing = await getDocs(q);
-            if (!existing.empty) {
-                nickErr.textContent = 'Ник уже занят';
-                nickErr.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Зарегистрироваться';
-                generateCaptcha();
-                return;
-            }
-
-            const email = `user_${nick.toLowerCase()}@rp.local`;
-            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-            const uid = userCredential.user.uid;
-
-            await setDoc(doc(db, "profiles", uid), {
-                nickname: nick,
-                nickname_lower: nick.toLowerCase(),
-                email: email,
-                createdAt: new Date()
-            });
-
-        } catch (error) {
-            nickErr.textContent = error.message;
-            nickErr.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Зарегистрироваться';
-            generateCaptcha();
-        }
-    });
-
-    // Google
-    document.getElementById('google-login').addEventListener('click', async () => {
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            const profileRef = doc(db, "profiles", user.uid);
-            const profileSnap = await getDoc(profileRef);
-
-            if (!profileSnap.exists()) {
-                let nickname = prompt("Придумайте ник в Minecraft (только латиница и цифры, без пробелов)");
-                while (!nickname || nickname.trim() === "") {
-                    nickname = prompt("Ник не может быть пустым. Придумайте ник:");
-                }
-                nickname = nickname.trim();
-
-                const profilesRef = collection(db, "profiles");
-                const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
-                const existing = await getDocs(q);
-                if (!existing.empty) {
-                    alert("Этот ник уже занят. Попробуйте другой.");
-                    await signOut(auth);
-                    return;
-                }
-
-                await setDoc(doc(db, "profiles", user.uid), {
-                    nickname: nickname,
-                    nickname_lower: nickname.toLowerCase(),
-                    email: user.email,
-                    createdAt: new Date()
-                });
-                alert("Аккаунт создан. Добро пожаловать, " + nickname);
-            }
-        } catch (error) {
-            alert("Ошибка входа через Google: " + error.message);
-        }
-    });
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) window.location.href = 'server.html';
-    });
-</script>
 </body>
 </html>
