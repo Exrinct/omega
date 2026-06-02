@@ -98,7 +98,7 @@
             display: inline-block;
             margin-left: 1rem;
         }
-        .btn-change {
+        .btn-change, .save-settings {
             background: #2d5a27;
             border: none;
             border-radius: 30px;
@@ -106,6 +106,18 @@
             color: white;
             cursor: pointer;
             margin-top: 1rem;
+        }
+        .settings-group {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-radius: 16px;
+        }
+        .settings-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
         }
         .modal {
             display: none;
@@ -134,21 +146,12 @@
             margin: 1rem 0;
             color: white;
         }
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-        .modal-buttons button {
-            flex: 1;
-            padding: 0.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-        }
-        .error { color: #e06c6c; font-size: 0.8rem; margin-top: 0.5rem; }
+        .modal-buttons { display: flex; gap: 1rem; }
+        .error { color: #e06c6c; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
-<div class="version">v2.1.0</div>
+<div class="version">v3.0.0</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <div id="profile-content">Загрузка...</div>
@@ -157,7 +160,7 @@
 <div id="nickname-modal" class="modal">
     <div class="modal-content">
         <h3>Смена ника</h3>
-        <input type="text" id="new-nickname" placeholder="Новый ник в Minecraft" autocomplete="off">
+        <input type="text" id="new-nickname" placeholder="Новый ник">
         <div class="modal-buttons">
             <button id="submit-nickname">Отправить заявку</button>
             <button id="cancel-nickname">Отмена</button>
@@ -169,7 +172,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -219,9 +222,28 @@
             const pendingSnap = await getDocs(query(collection(db, "pending_characters"), where("userId", "==", userId)));
             const pendingCount = pendingSnap.size;
             
+            let settingsHtml = '';
             let changeNickButton = '';
             if (isOwnProfile) {
                 changeNickButton = `<button id="change-nick-btn" class="btn-change">Сменить ник</button>`;
+                const settings = profile.settings || { email_notifications: true, theme: "dark" };
+                settingsHtml = `
+                    <div class="settings-group">
+                        <h3>Настройки</h3>
+                        <label>
+                            <input type="checkbox" id="email_notifications" ${settings.email_notifications ? 'checked' : ''}>
+                            Получать уведомления на email
+                        </label>
+                        <div style="margin-top:0.5rem;">
+                            <label>Тема оформления:</label>
+                            <select id="theme">
+                                <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Тёмная</option>
+                                <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Светлая (скоро)</option>
+                            </select>
+                        </div>
+                        <button id="save-settings" class="save-settings">Сохранить настройки</button>
+                    </div>
+                `;
             }
             
             const html = `
@@ -232,12 +254,14 @@
                             ${isOnline ? '<span class="online-badge">В сети</span>' : '<span class="online-badge" style="background:#444;">Офлайн</span>'}
                         </div>
                         <div class="profile-stats">
+                            <div class="stat">💰 ${profile.rp_points || 0} монет</div>
                             <div class="stat">📜 Персонажей: ${characters.length} / 3</div>
                             <div class="stat">⏳ Заявок: ${pendingCount}</div>
                             <div class="stat">🏆 Достижений: ${earnedAchievements.length}</div>
                         </div>
                     </div>
                     ${changeNickButton}
+                    ${settingsHtml}
                     <div style="margin-bottom: 2rem; margin-top: 1rem;">
                         <h3 class="section-title">📖 Персонажи</h3>
                         <div class="char-grid">
@@ -266,48 +290,40 @@
             container.innerHTML = html;
             
             if (isOwnProfile) {
+                document.getElementById('save-settings')?.addEventListener('click', async () => {
+                    const email_notifications = document.getElementById('email_notifications').checked;
+                    const theme = document.getElementById('theme').value;
+                    await updateDoc(doc(db, "profiles", userId), { settings: { email_notifications, theme } });
+                    alert('Настройки сохранены');
+                });
                 const changeBtn = document.getElementById('change-nick-btn');
                 const modal = document.getElementById('nickname-modal');
                 const submitBtn = document.getElementById('submit-nickname');
                 const cancelBtn = document.getElementById('cancel-nickname');
                 const nickInput = document.getElementById('new-nickname');
                 const errorSpan = document.getElementById('nick-error');
-                
                 changeBtn.addEventListener('click', () => {
                     modal.style.display = 'flex';
                     nickInput.value = '';
                     errorSpan.textContent = '';
                 });
-                cancelBtn.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                });
+                cancelBtn.addEventListener('click', () => modal.style.display = 'none');
                 submitBtn.addEventListener('click', async () => {
                     const newNick = nickInput.value.trim();
-                    if (!newNick) {
-                        errorSpan.textContent = 'Введите новый ник';
-                        return;
-                    }
+                    if (!newNick) { errorSpan.textContent = 'Введите новый ник'; return; }
                     if (!/^[a-zA-Z0-9_]{3,16}$/.test(newNick)) {
-                        errorSpan.textContent = 'Ник должен быть от 3 до 16 символов (латиница, цифры, _)';
+                        errorSpan.textContent = 'Ник: 3-16 символов (латиница, цифры, _)';
                         return;
                     }
-                    // проверка уникальности
                     const profilesRef = collection(db, "profiles");
                     const q = query(profilesRef, where("nickname_lower", "==", newNick.toLowerCase()));
                     const existing = await getDocs(q);
-                    if (!existing.empty) {
-                        errorSpan.textContent = 'Этот ник уже занят';
-                        return;
-                    }
-                    // создаём заявку
+                    if (!existing.empty) { errorSpan.textContent = 'Ник уже занят'; return; }
                     await addDoc(collection(db, "nickname_requests"), {
-                        userId: userId,
-                        oldNickname: nickname,
-                        newNickname: newNick,
-                        status: 'pending',
-                        createdAt: serverTimestamp()
+                        userId: userId, oldNickname: nickname, newNickname: newNick,
+                        status: 'pending', createdAt: serverTimestamp()
                     });
-                    alert('Заявка на смену ника отправлена администрации. Ожидайте решения.');
+                    alert('Заявка отправлена');
                     modal.style.display = 'none';
                 });
             }
@@ -318,12 +334,7 @@
     
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
 </script>
 </body>
