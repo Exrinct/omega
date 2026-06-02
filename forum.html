@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форум — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 2rem;
+            position: relative;
+        }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: #3b6e4f;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2c2c2c;
+        }
+        .forum-title {
+            font-size: 1.8rem;
+            font-weight: 500;
+        }
+        .forum-title span { color: #3b6e4f; }
+        .back-link {
+            color: #3b6e4f;
+            text-decoration: none;
+        }
+        .forum-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .forum-nav a {
+            color: #aaa;
+            text-decoration: none;
+            padding: 0.3rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .forum-nav a.active {
+            color: #3b6e4f;
+            border-bottom-color: #3b6e4f;
+        }
+        .category-list, .topic-list {
+            background: #121212;
+            border: 1px solid #2c2c2c;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .category-row, .topic-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #2c2c2c;
+            align-items: center;
+        }
+        .category-row:last-child, .topic-row:last-child { border-bottom: none; }
+        .category-name, .topic-title {
+            font-weight: 500;
+            color: #3b6e4f;
+            text-decoration: none;
+        }
+        .topic-title { font-size: 1rem; }
+        .topic-meta {
+            font-size: 0.75rem;
+            color: #888;
+        }
+        .topic-status {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            background: #2c2c2c;
+        }
+        .topic-status.closed { background: #5a2e2e; color: #ffaaaa; }
+        .btn {
+            background: #2d5a27;
+            border: none;
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-small { padding: 0.2rem 0.6rem; font-size: 0.7rem; }
+        .btn-danger { background: #5a2e2e; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #121212;
+            border: 1px solid #3b6e4f;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal-content input, .modal-content textarea, .modal-content select {
+            width: 100%;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 0.6rem;
+            color: white;
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        .posts-list {
+            background: #121212;
+            border: 1px solid #2c2c2c;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .post {
+            padding: 1rem;
+            border-bottom: 1px solid #2c2c2c;
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+        .post-text { line-height: 1.5; }
+        .reply-form {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .reply-form textarea {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 0.6rem;
+            color: white;
+        }
+        .admin-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="version">v1.2.0</div>
+<div class="container">
+    <div class="header">
+        <div class="forum-title">Форум <span>Omega RolePlay</span></div>
+        <a href="server.html" class="back-link">← Назад</a>
+    </div>
+
+    <div class="forum-nav">
+        <a href="#" data-view="categories" class="active">Разделы</a>
+        <a href="#" data-view="complaints">Жалобы</a>
+        <a href="#" data-view="rules">Правила сервера</a>
+        <a href="#" id="admin-panel-link" style="display:none;">Управление форумом</a>
+    </div>
+
+    <div id="categories-view">
+        <div id="categories-container"></div>
+    </div>
+    <div id="topics-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h2 id="current-category-name"></h2>
+            <button id="new-topic-btn" class="btn">Создать тему</button>
+        </div>
+        <div id="topics-container"></div>
+    </div>
+    <div id="topic-view" style="display:none;">
+        <button id="back-to-topics" class="btn btn-small">← Назад</button>
+        <h2 id="topic-title-display" style="margin: 1rem 0;"></h2>
+        <div id="posts-container" class="posts-list"></div>
+        <div class="reply-form">
+            <textarea id="reply-text" placeholder="Написать сообщение..."></textarea>
+            <button id="send-reply" class="btn">Ответить</button>
+        </div>
+    </div>
+    <div id="complaints-view" style="display:none;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+            <h2>Жалобы на игроков</h2>
+            <button id="new-complaint-btn" class="btn">Подать жалобу</button>
+        </div>
+        <div id="complaints-container"></div>
+    </div>
+    <div id="rules-view" style="display:none;">
+        <div class="category-list" style="padding:1rem;">
+            <h3>Правила сервера</h3>
+            <p>1. Уважайте других игроков и администрацию.</p>
+            <p>2. Запрещены читы, баги, неспортивное поведение.</p>
+            <p>3. Ролевая игра должна соответствовать сеттингу.</p>
+            <p>4. Запрещён гриферство и оскорбления.</p>
+            <p>5. Администрация имеет право блокировать аккаунт за нарушения.</p>
+            <p style="margin-top:1rem;">Полный свод правил будет дополняться.</p>
+        </div>
+    </div>
+    <div id="admin-forum-view" style="display:none;">
+        <div class="card" style="background:#121212; border:1px solid #2c2c2c; border-radius:16px; padding:1rem;">
+            <h3>Управление форумом</h3>
+            <div style="margin:1rem 0;">
+                <button id="create-category-btn" class="btn">Создать раздел</button>
+                <button id="ban-user-btn" class="btn btn-danger">Бан/мут игрока</button>
+            </div>
+            <div id="admin-categories-list"></div>
+            <div id="admin-topics-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Модалки -->
+<div id="new-topic-modal" class="modal">
+    <div class="modal-content">
+        <h3>Создание темы</h3>
+        <input type="text" id="topic-title" placeholder="Заголовок">
+        <textarea id="topic-content" rows="4" placeholder="Текст сообщения..."></textarea>
+        <div class="modal-buttons">
+            <button id="submit-topic" class="btn">Создать</button>
+            <button id="cancel-topic" class="btn btn-danger">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div id="new-category-modal" class="modal">
+    <div class="modal-content">
+        <h3>Новый раздел</h3>
+        <input type="text" id="category-name" placeholder="Название">
+        <div class="modal-buttons">
+            <button id="submit-category" class="btn">Создать</button>
+            <button id="cancel-category" class="btn btn-danger">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div id="ban-modal" class="modal">
+    <div class="modal-content">
+        <h3>Бан/мут игрока</h3>
+        <input type="text" id="ban-user-nick" placeholder="Ник игрока">
+        <select id="ban-type">
+            <option value="ban">Бан (полная блокировка форума)</option>
+            <option value="mute">Мут (не может писать)</option>
+        </select>
+        <input type="datetime-local" id="ban-until" placeholder="Дата окончания (опционально)">
+        <div class="modal-buttons">
+            <button id="submit-ban" class="btn">Применить</button>
+            <button id="cancel-ban" class="btn btn-danger">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, orderBy, getDocs, addDoc, doc, updateDoc, deleteDoc, where, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let currentUserRole = "user";
+    let currentCategoryId = null;
+    let currentTopicId = null;
+
+    // --- общие функции ---
+    async function checkBan(userId, type) {
+        const banRef = doc(db, "forum_bans", userId);
+        const banSnap = await getDoc(banRef);
+        if (!banSnap.exists()) return false;
+        const data = banSnap.data();
+        if (data.type !== type) return false;
+        if (data.until && data.until.toDate() < new Date()) return false;
+        return true;
+    }
+
+    // --- отрисовка категорий ---
+    async function renderCategories() {
+        const q = query(collection(db, "forum_categories"), orderBy("name"));
+        const snap = await getDocs(q);
+        const container = document.getElementById("categories-container");
+        container.innerHTML = '<div class="category-list"></div>';
+        const list = container.querySelector(".category-list");
+        snap.forEach(doc => {
+            const cat = doc.data();
+            const div = document.createElement("div");
+            div.className = "category-row";
+            div.innerHTML = `
+                <a href="#" class="category-name" data-id="${doc.id}">${cat.name}</a>
+                <span class="topic-meta">Тем: ${cat.topicsCount || 0}</span>
+            `;
+            list.appendChild(div);
+        });
+        document.querySelectorAll(".category-name").forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                currentCategoryId = link.getAttribute("data-id");
+                document.getElementById("categories-view").style.display = "none";
+                document.getElementById("topics-view").style.display = "block";
+                renderTopics(currentCategoryId);
+            });
+        });
+    }
+
+    async function renderTopics(categoryId) {
+        const q = query(collection(db, "forum_topics"), where("categoryId", "==", categoryId), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+        const container = document.getElementById("topics-container");
+        container.innerHTML = '';
+        const catDoc = await getDoc(doc(db, "forum_categories", categoryId));
+        document.getElementById("current-category-name").innerText = catDoc.data().name;
+        for (const docSnap of snap.docs) {
+            const topic = docSnap.data();
+            const author = await getUserNick(topic.authorId);
+            const div = document.createElement("div");
+            div.className = "topic-row";
+            div.innerHTML = `
+                <div style="flex:1">
+                    <a href="#" class="topic-title" data-id="${docSnap.id}">${topic.title}</a>
+                    <div class="topic-meta">Автор: ${author} • ${topic.createdAt?.toDate().toLocaleDateString()}</div>
+                </div>
+                <div class="topic-status ${topic.closed ? 'closed' : ''}">${topic.closed ? 'Закрыта' : 'Открыта'}</div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll(".topic-title").forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+                currentTopicId = link.getAttribute("data-id");
+                document.getElementById("topics-view").style.display = "none";
+                document.getElementById("topic-view").style.display = "block";
+                renderTopic(currentTopicId);
+            });
+        });
+    }
+
+    async function renderTopic(topicId) {
+        const topicRef = doc(db, "forum_topics", topicId);
+        const topicSnap = await getDoc(topicRef);
+        if (!topicSnap.exists()) return;
+        const topic = topicSnap.data();
+        document.getElementById("topic-title-display").innerText = topic.title;
+        const q = query(collection(db, "forum_posts"), where("topicId", "==", topicId), orderBy("createdAt", "asc"));
+        const snap = await getDocs(q);
+        const container = document.getElementById("posts-container");
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const post = docSnap.data();
+            const author = await getUserNick(post.authorId);
+            const div = document.createElement("div");
+            div.className = "post";
+            div.innerHTML = `
+                <div class="post-header">
+                    <span>${author}</span>
+                    <span>${post.createdAt?.toDate().toLocaleString()}</span>
+                </div>
+                <div class="post-text">${post.text.replace(/\n/g, '<br>')}</div>
+            `;
+            container.appendChild(div);
+        }
+        const replySection = document.querySelector(".reply-form");
+        if (topic.closed) {
+            replySection.style.display = "none";
+        } else {
+            replySection.style.display = "flex";
+        }
+    }
+
+    async function getUserNick(uid) {
+        const profile = await getDoc(doc(db, "profiles", uid));
+        return profile.exists() ? profile.data().nickname : "Unknown";
+    }
+
+    // --- создание темы ---
+    document.getElementById("new-topic-btn").addEventListener("click", () => {
+        document.getElementById("new-topic-modal").style.display = "flex";
+    });
+    document.getElementById("cancel-topic").addEventListener("click", () => {
+        document.getElementById("new-topic-modal").style.display = "none";
+    });
+    document.getElementById("submit-topic").addEventListener("click", async () => {
+        const title = document.getElementById("topic-title").value.trim();
+        const content = document.getElementById("topic-content").value.trim();
+        if (!title || !content) return alert("Заполните поля");
+        const isBanned = await checkBan(currentUser.uid, "ban");
+        if (isBanned) return alert("Вы забанены на форуме");
+        await addDoc(collection(db, "forum_topics"), {
+            title, categoryId: currentCategoryId, authorId: currentUser.uid,
+            createdAt: serverTimestamp(), closed: false
+        });
+        const topicRef = await addDoc(collection(db, "forum_posts"), {
+            topicId: "temp", text: content, authorId: currentUser.uid, createdAt: serverTimestamp()
+        });
+        // обновим topicId для поста
+        const topicsSnap = await getDocs(query(collection(db, "forum_topics"), where("title", "==", title), where("authorId", "==", currentUser.uid), orderBy("createdAt", "desc"), limit(1)));
+        const newTopicId = topicsSnap.docs[0].id;
+        await updateDoc(doc(db, "forum_posts", topicRef.id), { topicId: newTopicId });
+        // увеличить счётчик тем в категории
+        const catRef = doc(db, "forum_categories", currentCategoryId);
+        const catSnap = await getDoc(catRef);
+        const newCount = (catSnap.data().topicsCount || 0) + 1;
+        await updateDoc(catRef, { topicsCount: newCount });
+        document.getElementById("new-topic-modal").style.display = "none";
+        renderTopics(currentCategoryId);
+        document.getElementById("topic-title").value = "";
+        document.getElementById("topic-content").value = "";
+    });
+
+    // --- отправка ответа ---
+    document.getElementById("send-reply").addEventListener("click", async () => {
+        const text = document.getElementById("reply-text").value.trim();
+        if (!text) return;
+        const isBanned = await checkBan(currentUser.uid, "ban");
+        if (isBanned) return alert("Вы забанены на форуме");
+        const isMuted = await checkBan(currentUser.uid, "mute");
+        if (isMuted) return alert("Вы получили мут и не можете писать");
+        const topicRef = doc(db, "forum_topics", currentTopicId);
+        const topicSnap = await getDoc(topicRef);
+        if (topicSnap.data().closed) return alert("Тема закрыта");
+        await addDoc(collection(db, "forum_posts"), {
+            topicId: currentTopicId, text, authorId: currentUser.uid, createdAt: serverTimestamp()
+        });
+        document.getElementById("reply-text").value = "";
+        renderTopic(currentTopicId);
+    });
+
+    // --- кнопка "Назад" ---
+    document.getElementById("back-to-topics").addEventListener("click", () => {
+        document.getElementById("topic-view").style.display = "none";
+        document.getElementById("topics-view").style.display = "block";
+        renderTopics(currentCategoryId);
+    });
+
+    // --- навигация ---
+    document.querySelectorAll(".forum-nav a[data-view]").forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const view = link.getAttribute("data-view");
+            document.getElementById("categories-view").style.display = "none";
+            document.getElementById("topics-view").style.display = "none";
+            document.getElementById("topic-view").style.display = "none";
+            document.getElementById("complaints-view").style.display = "none";
+            document.getElementById("rules-view").style.display = "none";
+            document.getElementById("admin-forum-view").style.display = "none";
+            if (view === "categories") document.getElementById("categories-view").style.display = "block";
+            if (view === "complaints") document.getElementById("complaints-view").style.display = "block";
+            if (view === "rules") document.getElementById("rules-view").style.display = "block";
+            document.querySelectorAll(".forum-nav a").forEach(a => a.classList.remove("active"));
+            link.classList.add("active");
+        });
+    });
+
+    // --- админка форума ---
+    document.getElementById("admin-panel-link").addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("categories-view").style.display = "none";
+        document.getElementById("topics-view").style.display = "none";
+        document.getElementById("topic-view").style.display = "none";
+        document.getElementById("complaints-view").style.display = "none";
+        document.getElementById("rules-view").style.display = "none";
+        document.getElementById("admin-forum-view").style.display = "block";
+        renderAdminCategories();
+        renderAdminTopics();
+    });
+    async function renderAdminCategories() {
+        const snap = await getDocs(collection(db, "forum_categories"));
+        const container = document.getElementById("admin-categories-list");
+        container.innerHTML = "<h4>Разделы</h4>";
+        snap.forEach(docSnap => {
+            const cat = docSnap.data();
+            const div = document.createElement("div");
+            div.style.padding = "0.5rem 0";
+            div.innerHTML = `${cat.name} <button class="btn btn-small btn-danger" data-id="${docSnap.id}">Удалить</button>`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll("#admin-categories-list .btn-danger").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                if (confirm("Удалить раздел со всеми темами?")) {
+                    const id = btn.getAttribute("data-id");
+                    await deleteDoc(doc(db, "forum_categories", id));
+                    renderAdminCategories();
+                }
+            });
+        });
+    }
+    async function renderAdminTopics() {
+        const snap = await getDocs(collection(db, "forum_topics"));
+        const container = document.getElementById("admin-topics-list");
+        container.innerHTML = "<h4>Темы</h4>";
+        for (const docSnap of snap.docs) {
+            const topic = docSnap.data();
+            const author = await getUserNick(topic.authorId);
+            const div = document.createElement("div");
+            div.style.padding = "0.5rem 0";
+            div.innerHTML = `${topic.title} (автор: ${author}) 
+                <button class="btn btn-small" data-id="${docSnap.id}" data-action="toggle">${topic.closed ? "Открыть" : "Закрыть"}</button>
+                <button class="btn btn-small btn-danger" data-id="${docSnap.id}" data-action="delete">Удалить</button>`;
+            container.appendChild(div);
+        }
+        document.querySelectorAll("#admin-topics-list [data-action='toggle']").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.getAttribute("data-id");
+                const topicRef = doc(db, "forum_topics", id);
+                const topicSnap = await getDoc(topicRef);
+                await updateDoc(topicRef, { closed: !topicSnap.data().closed });
+                renderAdminTopics();
+            });
+        });
+        document.querySelectorAll("#admin-topics-list [data-action='delete']").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                if (confirm("Удалить тему и все сообщения?")) {
+                    const id = btn.getAttribute("data-id");
+                    const posts = await getDocs(query(collection(db, "forum_posts"), where("topicId", "==", id)));
+                    posts.forEach(p => deleteDoc(p.ref));
+                    await deleteDoc(doc(db, "forum_topics", id));
+                    renderAdminTopics();
+                }
+            });
+        });
+    }
+
+    document.getElementById("create-category-btn").addEventListener("click", () => {
+        document.getElementById("new-category-modal").style.display = "flex";
+    });
+    document.getElementById("submit-category").addEventListener("click", async () => {
+        const name = document.getElementById("category-name").value.trim();
+        if (!name) return;
+        await addDoc(collection(db, "forum_categories"), { name, topicsCount: 0 });
+        document.getElementById("new-category-modal").style.display = "none";
+        renderAdminCategories();
+        renderCategories();
+    });
+    document.getElementById("cancel-category").addEventListener("click", () => {
+        document.getElementById("new-category-modal").style.display = "none";
+    });
+
+    document.getElementById("ban-user-btn").addEventListener("click", () => {
+        document.getElementById("ban-modal").style.display = "flex";
+    });
+    document.getElementById("submit-ban").addEventListener("click", async () => {
+        const nick = document.getElementById("ban-user-nick").value.trim();
+        const type = document.getElementById("ban-type").value;
+        let until = null;
+        const untilStr = document.getElementById("ban-until").value;
+        if (untilStr) until = new Date(untilStr);
+        const profiles = await getDocs(collection(db, "profiles"));
+        let targetUid = null;
+        for (const docSnap of profiles.docs) {
+            if (docSnap.data().nickname.toLowerCase() === nick.toLowerCase()) {
+                targetUid = docSnap.id;
+                break;
+            }
+        }
+        if (!targetUid) return alert("Игрок не найден");
+        await setDoc(doc(db, "forum_bans", targetUid), { type, until: until ? serverTimestamp() : null, untilDate: until });
+        alert("Бан/мут применён");
+        document.getElementById("ban-modal").style.display = "none";
+    });
+    document.getElementById("cancel-ban").addEventListener("click", () => {
+        document.getElementById("ban-modal").style.display = "none";
+    });
+
+    // --- жалобы (упрощённо) ---
+    document.getElementById("new-complaint-btn").addEventListener("click", () => {
+        const victim = prompt("На кого жалоба? (ник)");
+        const reason = prompt("Причина жалобы");
+        if (!victim || !reason) return;
+        addDoc(collection(db, "forum_topics"), {
+            title: `Жалоба на ${victim}`, categoryId: "complaints", authorId: currentUser.uid,
+            createdAt: serverTimestamp(), closed: false, isComplaint: true, victim, reason
+        }).then(() => alert("Жалоба отправлена модераторам"));
+    });
+    async function renderComplaints() {
+        const q = query(collection(db, "forum_topics"), where("categoryId", "==", "complaints"));
+        const snap = await getDocs(q);
+        const container = document.getElementById("complaints-container");
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const topic = docSnap.data();
+            const author = await getUserNick(topic.authorId);
+            const div = document.createElement("div");
+            div.className = "list-item";
+            div.innerHTML = `<div><strong>${topic.title}</strong> (автор: ${author})<br>${topic.reason || ""}</div>`;
+            container.appendChild(div);
+        }
+    }
+
+    // --- инициализация ---
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "index.html"; return; }
+        currentUser = user;
+        const profileRef = doc(db, "profiles", user.uid);
+        const profileSnap = await getDoc(profileRef);
+        if (profileSnap.exists()) {
+            currentUserRole = profileSnap.data().role || "user";
+            if (currentUserRole === "admin" || currentUserRole === "reviewer") {
+                document.getElementById("admin-panel-link").style.display = "inline-block";
+            }
+        }
+        renderCategories();
+        renderComplaints();
+    });
+</script>
+</body>
+</html>
