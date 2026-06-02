@@ -199,6 +199,7 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
+    // Регистрация
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -252,6 +253,7 @@
         }
     });
 
+    // Вход по паролю
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -290,6 +292,7 @@
         }
     });
 
+    // Google вход
     let pendingGoogleUser = null;
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
