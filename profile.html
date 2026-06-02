@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль игрока — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 2rem;
+            position: relative;
+        }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: #3b6e4f;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #3b6e4f;
+            text-decoration: none;
+        }
+        .profile-card {
+            background: #121212;
+            border: 1px solid #2c2c2c;
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #2c2c2c;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .profile-nick {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #3b6e4f;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+        }
+        .stat {
+            background: #1e1e1e;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ddd;
+        }
+        .char-grid, .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .char-card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 1rem;
+            border-left: 3px solid #3b6e4f;
+        }
+        .char-name { font-weight: 600; font-size: 1.1rem; }
+        .char-meta { font-size: 0.8rem; color: #aaa; margin-top: 0.2rem; }
+        .achievement-card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 0.8rem;
+        }
+        .ach-title { font-weight: 500; }
+        .ach-desc { font-size: 0.75rem; color: #aaa; margin-top: 0.2rem; }
+        .empty-message {
+            color: #888;
+            font-style: italic;
+            padding: 1rem;
+        }
+        .online-badge {
+            background: #2a5a2a;
+            border-radius: 20px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            color: #aaffaa;
+            display: inline-block;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="version">v2.0.0 (no storage)</div>
+<div class="container">
+    <a href="server.html" class="back-link">← Назад в панель</a>
+    <div id="profile-content">Загрузка...</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get('uid');
+    const container = document.getElementById('profile-content');
+
+    if (!uid) {
+        container.innerHTML = '<div class="profile-card">Не указан пользователь</div>';
+    } else {
+        loadProfile(uid);
+    }
+
+    async function loadProfile(userId) {
+        try {
+            const profileSnap = await getDoc(doc(db, "profiles", userId));
+            if (!profileSnap.exists()) {
+                container.innerHTML = '<div class="profile-card">Пользователь не найден</div>';
+                return;
+            }
+            const profile = profileSnap.data();
+            const nickname = profile.nickname || "Неизвестно";
+            const isOnline = profile.isOnline === true;
+            
+            const charsSnap = await getDocs(query(collection(db, "approved_characters"), where("userId", "==", userId)));
+            const characters = charsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            
+            const userAchSnap = await getDocs(query(collection(db, "user_achievements"), where("userId", "==", userId)));
+            const userAchievements = userAchSnap.docs.map(d => d.data());
+            const allAchievements = await getDocs(collection(db, "achievements"));
+            const achievementsMap = {};
+            allAchievements.forEach(d => { achievementsMap[d.id] = d.data(); });
+            const earnedAchievements = userAchievements.map(ua => achievementsMap[ua.achievementId]).filter(a => a);
+            
+            const pendingSnap = await getDocs(query(collection(db, "pending_characters"), where("userId", "==", userId)));
+            const pendingCount = pendingSnap.size;
+            
+            const html = `
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div>
+                            <span class="profile-nick">${escapeHtml(nickname)}</span>
+                            ${isOnline ? '<span class="online-badge">В сети</span>' : '<span class="online-badge" style="background:#444;">Офлайн</span>'}
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat">📜 Персонажей: ${characters.length} / 3</div>
+                            <div class="stat">⏳ Заявок: ${pendingCount}</div>
+                            <div class="stat">🏆 Достижений: ${earnedAchievements.length}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h3 class="section-title">📖 Персонажи</h3>
+                        <div class="char-grid">
+                            ${characters.length === 0 ? '<div class="empty-message">Нет одобренных персонажей</div>' : characters.map(char => `
+                                <div class="char-card">
+                                    <div class="char-name">${escapeHtml(char.characterName)}</div>
+                                    <div class="char-meta">${escapeHtml(char.profession)} • ${escapeHtml(char.gender)} • ${char.age} лет</div>
+                                    <div class="char-meta">${escapeHtml(char.history.substring(0, 80))}...</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="section-title">🏆 Достижения</h3>
+                        <div class="achievement-grid">
+                            ${earnedAchievements.length === 0 ? '<div class="empty-message">Нет заработанных достижений</div>' : earnedAchievements.map(ach => `
+                                <div class="achievement-card">
+                                    <div class="ach-title">${escapeHtml(ach.title)}</div>
+                                    <div class="ach-desc">${escapeHtml(ach.description)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        } catch (err) {
+            container.innerHTML = `<div class="profile-card">Ошибка: ${err.message}</div>`;
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+</script>
+</body>
+</html>
