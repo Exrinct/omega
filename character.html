@@ -2,73 +2,75 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Создание персонажа — Omega RolePlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Анкета персонажа — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0A0A0A;
+            color: #E6E6E6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 2rem;
-            position: relative;
+            padding: 1.5rem;
         }
         .version {
             position: fixed;
             bottom: 12px;
             right: 12px;
-            font-size: 0.7rem;
-            color: #3b6e4f;
+            font-size: 0.65rem;
+            color: #3B6E4F;
             background: rgba(0,0,0,0.5);
             padding: 2px 6px;
-            border-radius: 8px;
+            border-radius: 20px;
+            z-index: 100;
         }
         .card {
-            background: #121212;
-            border: 1px solid #2c2c2c;
+            background: #111;
+            border: 1px solid #222;
             border-radius: 28px;
-            padding: 2.5rem 2rem;
+            padding: 2rem;
             max-width: 500px;
             width: 100%;
             text-align: center;
         }
-        h1 { font-size: 2rem; font-weight: 500; margin-bottom: 1rem; }
-        .accent { color: #3b6e4f; }
-        p { line-height: 1.6; margin: 1.5rem 0; color: #bbb; }
+        h1 {
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        p {
+            margin: 1.5rem 0;
+            color: #A0A0A0;
+            line-height: 1.5;
+        }
         .btn {
             display: inline-block;
-            background: #2d5a27;
+            background: #3B6E4F;
             color: white;
             text-decoration: none;
             border-radius: 40px;
-            padding: 0.9rem 2rem;
+            padding: 0.8rem 1.8rem;
             font-weight: 500;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
-        .btn:hover { background: #3a6e34; }
         .back-link {
-            color: #909090;
+            color: #3B6E4F;
             text-decoration: none;
-            border: 1px solid #3b6e4f;
-            padding: 0.6rem 1.5rem;
-            border-radius: 30px;
+            font-size: 0.9rem;
         }
-        .back-link:hover { background: #3b6e4f20; }
     </style>
 </head>
 <body>
-<div class="version">v1.0.0</div>
+<div class="version">v3.1.0</div>
 <div class="card">
-    <h1>Анкета персонажа<span class="accent">.</span></h1>
-    <p>Заполните Google-форму, чтобы создать историю вашего героя.</p>
+    <h1>Анкета персонажа</h1>
+    <p>Для создания персонажа заполните Google-форму. Укажите имя, историю и другие детали.</p>
     <a href="https://forms.gle/C9xFskgkDuPWiNMW6" target="_blank" class="btn">Заполнить анкету</a>
     <br>
-    <a href="server.html" class="back-link">Назад в панель</a>
+    <a href="server.html" class="back-link">← Назад в панель</a>
 </div>
 </body>
 </html>
