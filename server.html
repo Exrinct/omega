@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
@@ -16,15 +15,13 @@
             display: flex;
             justify-content: center;
         }
-
         .dashboard {
-            max-width: 680px;
+            max-width: 800px;
             width: 100%;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -33,14 +30,13 @@
             border: 1px solid #2c2c2c;
             border-radius: 20px;
             padding: 1rem 1.5rem;
+            position: relative;
         }
-
         .user-greeting {
             font-size: 1.2rem;
             font-weight: 500;
         }
         .user-greeting span { color: #3b6e4f; }
-
         .logout {
             background: none;
             border: 1px solid #3b6e4f;
@@ -49,133 +45,236 @@
             color: #ccc;
             cursor: pointer;
             font-family: inherit;
-            transition: 0.2s;
         }
-        .logout:hover { background: #3b6e4f20; border-color: #5a8e4a; color: white; }
+        .logout:hover { background: #3b6e4f20; }
+        
+        /* Уведомления */
+        .notif-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.4rem;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #3b6e4f;
+            color: white;
+            font-size: 0.65rem;
+            border-radius: 30px;
+            padding: 0 0.4rem;
+            min-width: 18px;
+            text-align: center;
+        }
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 280px;
+            background: #1c1c1c;
+            border: 1px solid #3b6e4f;
+            border-radius: 16px;
+            z-index: 10;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .notif-dropdown.show { display: block; }
+        .notif-item {
+            padding: 0.8rem;
+            border-bottom: 1px solid #2c2c2c;
+            cursor: pointer;
+        }
+        .notif-item.unread { background: #2a2a2a; }
+        .notif-item:hover { background: #252525; }
+        .notif-title { font-weight: 500; font-size: 0.9rem; }
+        .notif-message { font-size: 0.75rem; color: #aaa; margin-top: 0.2rem; }
 
         .card {
             background: #121212;
             border: 1px solid #2c2c2c;
             border-radius: 20px;
-            padding: 1.8rem;
+            padding: 1.5rem;
         }
-
-        .create-character {
-            display: block;
-            text-align: center;
-            background: #1e2a1e;
-            border: 1px solid #3b6e4f;
+        .create-btn {
+            background: #2d5a27;
+            border: none;
             border-radius: 40px;
-            padding: 1rem;
-            font-size: 1.2rem;
+            padding: 0.8rem 1.5rem;
+            color: white;
             font-weight: 600;
-            color: #c8e6c0;
-            text-decoration: none;
-            transition: 0.2s;
+            cursor: pointer;
+            width: 100%;
         }
-        .create-character:hover {
-            background: #2a3a2a;
-            border-color: #5a8e4a;
-        }
-
-        .ip-box {
+        .char-list {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1e1e1e;
-            border-radius: 14px;
-            padding: 0.8rem 1rem;
+            flex-direction: column;
             gap: 1rem;
         }
-        .ip-text {
-            font-family: monospace;
-            font-size: 1rem;
+        .char-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 1rem;
+            border-left: 3px solid #3b6e4f;
         }
-        .copy-btn {
-            background: none;
+        
+        /* Модалка создания персонажа */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #121212;
             border: 1px solid #3b6e4f;
-            color: #3b6e4f;
-            padding: 0.4rem 0.8rem;
-            border-radius: 20px;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 { margin-bottom: 1rem; }
+        .field { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.8rem; margin-bottom: 0.3rem; color: #aaa; }
+        input, select, textarea {
+            width: 100%;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 0.6rem;
+            color: white;
+            font-family: inherit;
+        }
+        textarea { resize: vertical; }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 30px;
             cursor: pointer;
         }
-
-        .modpack-link {
+        .submit-char { background: #2d5a27; border: none; color: white; }
+        .cancel-char { background: none; border: 1px solid #666; color: #ccc; }
+        
+        .admin-link {
             display: inline-block;
-            margin-top: 0.8rem;
+            margin-top: 0.5rem;
             color: #3b6e4f;
             text-decoration: none;
-            border-bottom: 1px solid transparent;
+            font-size: 0.8rem;
         }
-        .modpack-link:hover { border-bottom-color: #3b6e4f; }
-
-        .lore-link {
-            display: inline-block;
-            background: #1e1e1e;
-            border: 1px solid #3b6e4f;
-            border-radius: 40px;
-            padding: 0.8rem 1.8rem;
-            text-decoration: none;
-            color: #c0c0c0;
-            transition: 0.2s;
-            text-align: center;
-        }
-        .lore-link:hover { background: #2a2a2a; border-color: #5a8e4a; color: white; }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.2rem;
-            margin-top: 0.5rem;
-        }
-        .social-link {
-            color: #aaa;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border: 1px solid #333;
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
-        }
-        .social-link:hover { border-color: #3b6e4f; color: #ddd; }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="header">
         <div class="user-greeting">Привет, <span id="display-nick">...</span></div>
-        <button class="logout" id="logout-btn">Выйти</button>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="notif-icon" id="notif-icon">
+                🔔
+                <span id="notif-badge" class="notif-badge" style="display: none;">0</span>
+                <div id="notif-dropdown" class="notif-dropdown"></div>
+            </div>
+            <button class="logout" id="logout-btn">Выйти</button>
+        </div>
     </div>
 
-    <a href="character.html" class="create-character">СОЗДАТЬ ПЕРСОНАЖА</a>
+    <button class="create-btn" id="create-char-btn">СОЗДАТЬ ПЕРСОНАЖА</button>
 
     <div class="card">
-        <h3 style="margin-bottom: 0.8rem; font-weight: 500;">Адрес сервера</h3>
-        <div class="ip-box">
-            <span class="ip-text">play.rp-minecraft.ru</span>
-            <button class="copy-btn" onclick="copyIP()">Копировать</button>
+        <h3 style="margin-bottom: 1rem;">Мои персонажи</h3>
+        <div id="my-characters" class="char-list">Загрузка...</div>
+    </div>
+
+    <div class="card">
+        <h3>Адрес сервера</h3>
+        <div class="ip-box" style="display: flex; justify-content: space-between; background: #1e1e1e; border-radius: 14px; padding: 0.8rem;">
+            <span>play.rp-minecraft.ru</span>
+            <button class="copy-btn" onclick="copyIP()" style="background: none; border: 1px solid #3b6e4f; border-radius: 20px; padding: 0.2rem 0.8rem;">Копировать</button>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom: 0.5rem; font-weight: 500;">Сборка модов</h3>
+        <h3>Сборка модов</h3>
         <p>Скачайте сборку для версии 1.20.1 (Forge)</p>
-        <a href="#" class="modpack-link">Скачать ModPack (Google Диск)</a>
+        <a href="#" class="modpack-link" style="color: #3b6e4f;">Скачать ModPack (Google Диск)</a>
     </div>
 
     <div class="card" style="text-align: center;">
-        <a href="lore.html" class="lore-link">Перейти к лору проекта</a>
+        <a href="lore.html" style="color: #3b6e4f; text-decoration: none;">Перейти к лору проекта</a>
     </div>
 
-    <div class="social-links">
-        <a href="https://discord.gg/hyJUUckQMh" class="social-link" target="_blank">Discord</a>
-        <a href="https://t.me/Omega1RolePlay" class="social-link" target="_blank">Telegram</a>
+    <div style="display: flex; justify-content: center; gap: 1.5rem;">
+        <a href="https://discord.gg/hyJUUckQMh" target="_blank" style="color: #aaa;">Discord</a>
+        <a href="https://t.me/Omega1RolePlay" target="_blank" style="color: #aaa;">Telegram</a>
+    </div>
+    <div id="admin-link-place"></div>
+</div>
+
+<!-- Модалка создания персонажа -->
+<div id="char-modal" class="modal">
+    <div class="modal-content">
+        <h3>Создание персонажа</h3>
+        <div class="field">
+            <label>Имя персонажа</label>
+            <input type="text" id="char-name" placeholder="Например: Эльрин Светлый">
+        </div>
+        <div class="field">
+            <label>Пол</label>
+            <select id="char-gender">
+                <option value="Мужской">Мужской</option>
+                <option value="Женский">Женский</option>
+                <option value="Другой">Другой</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Возраст</label>
+            <input type="number" id="char-age" placeholder="18">
+        </div>
+        <div class="field">
+            <label>Профессия</label>
+            <select id="char-profession">
+                <option value="Воин">Воин</option>
+                <option value="Маг">Маг</option>
+                <option value="Лучник">Лучник</option>
+                <option value="Торговец">Торговец</option>
+                <option value="Вор">Вор</option>
+                <option value="Жрец">Жрец</option>
+                <option value="Алхимик">Алхимик</option>
+                <option value="Наёмник">Наёмник</option>
+                <option value="Другое">Другое</option>
+            </select>
+        </div>
+        <div class="field" id="custom-prof-field" style="display: none;">
+            <label>Укажите профессию</label>
+            <input type="text" id="custom-prof" placeholder="Например: Инженер">
+        </div>
+        <div class="field">
+            <label>История персонажа</label>
+            <textarea id="char-history" rows="4" placeholder="Расскажите о прошлом вашего героя..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="submit-char" id="submit-char">Отправить на модерацию</button>
+            <button class="cancel-char" id="close-modal">Отмена</button>
+        </div>
+        <div id="char-error" style="color: #e06c6c; margin-top: 0.5rem; display: none;"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, setDoc, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -189,36 +288,192 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const displayNick = document.getElementById('display-nick');
-    const logoutBtn = document.getElementById('logout-btn');
+    let currentUser = null;
+    let currentUserNick = "";
+    let isAdmin = false;
 
+    // Элементы
+    const displayNickSpan = document.getElementById('display-nick');
+    const logoutBtn = document.getElementById('logout-btn');
+    const createCharBtn = document.getElementById('create-char-btn');
+    const charModal = document.getElementById('char-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const submitCharBtn = document.getElementById('submit-char');
+    const professionSelect = document.getElementById('char-profession');
+    const customProfField = document.getElementById('custom-prof-field');
+    const myCharactersDiv = document.getElementById('my-characters');
+    const adminLinkPlace = document.getElementById('admin-link-place');
+
+    // Уведомления
+    const notifIcon = document.getElementById('notif-icon');
+    const notifDropdown = document.getElementById('notif-dropdown');
+    const notifBadge = document.getElementById('notif-badge');
+
+    // --- Вспомогательные функции ---
+    window.copyIP = function() {
+        const ip = "play.rp-minecraft.ru";
+        navigator.clipboard.writeText(ip);
+        alert("IP скопирован");
+    };
+
+    // Загрузка уведомлений
+    function loadNotifications() {
+        if (!currentUser) return;
+        const notifRef = collection(db, "notifications");
+        const q = query(notifRef, where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            let unreadCount = 0;
+            notifDropdown.innerHTML = '';
+            if (snapshot.empty) {
+                notifDropdown.innerHTML = '<div class="notif-item">Нет уведомлений</div>';
+                notifBadge.style.display = 'none';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const notif = doc.data();
+                if (!notif.isRead) unreadCount++;
+                const div = document.createElement('div');
+                div.className = `notif-item ${!notif.isRead ? 'unread' : ''}`;
+                div.innerHTML = `<div class="notif-title">${notif.title}</div><div class="notif-message">${notif.message}</div>`;
+                div.addEventListener('click', async () => {
+                    if (!notif.isRead) {
+                        await updateDoc(doc.ref, { isRead: true });
+                    }
+                });
+                notifDropdown.appendChild(div);
+            });
+            if (unreadCount > 0) {
+                notifBadge.textContent = unreadCount;
+                notifBadge.style.display = 'block';
+            } else {
+                notifBadge.style.display = 'none';
+            }
+        });
+    }
+
+    // Загрузка одобренных персонажей текущего пользователя
+    async function loadMyCharacters() {
+        if (!currentUser) return;
+        const approvedRef = collection(db, "approved_characters");
+        const q = query(approvedRef, where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+            myCharactersDiv.innerHTML = '<div class="char-card">У вас пока нет одобренных персонажей. Создайте заявку.</div>';
+            return;
+        }
+        myCharactersDiv.innerHTML = '';
+        snapshot.forEach(doc => {
+            const char = doc.data();
+            const card = document.createElement('div');
+            card.className = 'char-card';
+            card.innerHTML = `
+                <strong>${char.characterName}</strong> (${char.profession})<br>
+                Пол: ${char.gender}, Возраст: ${char.age}<br>
+                <small>История: ${char.history.substring(0, 100)}...</small>
+            `;
+            myCharactersDiv.appendChild(card);
+        });
+    }
+
+    // Отправка заявки на персонажа
+    async function submitCharacter() {
+        const name = document.getElementById('char-name').value.trim();
+        const gender = document.getElementById('char-gender').value;
+        const age = parseInt(document.getElementById('char-age').value);
+        const profession = professionSelect.value;
+        const customProf = document.getElementById('custom-prof').value.trim();
+        const history = document.getElementById('char-history').value.trim();
+        const errorDiv = document.getElementById('char-error');
+
+        if (!name || !history || isNaN(age) || age < 1) {
+            errorDiv.textContent = 'Заполните все поля корректно.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        let finalProf = profession;
+        if (profession === 'Другое') {
+            if (!customProf) {
+                errorDiv.textContent = 'Укажите профессию в поле "Другое"';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            finalProf = customProf;
+        }
+        errorDiv.style.display = 'none';
+
+        try {
+            await addDoc(collection(db, "pending_characters"), {
+                userId: currentUser.uid,
+                userNick: currentUserNick,
+                characterName: name,
+                gender: gender,
+                age: age,
+                history: history,
+                profession: finalProf,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            });
+            alert('Заявка отправлена на модерацию. Ожидайте решения.');
+            charModal.style.display = 'none';
+            // очистка формы
+            document.getElementById('char-name').value = '';
+            document.getElementById('char-history').value = '';
+            document.getElementById('char-age').value = '';
+            professionSelect.value = 'Воин';
+            customProfField.style.display = 'none';
+            document.getElementById('custom-prof').value = '';
+        } catch (err) {
+            errorDiv.textContent = 'Ошибка: ' + err.message;
+            errorDiv.style.display = 'block';
+        }
+    }
+
+    // --- Обработчики UI ---
+    professionSelect.addEventListener('change', () => {
+        customProfField.style.display = professionSelect.value === 'Другое' ? 'block' : 'none';
+    });
+
+    createCharBtn.onclick = () => { charModal.style.display = 'flex'; };
+    closeModalBtn.onclick = () => { charModal.style.display = 'none'; };
+    submitCharBtn.onclick = submitCharacter;
+    window.onclick = (e) => { if (e.target === charModal) charModal.style.display = 'none'; };
+
+    notifIcon.onclick = () => { notifDropdown.classList.toggle('show'); };
+    document.addEventListener('click', (e) => {
+        if (!notifIcon.contains(e.target)) notifDropdown.classList.remove('show');
+    });
+
+    logoutBtn.onclick = async () => { await signOut(auth); window.location.href = 'index.html'; };
+
+    // --- Авторизация ---
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';
             return;
         }
+        currentUser = user;
         const profileRef = doc(db, "profiles", user.uid);
         const profileSnap = await getDoc(profileRef);
         if (profileSnap.exists()) {
-            displayNick.textContent = profileSnap.data().nickname;
+            currentUserNick = profileSnap.data().nickname || "Игрок";
+            displayNickSpan.textContent = currentUserNick;
+            isAdmin = profileSnap.data().isAdmin === true;
+            if (isAdmin) {
+                const adminLink = document.createElement('a');
+                adminLink.href = 'admin.html';
+                adminLink.textContent = 'Админ-панель';
+                adminLink.className = 'admin-link';
+                adminLink.style.display = 'block';
+                adminLink.style.textAlign = 'center';
+                adminLink.style.marginTop = '1rem';
+                adminLinkPlace.appendChild(adminLink);
+            }
         } else {
-            displayNick.textContent = "Игрок";
+            displayNickSpan.textContent = "Игрок";
         }
+        loadNotifications();
+        loadMyCharacters();
     });
-
-    logoutBtn.addEventListener('click', async () => {
-        await signOut(auth);
-        window.location.href = 'index.html';
-    });
-
-    window.copyIP = function() {
-        const ip = document.querySelector('.ip-text').textContent;
-        navigator.clipboard.writeText(ip).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            btn.textContent = 'Скопировано';
-            setTimeout(() => btn.textContent = 'Копировать', 1500);
-        });
-    };
 </script>
 </body>
 </html>
