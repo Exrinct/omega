@@ -12,11 +12,20 @@
             background: #0a0a0a;
             color: #e0e0e0;
             padding: 2rem;
+            position: relative;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: #3b6e4f;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+            z-index: 100;
         }
+        .container { max-width: 1000px; margin: 0 auto; }
         h1 { margin-bottom: 1.5rem; }
         .card {
             background: #121212;
@@ -25,22 +34,14 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        .pending-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .pending-list { display: flex; flex-direction: column; gap: 1rem; }
         .pending-item {
             background: #1a1a1a;
             border-radius: 16px;
             padding: 1rem;
             border-left: 3px solid #e0a000;
         }
-        .actions {
-            margin-top: 0.8rem;
-            display: flex;
-            gap: 0.8rem;
-        }
+        .actions { margin-top: 0.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
         button {
             background: #2d5a27;
             border: none;
@@ -60,12 +61,7 @@
             width: 200px;
             color: white;
         }
-        .mass-notif {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
+        .mass-notif { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
         .mass-notif input, .mass-notif textarea {
             flex: 1;
             background: #1e1e1e;
@@ -73,6 +69,7 @@
             border-radius: 12px;
             padding: 0.6rem;
             color: white;
+            font-family: inherit;
         }
         .back-link {
             display: inline-block;
@@ -83,6 +80,7 @@
     </style>
 </head>
 <body>
+<div class="version">v1.0.0</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <h1>Админ-панель</h1>
@@ -121,7 +119,6 @@
 
     let currentUser = null;
 
-    // Проверка админа
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';
@@ -151,7 +148,6 @@
         for (const docSnap of snapshot.docs) {
             const data = docSnap.data();
             const userId = data.userId;
-            // Получаем ник из profiles (может не быть, но есть userNick)
             const userProfileRef = doc(db, "profiles", userId);
             const userProfile = await getDoc(userProfileRef);
             const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
@@ -164,7 +160,7 @@
                 <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
                 <div><strong>История:</strong> ${data.history}</div>
                 <div class="actions">
-                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа (если нужно)" class="comment-input">
+                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" class="comment-input">
                     <button class="approve-btn" data-id="${docSnap.id}">Одобрить</button>
                     <button class="reject-btn" data-id="${docSnap.id}">Отклонить</button>
                 </div>
@@ -172,7 +168,6 @@
             container.appendChild(div);
         }
 
-        // Обработчики
         document.querySelectorAll('.approve-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const id = btn.getAttribute('data-id');
@@ -195,7 +190,6 @@
         if (!pendingSnap.exists()) return;
         const data = pendingSnap.data();
         
-        // Копируем в approved_characters
         await addDoc(collection(db, "approved_characters"), {
             userId: data.userId,
             userNick: data.userNick,
@@ -208,7 +202,6 @@
             approvedBy: currentUser.uid
         });
         
-        // Отправляем уведомление пользователю
         await addDoc(collection(db, "notifications"), {
             userId: data.userId,
             title: 'Персонаж одобрен',
@@ -217,9 +210,8 @@
             createdAt: serverTimestamp()
         });
         
-        // Удаляем заявку
         await deleteDoc(pendingRef);
-        loadPendingCharacters(); // обновляем список
+        loadPendingCharacters();
     }
 
     async function rejectCharacter(pendingId, reason) {
@@ -240,7 +232,6 @@
         loadPendingCharacters();
     }
 
-    // Массовое уведомление
     document.getElementById('send-mass-notif').addEventListener('click', async () => {
         const title = document.getElementById('notif-title').value.trim();
         const message = document.getElementById('notif-message').value.trim();
@@ -248,7 +239,6 @@
             alert('Заполните заголовок и текст');
             return;
         }
-        // Получаем всех пользователей из коллекции profiles
         const profilesRef = collection(db, "profiles");
         const profilesSnap = await getDocs(profilesRef);
         const batch = [];
