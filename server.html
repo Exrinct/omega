@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель — RP Server</title>
+    <title>Omega RolePlay — Панель</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,83 +11,83 @@
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
-            background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             color: #e0e0e0;
             padding: 2rem;
-            position: relative;
+            display: flex;
+            justify-content: center;
         }
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 0;
-        }
+
         .dashboard {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 680px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(20,20,20,0.8);
-            backdrop-filter: blur(4px);
-            padding: 1rem 1.5rem;
-            border-radius: 20px;
+            background: #121212;
             border: 1px solid #2c2c2c;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
         }
+
         .user-greeting {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 500;
         }
         .user-greeting span { color: #3b6e4f; }
+
         .logout {
             background: none;
             border: 1px solid #3b6e4f;
             padding: 0.5rem 1.2rem;
-            border-radius: 12px;
+            border-radius: 30px;
             color: #ccc;
             cursor: pointer;
             font-family: inherit;
             transition: 0.2s;
         }
         .logout:hover { background: #3b6e4f20; border-color: #5a8e4a; color: white; }
+
         .card {
-            background: rgba(20,20,20,0.85);
-            backdrop-filter: blur(4px);
+            background: #121212;
             border: 1px solid #2c2c2c;
             border-radius: 20px;
             padding: 1.8rem;
         }
-        .card h3 {
-            font-weight: 500;
+
+        .create-character {
+            display: block;
+            text-align: center;
+            background: #1e2a1e;
+            border: 1px solid #3b6e4f;
+            border-radius: 40px;
+            padding: 1rem;
             font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: #ddd;
+            font-weight: 600;
+            color: #c8e6c0;
+            text-decoration: none;
+            transition: 0.2s;
         }
-        .accent { color: #3b6e4f; }
+        .create-character:hover {
+            background: #2a3a2a;
+            border-color: #5a8e4a;
+        }
+
         .ip-box {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             background: #1e1e1e;
             border-radius: 14px;
             padding: 0.8rem 1rem;
             gap: 1rem;
         }
         .ip-text {
-            flex: 1;
             font-family: monospace;
             font-size: 1rem;
         }
@@ -96,30 +96,47 @@
             border: 1px solid #3b6e4f;
             color: #3b6e4f;
             padding: 0.4rem 0.8rem;
-            border-radius: 10px;
+            border-radius: 20px;
             cursor: pointer;
         }
+
         .modpack-link {
+            display: inline-block;
+            margin-top: 0.8rem;
             color: #3b6e4f;
             text-decoration: none;
             border-bottom: 1px solid transparent;
         }
         .modpack-link:hover { border-bottom-color: #3b6e4f; }
-        .links-grid {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .link-item {
+
+        .lore-link {
+            display: inline-block;
             background: #1e1e1e;
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
+            border: 1px solid #3b6e4f;
+            border-radius: 40px;
+            padding: 0.8rem 1.8rem;
             text-decoration: none;
-            color: #ccc;
-            border: 1px solid #333;
+            color: #c0c0c0;
             transition: 0.2s;
+            text-align: center;
         }
-        .link-item:hover { background: #2a2a2a; border-color: #3b6e4f; }
+        .lore-link:hover { background: #2a2a2a; border-color: #5a8e4a; color: white; }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        .social-link {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid #333;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+        }
+        .social-link:hover { border-color: #3b6e4f; color: #ddd; }
     </style>
 </head>
 <body>
@@ -129,8 +146,10 @@
         <button class="logout" id="logout-btn">Выйти</button>
     </div>
 
+    <a href="character.html" class="create-character">СОЗДАТЬ ПЕРСОНАЖА</a>
+
     <div class="card">
-        <h3>Адрес сервера</h3>
+        <h3 style="margin-bottom: 0.8rem; font-weight: 500;">Адрес сервера</h3>
         <div class="ip-box">
             <span class="ip-text">play.rp-minecraft.ru</span>
             <button class="copy-btn" onclick="copyIP()">Копировать</button>
@@ -138,23 +157,18 @@
     </div>
 
     <div class="card">
-        <h3>Сборка модов</h3>
+        <h3 style="margin-bottom: 0.5rem; font-weight: 500;">Сборка модов</h3>
         <p>Скачайте сборку для версии 1.20.1 (Forge)</p>
         <a href="#" class="modpack-link">Скачать ModPack (Google Диск)</a>
     </div>
 
-    <div class="card">
-        <h3>Лор проекта</h3>
-        <p>Мир Этерион погрузился в хаос после Падения Небесного Камня. Королевства борются за осколки древней магии, а гильдии искателей отправляются в забытые земли в поисках истины. Ваша история начинается здесь.</p>
+    <div class="card" style="text-align: center;">
+        <a href="lore.html" class="lore-link">Перейти к лору проекта</a>
     </div>
 
-    <div class="card">
-        <h3>Сообщество</h3>
-        <div class="links-grid">
-            <a href="https://discord.gg/hyJUUckQMh" class="link-item" target="_blank">Discord</a>
-            <a href="https://t.me/Omega1RolePlay" class="link-item" target="_blank">Telegram</a>
-            <a href="character.html" class="link-item">Создать персонажа</a>
-        </div>
+    <div class="social-links">
+        <a href="https://discord.gg/hyJUUckQMh" class="social-link" target="_blank">Discord</a>
+        <a href="https://t.me/Omega1RolePlay" class="social-link" target="_blank">Telegram</a>
     </div>
 </div>
 
