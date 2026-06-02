@@ -27,6 +27,23 @@
         }
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { margin-bottom: 1.5rem; }
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #2c2c2c;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .tab.active {
+            color: #3b6e4f;
+            border-bottom: 2px solid #3b6e4f;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         .card {
             background: #121212;
             border: 1px solid #2c2c2c;
@@ -34,12 +51,12 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        .pending-list { display: flex; flex-direction: column; gap: 1rem; }
-        .pending-item {
+        .list-item {
             background: #1a1a1a;
             border-radius: 16px;
             padding: 1rem;
-            border-left: 3px solid #e0a000;
+            margin-bottom: 1rem;
+            border-left: 3px solid #3b6e4f;
         }
         .actions { margin-top: 0.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
         button {
@@ -50,16 +67,21 @@
             color: white;
             cursor: pointer;
         }
-        .reject-btn { background: #5a2e2e; }
-        .reject-btn:hover { background: #7a3e3e; }
-        .approve-btn:hover { background: #3a6e34; }
-        .comment-input {
+        .delete-btn { background: #5a2e2e; }
+        .delete-btn:hover { background: #7a3e3e; }
+        .role-select {
             background: #1e1e1e;
             border: 1px solid #333;
             border-radius: 12px;
-            padding: 0.4rem;
-            width: 200px;
+            padding: 0.3rem;
             color: white;
+            margin-left: 0.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #3b6e4f;
+            text-decoration: none;
         }
         .mass-notif { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
         .mass-notif input, .mass-notif textarea {
@@ -71,31 +93,50 @@
             color: white;
             font-family: inherit;
         }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 1rem;
-            color: #3b6e4f;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
-<div class="version">v1.0.0</div>
+<div class="version">v1.1.0</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <h1>Админ-панель</h1>
     
-    <div class="card">
-        <h3>Заявки на создание персонажа</h3>
-        <div id="pending-list" class="pending-list">Загрузка...</div>
+    <div class="tabs">
+        <div class="tab active" data-tab="pending">Заявки</div>
+        <div class="tab" data-tab="approved">Персонажи</div>
+        <div class="tab" data-tab="users">Пользователи</div>
+        <div class="tab" data-tab="notify">Уведомления</div>
     </div>
 
-    <div class="card">
-        <h3>Массовое уведомление</h3>
-        <div class="mass-notif">
-            <input type="text" id="notif-title" placeholder="Заголовок">
-            <textarea id="notif-message" rows="2" placeholder="Текст уведомления"></textarea>
-            <button id="send-mass-notif">Отправить всем</button>
+    <div id="pending-tab" class="tab-content active">
+        <div class="card">
+            <h3>Заявки на создание персонажа</h3>
+            <div id="pending-list">Загрузка...</div>
+        </div>
+    </div>
+
+    <div id="approved-tab" class="tab-content">
+        <div class="card">
+            <h3>Одобренные персонажи</h3>
+            <div id="approved-list">Загрузка...</div>
+        </div>
+    </div>
+
+    <div id="users-tab" class="tab-content">
+        <div class="card">
+            <h3>Управление пользователями</h3>
+            <div id="users-list">Загрузка...</div>
+        </div>
+    </div>
+
+    <div id="notify-tab" class="tab-content">
+        <div class="card">
+            <h3>Массовое уведомление</h3>
+            <div class="mass-notif">
+                <input type="text" id="notif-title" placeholder="Заголовок">
+                <textarea id="notif-message" rows="2" placeholder="Текст уведомления"></textarea>
+                <button id="send-mass-notif">Отправить всем</button>
+            </div>
         </div>
     </div>
 </div>
@@ -103,7 +144,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -118,7 +159,9 @@
     const db = getFirestore(app);
 
     let currentUser = null;
+    let currentUserRole = null;
 
+    // Проверка админа или анкетолога
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';
@@ -127,15 +170,22 @@
         currentUser = user;
         const profileRef = doc(db, "profiles", user.uid);
         const profileSnap = await getDoc(profileRef);
-        if (!profileSnap.exists() || profileSnap.data().isAdmin !== true) {
-            alert('У вас нет прав администратора');
+        if (!profileSnap.exists()) {
             window.location.href = 'server.html';
             return;
         }
-        loadPendingCharacters();
+        currentUserRole = profileSnap.data().role || "user";
+        if (currentUserRole !== 'admin' && currentUserRole !== 'reviewer') {
+            alert('У вас нет прав для доступа к админ-панели');
+            window.location.href = 'server.html';
+            return;
+        }
+        loadPending();
+        loadApproved();
+        loadUsers();
     });
 
-    async function loadPendingCharacters() {
+    async function loadPending() {
         const pendingRef = collection(db, "pending_characters");
         const q = query(pendingRef, where("status", "==", "pending"));
         const snapshot = await getDocs(q);
@@ -147,38 +197,30 @@
         container.innerHTML = '';
         for (const docSnap of snapshot.docs) {
             const data = docSnap.data();
-            const userId = data.userId;
-            const userProfileRef = doc(db, "profiles", userId);
-            const userProfile = await getDoc(userProfileRef);
+            const userProfile = await getDoc(doc(db, "profiles", data.userId));
             const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
-            
             const div = document.createElement('div');
-            div.className = 'pending-item';
+            div.className = 'list-item';
             div.innerHTML = `
                 <div><strong>Игрок:</strong> ${userNick}</div>
                 <div><strong>Персонаж:</strong> ${data.characterName} (${data.profession})</div>
                 <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
                 <div><strong>История:</strong> ${data.history}</div>
                 <div class="actions">
-                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" class="comment-input">
+                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" style="background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.3rem;">
                     <button class="approve-btn" data-id="${docSnap.id}">Одобрить</button>
                     <button class="reject-btn" data-id="${docSnap.id}">Отклонить</button>
                 </div>
             `;
             container.appendChild(div);
         }
-
         document.querySelectorAll('.approve-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.getAttribute('data-id');
-                await approveCharacter(id);
-            });
+            btn.addEventListener('click', async () => await approveCharacter(btn.getAttribute('data-id')));
         });
         document.querySelectorAll('.reject-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const id = btn.getAttribute('data-id');
-                const commentInput = document.getElementById(`comment-${id}`);
-                const comment = commentInput.value.trim();
+                const comment = document.getElementById(`comment-${id}`).value.trim();
                 await rejectCharacter(id, comment || 'Не указана причина');
             });
         });
@@ -189,7 +231,6 @@
         const pendingSnap = await getDoc(pendingRef);
         if (!pendingSnap.exists()) return;
         const data = pendingSnap.data();
-        
         await addDoc(collection(db, "approved_characters"), {
             userId: data.userId,
             userNick: data.userNick,
@@ -198,20 +239,20 @@
             age: data.age,
             history: data.history,
             profession: data.profession,
+            likes: 0,
             approvedAt: serverTimestamp(),
             approvedBy: currentUser.uid
         });
-        
         await addDoc(collection(db, "notifications"), {
             userId: data.userId,
             title: 'Персонаж одобрен',
-            message: `Ваш персонаж "${data.characterName}" был одобрен администрацией. Добро пожаловать в мир ролевой игры!`,
+            message: `Ваш персонаж "${data.characterName}" был одобрен. Добро пожаловать в мир ролевой игры!`,
             isRead: false,
             createdAt: serverTimestamp()
         });
-        
         await deleteDoc(pendingRef);
-        loadPendingCharacters();
+        loadPending();
+        loadApproved();
     }
 
     async function rejectCharacter(pendingId, reason) {
@@ -219,7 +260,6 @@
         const pendingSnap = await getDoc(pendingRef);
         if (!pendingSnap.exists()) return;
         const data = pendingSnap.data();
-        
         await addDoc(collection(db, "notifications"), {
             userId: data.userId,
             title: 'Персонаж отклонён',
@@ -227,12 +267,92 @@
             isRead: false,
             createdAt: serverTimestamp()
         });
-        
         await deleteDoc(pendingRef);
-        loadPendingCharacters();
+        loadPending();
+    }
+
+    async function loadApproved() {
+        const approvedRef = collection(db, "approved_characters");
+        const snapshot = await getDocs(approvedRef);
+        const container = document.getElementById('approved-list');
+        if (snapshot.empty) {
+            container.innerHTML = '<div>Нет одобренных персонажей</div>';
+            return;
+        }
+        container.innerHTML = '';
+        for (const docSnap of snapshot.docs) {
+            const data = docSnap.data();
+            const userProfile = await getDoc(doc(db, "profiles", data.userId));
+            const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>Игрок:</strong> ${userNick}</div>
+                <div><strong>Персонаж:</strong> ${data.characterName} (${data.profession})</div>
+                <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
+                <div><strong>История:</strong> ${data.history.substring(0, 150)}...</div>
+                <div class="actions">
+                    <button class="delete-char-btn" data-id="${docSnap.id}">Удалить персонажа</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.delete-char-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('Удалить персонажа? Это действие необратимо.')) {
+                    await deleteDoc(doc(db, "approved_characters", btn.getAttribute('data-id')));
+                    loadApproved();
+                }
+            });
+        });
+    }
+
+    async function loadUsers() {
+        const profilesRef = collection(db, "profiles");
+        const snapshot = await getDocs(profilesRef);
+        const container = document.getElementById('users-list');
+        if (snapshot.empty) {
+            container.innerHTML = '<div>Нет пользователей</div>';
+            return;
+        }
+        container.innerHTML = '';
+        for (const docSnap of snapshot.docs) {
+            const data = docSnap.data();
+            const role = data.role || "user";
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>Ник:</strong> ${data.nickname}</div>
+                <div><strong>Email:</strong> ${data.email}</div>
+                <div><strong>Роль:</strong> 
+                    <select class="role-select" data-uid="${docSnap.id}">
+                        <option value="user" ${role === 'user' ? 'selected' : ''}>Пользователь</option>
+                        <option value="reviewer" ${role === 'reviewer' ? 'selected' : ''}>Анкетолог</option>
+                        <option value="admin" ${role === 'admin' ? 'selected' : ''}>Администратор</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.role-select').forEach(select => {
+            select.addEventListener('change', async (e) => {
+                if (currentUserRole !== 'admin') {
+                    alert('Только администратор может менять роли');
+                    return;
+                }
+                const uid = select.getAttribute('data-uid');
+                const newRole = select.value;
+                await updateDoc(doc(db, "profiles", uid), { role: newRole });
+                alert('Роль обновлена');
+            });
+        });
     }
 
     document.getElementById('send-mass-notif').addEventListener('click', async () => {
+        if (currentUserRole !== 'admin') {
+            alert('Только администратор может отправлять массовые уведомления');
+            return;
+        }
         const title = document.getElementById('notif-title').value.trim();
         const message = document.getElementById('notif-message').value.trim();
         if (!title || !message) {
@@ -243,9 +363,8 @@
         const profilesSnap = await getDocs(profilesRef);
         const batch = [];
         profilesSnap.forEach(doc => {
-            const userId = doc.id;
             batch.push(addDoc(collection(db, "notifications"), {
-                userId: userId,
+                userId: doc.id,
                 title: title,
                 message: message,
                 isRead: false,
@@ -256,6 +375,18 @@
         alert(`Уведомление отправлено ${batch.length} пользователям`);
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-message').value = '';
+    });
+
+    // Переключение табов
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.getElementById(`${tab.getAttribute('data-tab')}-tab`).classList.add('active');
+            if (tab.getAttribute('data-tab') === 'approved') loadApproved();
+            if (tab.getAttribute('data-tab') === 'users') loadUsers();
+        });
     });
 </script>
 </body>
