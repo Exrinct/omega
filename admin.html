@@ -84,33 +84,25 @@
     </style>
 </head>
 <body>
-<div class="version">v2.0.0 (no storage)</div>
+<div class="version">v2.1.0</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <h1>Админ-панель</h1>
     <div class="tabs">
-        <div class="tab active" data-tab="pending">Заявки</div>
+        <div class="tab active" data-tab="pending">Заявки на персонажа</div>
         <div class="tab" data-tab="approved">Персонажи</div>
+        <div class="tab" data-tab="nickname">Смена ника</div>
         <div class="tab" data-tab="achievements">Достижения</div>
         <div class="tab" data-tab="users">Пользователи</div>
         <div class="tab" data-tab="notify">Уведомления</div>
     </div>
 
-    <div id="pending-tab" class="tab-content active">
-        <div class="card"><h3>Заявки на создание персонажа</h3><div id="pending-list">Загрузка...</div></div>
-    </div>
-    <div id="approved-tab" class="tab-content">
-        <div class="card"><h3>Одобренные персонажи (можно удалять)</h3><div id="approved-list">Загрузка...</div></div>
-    </div>
-    <div id="achievements-tab" class="tab-content">
-        <div class="card"><h3>Управление достижениями</h3><button id="new-ach-btn" class="btn">+ Новое достижение</button><div id="ach-list">Загрузка...</div></div>
-    </div>
-    <div id="users-tab" class="tab-content">
-        <div class="card"><h3>Управление пользователями</h3><div id="users-list">Загрузка...</div></div>
-    </div>
-    <div id="notify-tab" class="tab-content">
-        <div class="card"><h3>Массовое уведомление</h3><div class="mass-notif" style="display:flex; gap:1rem; flex-wrap:wrap;"><input type="text" id="notif-title" placeholder="Заголовок"><textarea id="notif-message" rows="2" placeholder="Текст"></textarea><button id="send-mass-notif">Отправить</button></div></div>
-    </div>
+    <div id="pending-tab" class="tab-content active"><div class="card"><h3>Заявки на создание персонажа</h3><div id="pending-list">Загрузка...</div></div></div>
+    <div id="approved-tab" class="tab-content"><div class="card"><h3>Одобренные персонажи</h3><div id="approved-list">Загрузка...</div></div></div>
+    <div id="nickname-tab" class="tab-content"><div class="card"><h3>Заявки на смену ника</h3><div id="nickname-list">Загрузка...</div></div></div>
+    <div id="achievements-tab" class="tab-content"><div class="card"><h3>Достижения</h3><button id="new-ach-btn" class="btn">+ Новое достижение</button><hr style="margin:1rem 0"><h4>Выдать достижение</h4><div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1rem;"><input type="text" id="give-nick" placeholder="Ник игрока"><select id="give-ach-select"></select><button id="give-ach-btn" class="btn">Выдать</button></div><div id="ach-list">Загрузка...</div></div></div>
+    <div id="users-tab" class="tab-content"><div class="card"><h3>Управление пользователями</h3><div id="users-list">Загрузка...</div></div></div>
+    <div id="notify-tab" class="tab-content"><div class="card"><h3>Массовое уведомление</h3><div style="display:flex; gap:1rem; flex-wrap:wrap;"><input type="text" id="notif-title" placeholder="Заголовок"><textarea id="notif-message" rows="2" placeholder="Текст"></textarea><button id="send-mass-notif">Отправить</button></div></div></div>
 </div>
 
 <script type="module">
@@ -146,11 +138,12 @@
         }
         loadPending();
         loadApproved();
+        loadNicknameRequests();
         loadAchievements();
         loadUsers();
     });
 
-    // ========== ЗАЯВКИ ==========
+    // === ЗАЯВКИ НА ПЕРСОНАЖА (как раньше) ===
     async function loadPending() {
         const q = query(collection(db, "pending_characters"), where("status", "==", "pending"));
         const snap = await getDocs(q);
@@ -170,14 +163,14 @@
                 <div><strong>История:</strong> ${data.history}</div>
                 <div class="actions">
                     <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" style="max-width:200px;">
-                    <button class="approve-btn" data-id="${docSnap.id}">Одобрить</button>
-                    <button class="reject-btn" data-id="${docSnap.id}">Отклонить</button>
+                    <button class="approve-char" data-id="${docSnap.id}">Одобрить</button>
+                    <button class="reject-char" data-id="${docSnap.id}">Отклонить</button>
                 </div>
             `;
             container.appendChild(div);
         }
-        document.querySelectorAll('.approve-btn').forEach(btn => btn.addEventListener('click', async () => approveCharacter(btn.getAttribute('data-id'))));
-        document.querySelectorAll('.reject-btn').forEach(btn => btn.addEventListener('click', async () => {
+        document.querySelectorAll('.approve-char').forEach(btn => btn.addEventListener('click', async () => approveCharacter(btn.getAttribute('data-id'))));
+        document.querySelectorAll('.reject-char').forEach(btn => btn.addEventListener('click', async () => {
             const id = btn.getAttribute('data-id');
             const comment = document.getElementById(`comment-${id}`).value.trim();
             await rejectCharacter(id, comment || 'Не указана причина');
@@ -214,7 +207,7 @@
         loadPending();
     }
 
-    // ========== ОДОБРЕННЫЕ ПЕРСОНАЖИ ==========
+    // === ОДОБРЕННЫЕ ПЕРСОНАЖИ ===
     async function loadApproved() {
         const snap = await getDocs(collection(db, "approved_characters"));
         const container = document.getElementById('approved-list');
@@ -228,9 +221,7 @@
             div.className = 'list-item';
             div.innerHTML = `
                 <div><strong>${data.characterName}</strong> (игрок: ${userNick}) — ${data.profession}, возраст ${data.age}</div>
-                <div class="actions">
-                    <button class="delete-char" data-id="${docSnap.id}">Удалить персонажа</button>
-                </div>
+                <div class="actions"><button class="delete-char" data-id="${docSnap.id}">Удалить</button></div>
             `;
             container.appendChild(div);
         }
@@ -244,32 +235,90 @@
         });
     }
 
-    // ========== ДОСТИЖЕНИЯ ==========
+    // === ЗАЯВКИ НА СМЕНУ НИКА ===
+    async function loadNicknameRequests() {
+        const q = query(collection(db, "nickname_requests"), where("status", "==", "pending"));
+        const snap = await getDocs(q);
+        const container = document.getElementById('nickname-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет заявок на смену ника</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const data = docSnap.data();
+            const userProfile = await getDoc(doc(db, "profiles", data.userId));
+            const userNick = userProfile.exists() ? userProfile.data().nickname : data.userId;
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>Игрок:</strong> ${userNick}</div>
+                <div><strong>Текущий ник:</strong> ${data.oldNickname}</div>
+                <div><strong>Новый ник:</strong> ${data.newNickname}</div>
+                <div class="actions">
+                    <button class="approve-nick" data-id="${docSnap.id}" data-uid="${data.userId}" data-newname="${data.newNickname}">Одобрить</button>
+                    <button class="reject-nick" data-id="${docSnap.id}">Отклонить</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.approve-nick').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const requestId = btn.getAttribute('data-id');
+                const userId = btn.getAttribute('data-uid');
+                const newName = btn.getAttribute('data-newname');
+                // обновляем ник в профиле
+                const userRef = doc(db, "profiles", userId);
+                await updateDoc(userRef, { nickname: newName, nickname_lower: newName.toLowerCase() });
+                // обновляем заявку
+                await updateDoc(doc(db, "nickname_requests", requestId), { status: 'approved' });
+                // уведомление игроку
+                await addDoc(collection(db, "notifications"), {
+                    userId: userId, title: 'Ник изменён', message: `Ваш ник успешно изменён на "${newName}".`, isRead: false, createdAt: serverTimestamp()
+                });
+                loadNicknameRequests();
+            });
+        });
+        document.querySelectorAll('.reject-nick').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const requestId = btn.getAttribute('data-id');
+                await updateDoc(doc(db, "nickname_requests", requestId), { status: 'rejected' });
+                const reqSnap = await getDoc(doc(db, "nickname_requests", requestId));
+                const data = reqSnap.data();
+                await addDoc(collection(db, "notifications"), {
+                    userId: data.userId, title: 'Смена ника отклонена', message: `Ваша заявка на смену ника на "${data.newNickname}" отклонена.`, isRead: false, createdAt: serverTimestamp()
+                });
+                loadNicknameRequests();
+            });
+        });
+    }
+
+    // === ДОСТИЖЕНИЯ ===
     async function loadAchievements() {
         const snap = await getDocs(collection(db, "achievements"));
         const container = document.getElementById('ach-list');
-        if (snap.empty) { container.innerHTML = '<p>Нет достижений. Создайте первое.</p>'; return; }
+        const select = document.getElementById('give-ach-select');
+        if (snap.empty) {
+            container.innerHTML = '<p>Нет достижений. Создайте первое.</p>';
+            select.innerHTML = '<option>Нет достижений</option>';
+            return;
+        }
         container.innerHTML = '';
+        select.innerHTML = '';
         snap.forEach(docSnap => {
             const a = docSnap.data();
             const div = document.createElement('div');
             div.className = 'list-item';
-            div.innerHTML = `
-                <div><strong>${a.title}</strong> — ${a.description}</div>
-                <div class="actions">
-                    <button class="delete-ach" data-id="${docSnap.id}">Удалить</button>
-                </div>
-            `;
+            div.innerHTML = `<div><strong>${a.title}</strong> — ${a.description}</div><div class="actions"><button class="delete-ach" data-id="${docSnap.id}">Удалить</button></div>`;
             container.appendChild(div);
+            const option = document.createElement('option');
+            option.value = docSnap.id;
+            option.textContent = a.title;
+            select.appendChild(option);
         });
-        document.querySelectorAll('.delete-ach').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (confirm('Удалить достижение? Оно пропадёт из профилей игроков.')) {
-                    await deleteDoc(doc(db, "achievements", btn.getAttribute('data-id')));
-                    loadAchievements();
-                }
-            });
-        });
+        document.querySelectorAll('.delete-ach').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить достижение?')) {
+                await deleteDoc(doc(db, "achievements", btn.getAttribute('data-id')));
+                loadAchievements();
+            }
+        }));
     }
     document.getElementById('new-ach-btn')?.addEventListener('click', async () => {
         const title = prompt('Название достижения');
@@ -279,8 +328,26 @@
         await addDoc(collection(db, "achievements"), { title, description: desc });
         loadAchievements();
     });
+    document.getElementById('give-ach-btn')?.addEventListener('click', async () => {
+        const nick = document.getElementById('give-nick').value.trim();
+        const achId = document.getElementById('give-ach-select').value;
+        if (!nick || !achId) { alert('Введите ник и выберите достижение'); return; }
+        const profiles = await getDocs(collection(db, "profiles"));
+        let targetUid = null;
+        for (const docSnap of profiles.docs) {
+            if (docSnap.data().nickname.toLowerCase() === nick.toLowerCase()) {
+                targetUid = docSnap.id;
+                break;
+            }
+        }
+        if (!targetUid) { alert('Игрок не найден'); return; }
+        const existing = await getDocs(query(collection(db, "user_achievements"), where("userId", "==", targetUid), where("achievementId", "==", achId)));
+        if (!existing.empty) { alert('У игрока уже есть это достижение'); return; }
+        await addDoc(collection(db, "user_achievements"), { userId: targetUid, achievementId: achId, earnedAt: serverTimestamp() });
+        alert('Достижение выдано!');
+    });
 
-    // ========== ПОЛЬЗОВАТЕЛИ ==========
+    // === ПОЛЬЗОВАТЕЛИ ===
     async function loadUsers() {
         const snap = await getDocs(collection(db, "profiles"));
         const container = document.getElementById('users-list');
@@ -315,7 +382,7 @@
         });
     }
 
-    // ========== УВЕДОМЛЕНИЯ ==========
+    // === УВЕДОМЛЕНИЯ ===
     document.getElementById('send-mass-notif')?.addEventListener('click', async () => {
         if (currentUserRole !== 'admin') { alert('Только админ'); return; }
         const title = document.getElementById('notif-title').value.trim();
@@ -334,7 +401,7 @@
         document.getElementById('notif-message').value = '';
     });
 
-    // Переключение табов
+    // Переключение вкладок
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
             const target = tab.getAttribute('data-tab');
@@ -343,6 +410,7 @@
             document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
             document.getElementById(`${target}-tab`).classList.add('active');
             if (target === 'approved') loadApproved();
+            if (target === 'nickname') loadNicknameRequests();
             if (target === 'achievements') loadAchievements();
             if (target === 'users') loadUsers();
         });
