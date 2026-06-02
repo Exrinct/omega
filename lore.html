@@ -2,60 +2,62 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лор проекта — Omega RolePlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Лор — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            padding: 2rem;
-            display: flex;
-            justify-content: center;
-            position: relative;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0A0A0A;
+            color: #E6E6E6;
+            padding: 1.5rem;
         }
         .version {
             position: fixed;
             bottom: 12px;
             right: 12px;
-            font-size: 0.7rem;
-            color: #3b6e4f;
+            font-size: 0.65rem;
+            color: #3B6E4F;
             background: rgba(0,0,0,0.5);
             padding: 2px 6px;
-            border-radius: 8px;
+            border-radius: 20px;
+            z-index: 100;
         }
         .container {
             max-width: 800px;
-            background: #121212;
-            border: 1px solid #2c2c2c;
+            margin: 0 auto;
+            background: #111;
+            border: 1px solid #222;
             border-radius: 28px;
-            padding: 2.5rem;
+            padding: 2rem;
         }
-        h1 { font-size: 2rem; font-weight: 500; margin-bottom: 1.5rem; }
-        .accent { color: #3b6e4f; }
-        p { line-height: 1.7; margin-bottom: 1rem; color: #bbb; }
+        h1 {
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
         .back-link {
             display: inline-block;
-            margin-top: 2rem;
-            color: #909090;
+            margin-bottom: 1.5rem;
+            color: #3B6E4F;
             text-decoration: none;
-            border: 1px solid #3b6e4f;
-            padding: 0.6rem 1.5rem;
-            border-radius: 30px;
         }
-        .back-link:hover { background: #3b6e4f20; }
+        p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: #C0C0C0;
+        }
     </style>
 </head>
 <body>
-<div class="version">v1.0.0</div>
+<div class="version">v3.1.0</div>
 <div class="container">
-    <h1>Лор Этериона<span class="accent">.</span></h1>
+    <a href="server.html" class="back-link">← Назад</a>
+    <h1>Лор Этериона</h1>
     <p>Мир Этерион был велик и процветал под покровительством древних. Но после Падения Небесного Камня магия исказилась, границы между измерениями истончились, а старые королевства пали.</p>
     <p>Теперь осколки Камня разбросаны по землям, и те, кто осмелится их собрать, смогут изменить судьбу этого мира. Гильдии искателей, тёмные культы и наёмники — каждый преследует свою цель.</p>
     <p>Твоя история начинается с простого странника. Кем ты станешь — героем, завоевателем или тенью?</p>
-    <a href="server.html" class="back-link">Вернуться в панель</a>
+    <p style="margin-top:1rem;">Следите за объявлениями, чтобы не пропустить новые сюжетные главы.</p>
 </div>
 </body>
 </html>
