@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магазин — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 2rem;
+        }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: #3b6e4f;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { margin-bottom: 1rem; }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #3b6e4f;
+            text-decoration: none;
+        }
+        .balance {
+            background: #1e1e1e;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .item-card {
+            background: #121212;
+            border: 1px solid #2c2c2c;
+            border-radius: 20px;
+            padding: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .item-card:hover { transform: translateY(-2px); border-color: #3b6e4f; }
+        .item-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        .item-desc {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 0.8rem;
+        }
+        .item-price {
+            color: #ffd966;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .buy-btn {
+            background: #2d5a27;
+            border: none;
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+        }
+        .buy-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+        }
+        .message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2d5a27;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            z-index: 100;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="version">v3.0.0</div>
+<div class="container">
+    <a href="server.html" class="back-link">← Назад в панель</a>
+    <h1>Магазин монет</h1>
+    <div class="balance">💰 Ваш баланс: <span id="user-points">0</span> монет</div>
+    <div id="shop-items" class="items-grid">Загрузка...</div>
+</div>
+<div id="message" class="message"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    async function loadBalance() {
+        if (!currentUser) return;
+        const profile = await getDoc(doc(db, "profiles", currentUser.uid));
+        const points = profile.exists() ? (profile.data().rp_points || 0) : 0;
+        document.getElementById('user-points').innerText = points;
+    }
+
+    async function loadShop() {
+        const snap = await getDocs(collection(db, "shop_items"));
+        const container = document.getElementById('shop-items');
+        if (snap.empty) {
+            container.innerHTML = '<div>Товаров пока нет. Зайдите позже.</div>';
+            return;
+        }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const item = docSnap.data();
+            const div = document.createElement('div');
+            div.className = 'item-card';
+            div.innerHTML = `
+                <div class="item-name">${escapeHtml(item.name)}</div>
+                <div class="item-desc">${escapeHtml(item.description)}</div>
+                <div class="item-price">💰 ${item.price} монет</div>
+                <button class="buy-btn" data-id="${docSnap.id}" data-price="${item.price}">Купить</button>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.buy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const itemId = btn.getAttribute('data-id');
+                const price = parseInt(btn.getAttribute('data-price'));
+                if (!currentUser) { showMessage('Авторизуйтесь'); return; }
+                const profileRef = doc(db, "profiles", currentUser.uid);
+                const profile = await getDoc(profileRef);
+                const points = profile.data().rp_points || 0;
+                if (points < price) {
+                    showMessage('Недостаточно монет');
+                    return;
+                }
+                // Вычитаем монеты и записываем покупку
+                await updateDoc(profileRef, { rp_points: increment(-price) });
+                await addDoc(collection(db, "purchases"), {
+                    userId: currentUser.uid,
+                    itemId: itemId,
+                    purchasedAt: serverTimestamp(),
+                    used: false
+                });
+                showMessage(`Вы купили ${escapeHtml(btn.parentElement.querySelector('.item-name').innerText)}`);
+                loadBalance();
+            });
+        });
+    }
+
+    function showMessage(text) {
+        const msgDiv = document.getElementById('message');
+        msgDiv.innerText = text;
+        msgDiv.style.display = 'block';
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+    }
+
+    function escapeHtml(str) { return str ? str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;') : ''; }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'index.html'; return; }
+        currentUser = user;
+        loadBalance();
+        loadShop();
+    });
+</script>
+</body>
+</html>
