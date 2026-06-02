@@ -32,6 +32,7 @@
             gap: 1rem;
             margin-bottom: 1.5rem;
             border-bottom: 1px solid #2c2c2c;
+            flex-wrap: wrap;
         }
         .tab {
             padding: 0.5rem 1rem;
@@ -96,7 +97,7 @@
     </style>
 </head>
 <body>
-<div class="version">v1.1.0</div>
+<div class="version">v1.2.0</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <h1>Админ-панель</h1>
@@ -105,6 +106,7 @@
         <div class="tab active" data-tab="pending">Заявки</div>
         <div class="tab" data-tab="approved">Персонажи</div>
         <div class="tab" data-tab="users">Пользователи</div>
+        <div class="tab" data-tab="forum">Форум</div>
         <div class="tab" data-tab="notify">Уведомления</div>
     </div>
 
@@ -117,7 +119,7 @@
 
     <div id="approved-tab" class="tab-content">
         <div class="card">
-            <h3>Одобренные персонажи</h3>
+            <h3>Одобренные персонажи (можно удалять)</h3>
             <div id="approved-list">Загрузка...</div>
         </div>
     </div>
@@ -126,6 +128,18 @@
         <div class="card">
             <h3>Управление пользователями</h3>
             <div id="users-list">Загрузка...</div>
+        </div>
+    </div>
+
+    <div id="forum-tab" class="tab-content">
+        <div class="card">
+            <h3>Управление форумом</h3>
+            <div style="margin-bottom:1rem;">
+                <button id="create-category-btn" class="btn">Создать раздел</button>
+                <button id="ban-user-btn" class="btn delete-btn">Бан/мут игрока</button>
+            </div>
+            <div id="forum-categories-list"></div>
+            <div id="forum-topics-list"></div>
         </div>
     </div>
 
@@ -141,10 +155,38 @@
     </div>
 </div>
 
+<!-- Модалки для форума -->
+<div id="new-category-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
+    <div class="modal-content" style="background:#121212; border:1px solid #3b6e4f; border-radius:28px; padding:2rem; max-width:400px; width:90%;">
+        <h3>Новый раздел</h3>
+        <input type="text" id="category-name" placeholder="Название" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin:1rem 0;">
+        <div class="modal-buttons" style="display:flex; gap:1rem;">
+            <button id="submit-category" class="btn">Создать</button>
+            <button id="cancel-category" class="btn delete-btn">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div id="ban-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
+    <div class="modal-content" style="background:#121212; border:1px solid #3b6e4f; border-radius:28px; padding:2rem; max-width:400px; width:90%;">
+        <h3>Бан/мут игрока на форуме</h3>
+        <input type="text" id="ban-user-nick" placeholder="Ник игрока" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin:1rem 0;">
+        <select id="ban-type" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin-bottom:1rem;">
+            <option value="ban">Бан (полная блокировка форума)</option>
+            <option value="mute">Мут (не может писать)</option>
+        </select>
+        <input type="datetime-local" id="ban-until" placeholder="Дата окончания (опционально)" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin-bottom:1rem;">
+        <div class="modal-buttons" style="display:flex; gap:1rem;">
+            <button id="submit-ban" class="btn">Применить</button>
+            <button id="cancel-ban" class="btn delete-btn">Отмена</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -161,41 +203,31 @@
     let currentUser = null;
     let currentUserRole = null;
 
-    // Проверка админа или анкетолога
     onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = 'index.html';
-            return;
-        }
+        if (!user) { window.location.href = 'index.html'; return; }
         currentUser = user;
-        const profileRef = doc(db, "profiles", user.uid);
-        const profileSnap = await getDoc(profileRef);
-        if (!profileSnap.exists()) {
-            window.location.href = 'server.html';
-            return;
-        }
+        const profileSnap = await getDoc(doc(db, "profiles", user.uid));
+        if (!profileSnap.exists()) { window.location.href = 'server.html'; return; }
         currentUserRole = profileSnap.data().role || "user";
         if (currentUserRole !== 'admin' && currentUserRole !== 'reviewer') {
-            alert('У вас нет прав для доступа к админ-панели');
+            alert('У вас нет прав');
             window.location.href = 'server.html';
             return;
         }
         loadPending();
         loadApproved();
         loadUsers();
+        loadForumCategories();
+        loadForumTopics();
     });
 
     async function loadPending() {
-        const pendingRef = collection(db, "pending_characters");
-        const q = query(pendingRef, where("status", "==", "pending"));
-        const snapshot = await getDocs(q);
+        const q = query(collection(db, "pending_characters"), where("status", "==", "pending"));
+        const snap = await getDocs(q);
         const container = document.getElementById('pending-list');
-        if (snapshot.empty) {
-            container.innerHTML = '<div>Нет заявок на модерацию</div>';
-            return;
-        }
+        if (snap.empty) { container.innerHTML = '<div>Нет заявок</div>'; return; }
         container.innerHTML = '';
-        for (const docSnap of snapshot.docs) {
+        for (const docSnap of snap.docs) {
             const data = docSnap.data();
             const userProfile = await getDoc(doc(db, "profiles", data.userId));
             const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
@@ -214,16 +246,12 @@
             `;
             container.appendChild(div);
         }
-        document.querySelectorAll('.approve-btn').forEach(btn => {
-            btn.addEventListener('click', async () => await approveCharacter(btn.getAttribute('data-id')));
-        });
-        document.querySelectorAll('.reject-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.getAttribute('data-id');
-                const comment = document.getElementById(`comment-${id}`).value.trim();
-                await rejectCharacter(id, comment || 'Не указана причина');
-            });
-        });
+        document.querySelectorAll('.approve-btn').forEach(btn => btn.addEventListener('click', async () => approveCharacter(btn.getAttribute('data-id'))));
+        document.querySelectorAll('.reject-btn').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const comment = document.getElementById(`comment-${id}`).value.trim();
+            await rejectCharacter(id, comment || 'Не указана причина');
+        }));
     }
 
     async function approveCharacter(pendingId) {
@@ -232,23 +260,13 @@
         if (!pendingSnap.exists()) return;
         const data = pendingSnap.data();
         await addDoc(collection(db, "approved_characters"), {
-            userId: data.userId,
-            userNick: data.userNick,
-            characterName: data.characterName,
-            gender: data.gender,
-            age: data.age,
-            history: data.history,
-            profession: data.profession,
-            likes: 0,
-            approvedAt: serverTimestamp(),
-            approvedBy: currentUser.uid
+            userId: data.userId, userNick: data.userNick, characterName: data.characterName,
+            gender: data.gender, age: data.age, history: data.history, profession: data.profession,
+            approvedAt: serverTimestamp(), approvedBy: currentUser.uid
         });
         await addDoc(collection(db, "notifications"), {
-            userId: data.userId,
-            title: 'Персонаж одобрен',
-            message: `Ваш персонаж "${data.characterName}" был одобрен. Добро пожаловать в мир ролевой игры!`,
-            isRead: false,
-            createdAt: serverTimestamp()
+            userId: data.userId, title: 'Персонаж одобрен',
+            message: `Ваш персонаж "${data.characterName}" одобрен.`, isRead: false, createdAt: serverTimestamp()
         });
         await deleteDoc(pendingRef);
         loadPending();
@@ -261,26 +279,19 @@
         if (!pendingSnap.exists()) return;
         const data = pendingSnap.data();
         await addDoc(collection(db, "notifications"), {
-            userId: data.userId,
-            title: 'Персонаж отклонён',
-            message: `Ваш персонаж "${data.characterName}" был отклонён. Причина: ${reason}. Вы можете создать новую заявку.`,
-            isRead: false,
-            createdAt: serverTimestamp()
+            userId: data.userId, title: 'Персонаж отклонён',
+            message: `Ваш персонаж "${data.characterName}" отклонён. Причина: ${reason}`, isRead: false, createdAt: serverTimestamp()
         });
         await deleteDoc(pendingRef);
         loadPending();
     }
 
     async function loadApproved() {
-        const approvedRef = collection(db, "approved_characters");
-        const snapshot = await getDocs(approvedRef);
+        const snap = await getDocs(collection(db, "approved_characters"));
         const container = document.getElementById('approved-list');
-        if (snapshot.empty) {
-            container.innerHTML = '<div>Нет одобренных персонажей</div>';
-            return;
-        }
+        if (snap.empty) { container.innerHTML = '<div>Нет одобренных персонажей</div>'; return; }
         container.innerHTML = '';
-        for (const docSnap of snapshot.docs) {
+        for (const docSnap of snap.docs) {
             const data = docSnap.data();
             const userProfile = await getDoc(doc(db, "profiles", data.userId));
             const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
@@ -290,7 +301,7 @@
                 <div><strong>Игрок:</strong> ${userNick}</div>
                 <div><strong>Персонаж:</strong> ${data.characterName} (${data.profession})</div>
                 <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
-                <div><strong>История:</strong> ${data.history.substring(0, 150)}...</div>
+                <div><strong>История:</strong> ${data.history.substring(0, 100)}...</div>
                 <div class="actions">
                     <button class="delete-char-btn" data-id="${docSnap.id}">Удалить персонажа</button>
                 </div>
@@ -299,7 +310,7 @@
         }
         document.querySelectorAll('.delete-char-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
-                if (confirm('Удалить персонажа? Это действие необратимо.')) {
+                if (confirm('Удалить персонажа?')) {
                     await deleteDoc(doc(db, "approved_characters", btn.getAttribute('data-id')));
                     loadApproved();
                 }
@@ -308,15 +319,11 @@
     }
 
     async function loadUsers() {
-        const profilesRef = collection(db, "profiles");
-        const snapshot = await getDocs(profilesRef);
+        const snap = await getDocs(collection(db, "profiles"));
         const container = document.getElementById('users-list');
-        if (snapshot.empty) {
-            container.innerHTML = '<div>Нет пользователей</div>';
-            return;
-        }
+        if (snap.empty) { container.innerHTML = '<div>Нет пользователей</div>'; return; }
         container.innerHTML = '';
-        for (const docSnap of snapshot.docs) {
+        for (const docSnap of snap.docs) {
             const data = docSnap.data();
             const role = data.role || "user";
             const div = document.createElement('div');
@@ -335,44 +342,140 @@
             container.appendChild(div);
         }
         document.querySelectorAll('.role-select').forEach(select => {
-            select.addEventListener('change', async (e) => {
-                if (currentUserRole !== 'admin') {
-                    alert('Только администратор может менять роли');
-                    return;
-                }
+            select.addEventListener('change', async () => {
+                if (currentUserRole !== 'admin') { alert('Только админ'); return; }
                 const uid = select.getAttribute('data-uid');
-                const newRole = select.value;
-                await updateDoc(doc(db, "profiles", uid), { role: newRole });
+                await updateDoc(doc(db, "profiles", uid), { role: select.value });
                 alert('Роль обновлена');
             });
         });
     }
 
-    document.getElementById('send-mass-notif').addEventListener('click', async () => {
-        if (currentUserRole !== 'admin') {
-            alert('Только администратор может отправлять массовые уведомления');
-            return;
+    // --- Управление форумом ---
+    async function loadForumCategories() {
+        const snap = await getDocs(collection(db, "forum_categories"));
+        const container = document.getElementById('forum-categories-list');
+        container.innerHTML = '<h4>Разделы форума</h4>';
+        snap.forEach(docSnap => {
+            const cat = docSnap.data();
+            const div = document.createElement('div');
+            div.style.padding = '0.5rem 0';
+            div.innerHTML = `${cat.name} <button class="delete-cat-btn" data-id="${docSnap.id}" style="background:#5a2e2e; border:none; border-radius:20px; padding:0.2rem 0.6rem; margin-left:0.5rem;">Удалить</button>`;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('.delete-cat-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('Удалить раздел со всеми темами?')) {
+                    const id = btn.getAttribute('data-id');
+                    const topics = await getDocs(query(collection(db, "forum_topics"), where("categoryId", "==", id)));
+                    for (const t of topics.docs) {
+                        const posts = await getDocs(query(collection(db, "forum_posts"), where("topicId", "==", t.id)));
+                        posts.forEach(p => deleteDoc(p.ref));
+                        await deleteDoc(t.ref);
+                    }
+                    await deleteDoc(doc(db, "forum_categories", id));
+                    loadForumCategories();
+                    loadForumTopics();
+                }
+            });
+        });
+    }
+
+    async function loadForumTopics() {
+        const snap = await getDocs(collection(db, "forum_topics"));
+        const container = document.getElementById('forum-topics-list');
+        container.innerHTML = '<h4>Темы форума</h4>';
+        for (const docSnap of snap.docs) {
+            const topic = docSnap.data();
+            const author = await getUserNick(topic.authorId);
+            const div = document.createElement('div');
+            div.style.padding = '0.5rem 0';
+            div.innerHTML = `${topic.title} (автор: ${author}) 
+                <button class="toggle-topic-btn" data-id="${docSnap.id}" style="background:#2d5a27; border:none; border-radius:20px; padding:0.2rem 0.6rem; margin-left:0.5rem;">${topic.closed ? 'Открыть' : 'Закрыть'}</button>
+                <button class="delete-topic-btn" data-id="${docSnap.id}" style="background:#5a2e2e; border:none; border-radius:20px; padding:0.2rem 0.6rem;">Удалить</button>`;
+            container.appendChild(div);
         }
+        document.querySelectorAll('.toggle-topic-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const topicRef = doc(db, "forum_topics", id);
+                const topicSnap = await getDoc(topicRef);
+                await updateDoc(topicRef, { closed: !topicSnap.data().closed });
+                loadForumTopics();
+            });
+        });
+        document.querySelectorAll('.delete-topic-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('Удалить тему?')) {
+                    const id = btn.getAttribute('data-id');
+                    const posts = await getDocs(query(collection(db, "forum_posts"), where("topicId", "==", id)));
+                    posts.forEach(p => deleteDoc(p.ref));
+                    await deleteDoc(doc(db, "forum_topics", id));
+                    loadForumTopics();
+                }
+            });
+        });
+    }
+
+    async function getUserNick(uid) {
+        const profile = await getDoc(doc(db, "profiles", uid));
+        return profile.exists() ? profile.data().nickname : "Unknown";
+    }
+
+    document.getElementById('create-category-btn').addEventListener('click', () => {
+        document.getElementById('new-category-modal').style.display = 'flex';
+    });
+    document.getElementById('submit-category').addEventListener('click', async () => {
+        const name = document.getElementById('category-name').value.trim();
+        if (!name) return;
+        await addDoc(collection(db, "forum_categories"), { name, topicsCount: 0 });
+        document.getElementById('new-category-modal').style.display = 'none';
+        loadForumCategories();
+    });
+    document.getElementById('cancel-category').addEventListener('click', () => {
+        document.getElementById('new-category-modal').style.display = 'none';
+    });
+
+    document.getElementById('ban-user-btn').addEventListener('click', () => {
+        document.getElementById('ban-modal').style.display = 'flex';
+    });
+    document.getElementById('submit-ban').addEventListener('click', async () => {
+        const nick = document.getElementById('ban-user-nick').value.trim();
+        const type = document.getElementById('ban-type').value;
+        let until = null;
+        const untilStr = document.getElementById('ban-until').value;
+        if (untilStr) until = new Date(untilStr);
+        const profiles = await getDocs(collection(db, "profiles"));
+        let targetUid = null;
+        for (const docSnap of profiles.docs) {
+            if (docSnap.data().nickname.toLowerCase() === nick.toLowerCase()) {
+                targetUid = docSnap.id;
+                break;
+            }
+        }
+        if (!targetUid) { alert('Игрок не найден'); return; }
+        await setDoc(doc(db, "forum_bans", targetUid), { type, until: until ? serverTimestamp() : null, untilDate: until });
+        alert('Бан/мут применён');
+        document.getElementById('ban-modal').style.display = 'none';
+    });
+    document.getElementById('cancel-ban').addEventListener('click', () => {
+        document.getElementById('ban-modal').style.display = 'none';
+    });
+
+    document.getElementById('send-mass-notif').addEventListener('click', async () => {
+        if (currentUserRole !== 'admin') { alert('Только администратор'); return; }
         const title = document.getElementById('notif-title').value.trim();
         const message = document.getElementById('notif-message').value.trim();
-        if (!title || !message) {
-            alert('Заполните заголовок и текст');
-            return;
-        }
-        const profilesRef = collection(db, "profiles");
-        const profilesSnap = await getDocs(profilesRef);
+        if (!title || !message) { alert('Заполните поля'); return; }
+        const profiles = await getDocs(collection(db, "profiles"));
         const batch = [];
-        profilesSnap.forEach(doc => {
+        profiles.forEach(doc => {
             batch.push(addDoc(collection(db, "notifications"), {
-                userId: doc.id,
-                title: title,
-                message: message,
-                isRead: false,
-                createdAt: serverTimestamp()
+                userId: doc.id, title, message, isRead: false, createdAt: serverTimestamp()
             }));
         });
         await Promise.all(batch);
-        alert(`Уведомление отправлено ${batch.length} пользователям`);
+        alert(`Отправлено ${batch.length} пользователям`);
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-message').value = '';
     });
@@ -386,6 +489,7 @@
             document.getElementById(`${tab.getAttribute('data-tab')}-tab`).classList.add('active');
             if (tab.getAttribute('data-tab') === 'approved') loadApproved();
             if (tab.getAttribute('data-tab') === 'users') loadUsers();
+            if (tab.getAttribute('data-tab') === 'forum') { loadForumCategories(); loadForumTopics(); }
         });
     });
 </script>
