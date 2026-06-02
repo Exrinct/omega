@@ -23,43 +23,43 @@
             border-radius: 20px;
             z-index: 100;
         }
-        /* Статус-бар (верхняя полоса) */
+        /* статус-бар более плотный */
         .status-bar {
             background: #111;
             border-bottom: 1px solid #222;
-            padding: 0.6rem 1.5rem;
+            padding: 0.5rem 1.5rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 1rem;
+            gap: 0.8rem;
         }
         .status-left {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
             flex-wrap: wrap;
         }
         .online-indicator {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: #1A1A1A;
-            padding: 0.3rem 0.8rem;
-            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
             font-size: 0.75rem;
+            font-weight: 500;
         }
         .online-dot {
             width: 8px;
             height: 8px;
             background: #2E8B57;
             border-radius: 50%;
-            display: inline-block;
         }
         .balance-badge {
             background: #1A1A1A;
-            padding: 0.3rem 0.8rem;
-            border-radius: 40px;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
             font-size: 0.75rem;
             font-weight: 500;
             color: #FFD966;
@@ -67,20 +67,22 @@
         .status-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
+            flex-wrap: wrap;
         }
-        .icon-btn {
+        .nav-link {
             background: none;
             border: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #E6E6E6;
             cursor: pointer;
-            padding: 0.3rem;
+            padding: 0.3rem 0.6rem;
             border-radius: 30px;
             transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            text-decoration: none;
         }
-        .icon-btn:hover {
+        .nav-link:hover {
             background: #1A1A1A;
         }
         .notif-icon {
@@ -121,25 +123,25 @@
         .notif-item.unread { background: #1A2A1A; }
         .container {
             max-width: 1100px;
-            margin: 2rem auto;
+            margin: 1.5rem auto;
             padding: 0 1.5rem;
         }
         .card {
             background: #111;
             border: 1px solid #222;
             border-radius: 20px;
-            padding: 1.2rem;
-            margin-bottom: 1.2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
         .poll-card {
             background: #1A1A1A;
             border-left: 3px solid #3B6E4F;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 1rem;
+            gap: 0.8rem;
         }
         .character-item {
             background: #1A1A1A;
@@ -151,10 +153,11 @@
             background: #3B6E4F;
             border: none;
             border-radius: 40px;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             color: white;
             font-weight: 500;
             cursor: pointer;
+            font-size: 0.85rem;
         }
         .copy-btn {
             background: #1A1A1A;
@@ -163,8 +166,8 @@
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 1.2rem;
-            margin: 1rem 0;
+            gap: 1rem;
+            margin: 0.8rem 0;
         }
         .social-links a {
             color: #A0A0A0;
@@ -173,8 +176,42 @@
         }
         .admin-link {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index:1000;
+        }
+        .modal-content {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 28px;
+            padding: 1.5rem;
+            max-width: 450px;
+            width:90%;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width:100%;
+            background: #1A1A1A;
+            border:1px solid #333;
+            border-radius:14px;
+            padding:0.6rem;
+            margin:0.5rem 0;
+            color:white;
+        }
+        .modal-buttons {
+            display:flex;
+            gap:0.8rem;
+            margin-top:1rem;
+        }
+        .modal-buttons button { flex:1; }
         @media (max-width: 680px) {
             .status-bar { flex-direction: column; align-items: stretch; }
             .status-left { justify-content: space-between; }
@@ -189,22 +226,22 @@
     <div class="status-left">
         <div class="online-indicator">
             <span class="online-dot"></span>
-            <span id="online-count">0</span>
+            <span id="online-count">0</span> в сети
         </div>
         <div class="balance-badge">
             <span id="user-points">0</span> монет
         </div>
     </div>
     <div class="status-right">
-        <a href="shop.html" class="icon-btn" style="text-decoration:none; color:#E6E6E6;">🛒</a>
-        <button id="ticket-btn" class="icon-btn">✉️</button>
-        <a href="#" id="my-profile-link" class="icon-btn">👤</a>
+        <a href="shop.html" class="nav-link">Магазин</a>
+        <button id="ticket-btn" class="nav-link">Поддержка</button>
+        <a href="#" id="my-profile-link" class="nav-link">Профиль</a>
         <div class="notif-icon">
-            <button id="notif-icon" class="icon-btn">🔔</button>
+            <button id="notif-icon" class="nav-link">Уведомления</button>
             <span id="notif-badge" class="notif-badge" style="display:none;">0</span>
             <div id="notif-dropdown" class="notif-dropdown"></div>
         </div>
-        <button id="logout-btn" class="icon-btn">🚪</button>
+        <button id="logout-btn" class="nav-link">Выход</button>
     </div>
 </div>
 
@@ -212,12 +249,11 @@
     <div id="poll-widget"></div>
 
     <div class="card">
-        <h2 style="font-weight:500; margin-bottom:0.8rem;">Создать персонажа</h2>
-        <button id="create-char-btn">+ Новая заявка</button>
+        <button id="create-char-btn">Создать персонажа</button>
     </div>
 
     <div class="card">
-        <h2 style="font-weight:500; margin-bottom:0.8rem;">Мои персонажи</h2>
+        <h3 style="font-weight:500; margin-bottom:0.6rem;">Мои персонажи</h3>
         <div id="my-characters" class="grid"></div>
         <div id="char-counter" style="font-size:0.75rem; margin-top:0.5rem; color:#888;"></div>
     </div>
@@ -230,9 +266,9 @@
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom:0.5rem;">Сборка модов</h3>
-        <p style="font-size:0.85rem;">Forge 1.20.1</p>
-        <a href="#" class="modpack-link">Скачать</a>
+        <h3 style="font-weight:500;">Сборка модов</h3>
+        <p style="font-size:0.8rem; margin-top:0.2rem;">Forge 1.20.1</p>
+        <a href="#" style="color:#3B6E4F; text-decoration:none;">Скачать</a>
     </div>
 
     <div class="card" style="text-align:center;">
@@ -246,7 +282,7 @@
     <div id="admin-link-place" class="admin-link"></div>
 </div>
 
-<!-- модалка создания персонажа (сокращённо, но рабочая) -->
+<!-- модалка создания персонажа (упрощённая) -->
 <div id="char-modal" class="modal">
     <div class="modal-content">
         <h3>Новый персонаж</h3>
@@ -254,8 +290,7 @@
         <select id="char-gender"><option>Мужской</option><option>Женский</option></select>
         <input type="number" id="char-age" placeholder="Возраст">
         <select id="char-profession">
-            <option>Воин</option><option>Маг</option><option>Лучник</option><option>Торговец</option>
-            <option>Другое</option>
+            <option>Воин</option><option>Маг</option><option>Лучник</option><option>Торговец</option><option>Другое</option>
         </select>
         <textarea id="char-history" rows="3" placeholder="История персонажа"></textarea>
         <div class="modal-buttons">
@@ -279,43 +314,6 @@
         <div id="ticket-error" style="color:#e06c6c;"></div>
     </div>
 </div>
-
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        top:0; left:0;
-        width:100%; height:100%;
-        background: rgba(0,0,0,0.85);
-        backdrop-filter: blur(8px);
-        justify-content: center;
-        align-items: center;
-        z-index:1000;
-    }
-    .modal-content {
-        background: #111;
-        border: 1px solid #222;
-        border-radius: 28px;
-        padding: 1.5rem;
-        max-width: 450px;
-        width:90%;
-    }
-    .modal-content input, .modal-content select, .modal-content textarea {
-        width:100%;
-        background: #1A1A1A;
-        border:1px solid #333;
-        border-radius:14px;
-        padding:0.6rem;
-        margin:0.5rem 0;
-        color:white;
-    }
-    .modal-buttons {
-        display:flex;
-        gap:0.8rem;
-        margin-top:1rem;
-    }
-    .modal-buttons button { flex:1; }
-</style>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -486,7 +484,7 @@
                 adminLink.href = 'admin.html';
                 adminLink.textContent = 'Админ-панель';
                 adminLink.style.display = 'block';
-                adminLink.style.marginTop = '1rem';
+                adminLink.style.marginTop = '0.8rem';
                 adminLink.style.color = '#3B6E4F';
                 document.getElementById('admin-link-place').appendChild(adminLink);
             }
@@ -495,11 +493,11 @@
         loadBalance();
         loadNotifications();
         loadMyCharacters();
-        // опрос (упрощённо)
+        // опрос
         const pollSnap = await getDocs(query(collection(db, "polls"), where("isActive", "==", true)));
         if (!pollSnap.empty) {
             const poll = pollSnap.docs[0].data();
-            document.getElementById('poll-widget').innerHTML = `<div class="card poll-card"><h3>Опрос: ${poll.question}</h3><div>Проголосовать можно в админ-панели</div></div>`;
+            document.getElementById('poll-widget').innerHTML = `<div class="card poll-card"><strong>Опрос:</strong> ${poll.question}</div>`;
         }
         window.addEventListener('beforeunload', () => setOnlineStatus(false));
     });
