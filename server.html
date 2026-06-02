@@ -27,13 +27,7 @@
             border-radius: 8px;
             z-index: 100;
         }
-        .dashboard {
-            max-width: 800px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
+        .dashboard { max-width: 800px; width: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
         .header {
             display: flex;
             justify-content: space-between;
@@ -117,7 +111,20 @@
             border-radius: 16px;
             padding: 1rem;
             border-left: 3px solid #3b6e4f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+        .char-info { flex: 1; }
+        .like-btn {
+            background: none;
+            border: 1px solid #3b6e4f;
+            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            color: #3b6e4f;
+            cursor: pointer;
+        }
+        .like-btn:hover { background: #3b6e4f20; }
         .ip-box {
             display: flex;
             justify-content: space-between;
@@ -147,12 +154,9 @@
             text-decoration: none;
             text-align: center;
         }
-        .lore-btn:hover { background: #3b6e4f20; border-color: #5a8e4a; color: white; }
         .modpack-link { color: #3b6e4f; text-decoration: none; border-bottom: 1px solid transparent; }
-        .modpack-link:hover { border-bottom-color: #3b6e4f; }
         .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem; }
         .social-links a { color: #aaa; text-decoration: none; font-size: 0.9rem; }
-        .social-links a:hover { color: #3b6e4f; }
         .admin-link { display: inline-block; margin-top: 1rem; text-align: center; color: #3b6e4f; text-decoration: none; font-size: 0.8rem; }
         .modal {
             display: none;
@@ -174,7 +178,6 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        .modal-content h3 { margin-bottom: 1rem; }
         .field { margin-bottom: 1rem; }
         label { display: block; font-size: 0.8rem; margin-bottom: 0.3rem; color: #aaa; }
         input, select, textarea {
@@ -200,11 +203,11 @@
         }
         .submit-char { background: #2d5a27; border: none; color: white; }
         .cancel-char { background: none; border: 1px solid #666; color: #ccc; }
-        #char-error { color: #e06c6c; margin-top: 0.5rem; display: none; }
+        .char-counter { font-size: 0.8rem; color: #aaa; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
-<div class="version">v1.0.0</div>
+<div class="version">v1.1.0</div>
 <div class="dashboard">
     <div class="header">
         <div class="user-greeting">Привет, <span id="display-nick">...</span></div>
@@ -223,6 +226,7 @@
     <div class="card">
         <h3 style="margin-bottom: 1rem;">Мои персонажи</h3>
         <div id="my-characters" class="char-list">Загрузка...</div>
+        <div id="char-counter" class="char-counter"></div>
     </div>
 
     <div class="card">
@@ -295,14 +299,14 @@
             <button class="submit-char" id="submit-char">Отправить на модерацию</button>
             <button class="cancel-char" id="close-modal">Отмена</button>
         </div>
-        <div id="char-error"></div>
+        <div id="char-error" style="color: #e06c6c; margin-top: 0.5rem; display: none;"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -319,6 +323,7 @@
     let currentUser = null;
     let currentUserNick = "";
     let isAdmin = false;
+    let isReviewer = false;
 
     const displayNickSpan = document.getElementById('display-nick');
     const logoutBtn = document.getElementById('logout-btn');
@@ -329,6 +334,7 @@
     const professionSelect = document.getElementById('char-profession');
     const customProfField = document.getElementById('custom-prof-field');
     const myCharactersDiv = document.getElementById('my-characters');
+    const charCounterSpan = document.getElementById('char-counter');
     const adminLinkPlace = document.getElementById('admin-link-place');
     const notifIcon = document.getElementById('notif-icon');
     const notifDropdown = document.getElementById('notif-dropdown');
@@ -383,21 +389,61 @@
         const approvedRef = collection(db, "approved_characters");
         const q = query(approvedRef, where("userId", "==", currentUser.uid));
         const snapshot = await getDocs(q);
-        if (snapshot.empty) {
+        const characters = [];
+        snapshot.forEach(doc => {
+            characters.push({ id: doc.id, ...doc.data() });
+        });
+        charCounterSpan.textContent = `Одобрено персонажей: ${characters.length} / 3`;
+        if (characters.length === 0) {
             myCharactersDiv.innerHTML = '<div class="char-card">У вас пока нет одобренных персонажей. Создайте заявку.</div>';
             return;
         }
         myCharactersDiv.innerHTML = '';
-        snapshot.forEach(doc => {
-            const char = doc.data();
+        for (const char of characters) {
+            // Проверяем, лайкал ли текущий пользователь этого персонажа
+            const likeId = `${currentUser.uid}_${char.id}`;
+            const likeRef = doc(db, "character_likes", likeId);
+            const likeSnap = await getDoc(likeRef);
+            const liked = likeSnap.exists();
+            
             const card = document.createElement('div');
             card.className = 'char-card';
             card.innerHTML = `
-                <strong>${char.characterName}</strong> (${char.profession})<br>
-                Пол: ${char.gender}, Возраст: ${char.age}<br>
-                <small>История: ${char.history.substring(0, 100)}...</small>
+                <div class="char-info">
+                    <strong>${char.characterName}</strong> (${char.profession})<br>
+                    Пол: ${char.gender}, Возраст: ${char.age}<br>
+                    <small>История: ${char.history.substring(0, 100)}...</small>
+                    <div>❤️ Лайки: ${char.likes || 0}</div>
+                </div>
+                <div>
+                    <button class="like-btn" data-char-id="${char.id}" data-liked="${liked}">${liked ? '❤️' : '🤍'}</button>
+                </div>
             `;
             myCharactersDiv.appendChild(card);
+        }
+        // Обработчики лайков
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const charId = btn.getAttribute('data-char-id');
+                const liked = btn.getAttribute('data-liked') === 'true';
+                const likeId = `${currentUser.uid}_${charId}`;
+                const likeRef = doc(db, "character_likes", likeId);
+                const charRef = doc(db, "approved_characters", charId);
+                if (liked) {
+                    await deleteDoc(likeRef);
+                    await updateDoc(charRef, { likes: increment(-1) });
+                    btn.setAttribute('data-liked', 'false');
+                    btn.textContent = '🤍';
+                } else {
+                    await setDoc(likeRef, { userId: currentUser.uid, characterId: charId, createdAt: new Date() });
+                    await updateDoc(charRef, { likes: increment(1) });
+                    btn.setAttribute('data-liked', 'true');
+                    btn.textContent = '❤️';
+                }
+                // Обновим счётчик лайков в интерфейсе (просто перезагрузим список)
+                loadMyCharacters();
+            });
         });
     }
 
@@ -424,8 +470,18 @@
             }
             finalProf = customProf;
         }
-        errorDiv.style.display = 'none';
 
+        // Проверка лимита 3 персонажа
+        const approvedRef = collection(db, "approved_characters");
+        const q = query(approvedRef, where("userId", "==", currentUser.uid));
+        const snapshot = await getDocs(q);
+        if (snapshot.size >= 3) {
+            errorDiv.textContent = 'Вы уже имеете 3 одобренных персонажа. Удалите одного, чтобы создать нового.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        errorDiv.style.display = 'none';
         try {
             await addDoc(collection(db, "pending_characters"), {
                 userId: currentUser.uid,
@@ -474,8 +530,10 @@
         if (profileSnap.exists()) {
             currentUserNick = profileSnap.data().nickname || "Игрок";
             displayNickSpan.textContent = currentUserNick;
-            isAdmin = profileSnap.data().isAdmin === true;
-            if (isAdmin) {
+            const role = profileSnap.data().role || "user";
+            isAdmin = role === 'admin';
+            isReviewer = role === 'reviewer';
+            if (isAdmin || isReviewer) {
                 const adminLink = document.createElement('a');
                 adminLink.href = 'admin.html';
                 adminLink.textContent = 'Админ-панель';
