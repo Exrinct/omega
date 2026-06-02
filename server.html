@@ -14,6 +14,18 @@
             padding: 2rem;
             display: flex;
             justify-content: center;
+            position: relative;
+        }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            color: #3b6e4f;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 8px;
+            z-index: 100;
         }
         .dashboard {
             max-width: 800px;
@@ -32,10 +44,7 @@
             padding: 1rem 1.5rem;
             position: relative;
         }
-        .user-greeting {
-            font-size: 1.2rem;
-            font-weight: 500;
-        }
+        .user-greeting { font-size: 1.2rem; font-weight: 500; }
         .user-greeting span { color: #3b6e4f; }
         .logout {
             background: none;
@@ -44,11 +53,8 @@
             border-radius: 30px;
             color: #ccc;
             cursor: pointer;
-            font-family: inherit;
         }
         .logout:hover { background: #3b6e4f20; }
-        
-        /* Уведомления */
         .notif-icon {
             position: relative;
             cursor: pointer;
@@ -89,7 +95,6 @@
         .notif-item:hover { background: #252525; }
         .notif-title { font-weight: 500; font-size: 0.9rem; }
         .notif-message { font-size: 0.75rem; color: #aaa; margin-top: 0.2rem; }
-
         .card {
             background: #121212;
             border: 1px solid #2c2c2c;
@@ -106,19 +111,49 @@
             cursor: pointer;
             width: 100%;
         }
-        .char-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+        .char-list { display: flex; flex-direction: column; gap: 1rem; }
         .char-card {
             background: #1a1a1a;
             border-radius: 16px;
             padding: 1rem;
             border-left: 3px solid #3b6e4f;
         }
-        
-        /* Модалка создания персонажа */
+        .ip-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e1e;
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            border: 1px solid #2c2c2c;
+        }
+        .ip-text { font-family: monospace; font-size: 1rem; }
+        .copy-btn {
+            background: #2c2c2c;
+            border: 1px solid #3b6e4f;
+            border-radius: 30px;
+            padding: 0.4rem 1.2rem;
+            color: #c0c0c0;
+            cursor: pointer;
+        }
+        .copy-btn:hover { background: #3b6e4f20; color: white; }
+        .lore-btn {
+            display: inline-block;
+            background: #2c2c2c;
+            border: 1px solid #3b6e4f;
+            border-radius: 40px;
+            padding: 0.7rem 1.8rem;
+            color: #ddd;
+            text-decoration: none;
+            text-align: center;
+        }
+        .lore-btn:hover { background: #3b6e4f20; border-color: #5a8e4a; color: white; }
+        .modpack-link { color: #3b6e4f; text-decoration: none; border-bottom: 1px solid transparent; }
+        .modpack-link:hover { border-bottom-color: #3b6e4f; }
+        .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem; }
+        .social-links a { color: #aaa; text-decoration: none; font-size: 0.9rem; }
+        .social-links a:hover { color: #3b6e4f; }
+        .admin-link { display: inline-block; margin-top: 1rem; text-align: center; color: #3b6e4f; text-decoration: none; font-size: 0.8rem; }
         .modal {
             display: none;
             position: fixed;
@@ -165,17 +200,11 @@
         }
         .submit-char { background: #2d5a27; border: none; color: white; }
         .cancel-char { background: none; border: 1px solid #666; color: #ccc; }
-        
-        .admin-link {
-            display: inline-block;
-            margin-top: 0.5rem;
-            color: #3b6e4f;
-            text-decoration: none;
-            font-size: 0.8rem;
-        }
+        #char-error { color: #e06c6c; margin-top: 0.5rem; display: none; }
     </style>
 </head>
 <body>
+<div class="version">v1.0.0</div>
 <div class="dashboard">
     <div class="header">
         <div class="user-greeting">Привет, <span id="display-nick">...</span></div>
@@ -197,31 +226,30 @@
     </div>
 
     <div class="card">
-        <h3>Адрес сервера</h3>
-        <div class="ip-box" style="display: flex; justify-content: space-between; background: #1e1e1e; border-radius: 14px; padding: 0.8rem;">
-            <span>play.rp-minecraft.ru</span>
-            <button class="copy-btn" onclick="copyIP()" style="background: none; border: 1px solid #3b6e4f; border-radius: 20px; padding: 0.2rem 0.8rem;">Копировать</button>
+        <h3 style="margin-bottom: 0.8rem;">Адрес сервера</h3>
+        <div class="ip-box">
+            <span class="ip-text">play.rp-minecraft.ru</span>
+            <button class="copy-btn" id="copy-ip-btn">Копировать</button>
         </div>
     </div>
 
     <div class="card">
-        <h3>Сборка модов</h3>
+        <h3 style="margin-bottom: 0.5rem;">Сборка модов</h3>
         <p>Скачайте сборку для версии 1.20.1 (Forge)</p>
-        <a href="#" class="modpack-link" style="color: #3b6e4f;">Скачать ModPack (Google Диск)</a>
+        <a href="#" class="modpack-link">Скачать ModPack (Google Диск)</a>
     </div>
 
     <div class="card" style="text-align: center;">
-        <a href="lore.html" style="color: #3b6e4f; text-decoration: none;">Перейти к лору проекта</a>
+        <a href="lore.html" class="lore-btn">Перейти к лору проекта</a>
     </div>
 
-    <div style="display: flex; justify-content: center; gap: 1.5rem;">
-        <a href="https://discord.gg/hyJUUckQMh" target="_blank" style="color: #aaa;">Discord</a>
-        <a href="https://t.me/Omega1RolePlay" target="_blank" style="color: #aaa;">Telegram</a>
+    <div class="social-links">
+        <a href="https://discord.gg/hyJUUckQMh" target="_blank">Discord</a>
+        <a href="https://t.me/Omega1RolePlay" target="_blank">Telegram</a>
     </div>
-    <div id="admin-link-place"></div>
+    <div id="admin-link-place" style="text-align: center;"></div>
 </div>
 
-<!-- Модалка создания персонажа -->
 <div id="char-modal" class="modal">
     <div class="modal-content">
         <h3>Создание персонажа</h3>
@@ -267,14 +295,14 @@
             <button class="submit-char" id="submit-char">Отправить на модерацию</button>
             <button class="cancel-char" id="close-modal">Отмена</button>
         </div>
-        <div id="char-error" style="color: #e06c6c; margin-top: 0.5rem; display: none;"></div>
+        <div id="char-error"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, setDoc, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -292,7 +320,6 @@
     let currentUserNick = "";
     let isAdmin = false;
 
-    // Элементы
     const displayNickSpan = document.getElementById('display-nick');
     const logoutBtn = document.getElementById('logout-btn');
     const createCharBtn = document.getElementById('create-char-btn');
@@ -303,20 +330,20 @@
     const customProfField = document.getElementById('custom-prof-field');
     const myCharactersDiv = document.getElementById('my-characters');
     const adminLinkPlace = document.getElementById('admin-link-place');
-
-    // Уведомления
     const notifIcon = document.getElementById('notif-icon');
     const notifDropdown = document.getElementById('notif-dropdown');
     const notifBadge = document.getElementById('notif-badge');
+    const copyIpBtn = document.getElementById('copy-ip-btn');
 
-    // --- Вспомогательные функции ---
-    window.copyIP = function() {
+    copyIpBtn.addEventListener('click', () => {
         const ip = "play.rp-minecraft.ru";
-        navigator.clipboard.writeText(ip);
-        alert("IP скопирован");
-    };
+        navigator.clipboard.writeText(ip).then(() => {
+            const originalText = copyIpBtn.textContent;
+            copyIpBtn.textContent = 'Скопировано';
+            setTimeout(() => { copyIpBtn.textContent = originalText; }, 1500);
+        });
+    });
 
-    // Загрузка уведомлений
     function loadNotifications() {
         if (!currentUser) return;
         const notifRef = collection(db, "notifications");
@@ -351,7 +378,6 @@
         });
     }
 
-    // Загрузка одобренных персонажей текущего пользователя
     async function loadMyCharacters() {
         if (!currentUser) return;
         const approvedRef = collection(db, "approved_characters");
@@ -375,7 +401,6 @@
         });
     }
 
-    // Отправка заявки на персонажа
     async function submitCharacter() {
         const name = document.getElementById('char-name').value.trim();
         const gender = document.getElementById('char-gender').value;
@@ -415,7 +440,6 @@
             });
             alert('Заявка отправлена на модерацию. Ожидайте решения.');
             charModal.style.display = 'none';
-            // очистка формы
             document.getElementById('char-name').value = '';
             document.getElementById('char-history').value = '';
             document.getElementById('char-age').value = '';
@@ -428,24 +452,17 @@
         }
     }
 
-    // --- Обработчики UI ---
     professionSelect.addEventListener('change', () => {
         customProfField.style.display = professionSelect.value === 'Другое' ? 'block' : 'none';
     });
-
     createCharBtn.onclick = () => { charModal.style.display = 'flex'; };
     closeModalBtn.onclick = () => { charModal.style.display = 'none'; };
     submitCharBtn.onclick = submitCharacter;
     window.onclick = (e) => { if (e.target === charModal) charModal.style.display = 'none'; };
-
-    notifIcon.onclick = () => { notifDropdown.classList.toggle('show'); };
-    document.addEventListener('click', (e) => {
-        if (!notifIcon.contains(e.target)) notifDropdown.classList.remove('show');
-    });
-
+    notifIcon.onclick = (e) => { e.stopPropagation(); notifDropdown.classList.toggle('show'); };
+    document.addEventListener('click', () => { notifDropdown.classList.remove('show'); });
     logoutBtn.onclick = async () => { await signOut(auth); window.location.href = 'index.html'; };
 
-    // --- Авторизация ---
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';
@@ -463,9 +480,6 @@
                 adminLink.href = 'admin.html';
                 adminLink.textContent = 'Админ-панель';
                 adminLink.className = 'admin-link';
-                adminLink.style.display = 'block';
-                adminLink.style.textAlign = 'center';
-                adminLink.style.marginTop = '1rem';
                 adminLinkPlace.appendChild(adminLink);
             }
         } else {
