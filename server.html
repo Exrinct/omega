@@ -163,7 +163,7 @@
             padding: 0.8rem;
             border-left: 3px solid #3B6E4F;
         }
-        button {
+        button, .download-btn {
             background: #3B6E4F;
             border: none;
             border-radius: 40px;
@@ -172,6 +172,15 @@
             font-weight: 500;
             cursor: pointer;
             font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .download-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
         }
         .copy-btn {
             background: #1A1A1A;
@@ -230,6 +239,7 @@
             .status-bar { flex-direction: column; align-items: stretch; }
             .status-left { justify-content: space-between; }
             .container { padding: 0 1rem; }
+            .download-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -279,10 +289,15 @@
         </div>
     </div>
 
+    <!-- Блок сборки модов с тремя вариантами загрузки -->
     <div class="card">
         <h3 style="font-weight:500;">Сборка модов</h3>
-        <p style="font-size:0.8rem; margin-top:0.2rem;">Forge 1.20.1</p>
-        <a href="#" style="color:#3B6E4F; text-decoration:none;">Скачать</a>
+        <p style="font-size:0.8rem; margin-top:0.2rem;">Forge 1.20.1 | Omega RolePlay Modpack</p>
+        <div class="download-group">
+            <a href="https://drive.google.com/your-google-drive-link" class="download-btn" target="_blank">Google Диск</a>
+            <a href="https://disk.yandex.ru/your-yandex-link" class="download-btn" target="_blank">Яндекс.Диск</a>
+            <a href="https://www.mediafire.com/your-mediafire-link" class="download-btn" target="_blank">MediaFire</a>
+        </div>
     </div>
 
     <div class="card" style="text-align:center;">
@@ -296,7 +311,7 @@
     <div id="admin-link-place" class="admin-link"></div>
 </div>
 
-<!-- модалка тикета (осталась) -->
+<!-- модалка тикета -->
 <div id="ticket-modal" class="modal">
     <div class="modal-content">
         <h3>Обращение в поддержку</h3>
