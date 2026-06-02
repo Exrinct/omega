@@ -234,7 +234,7 @@
     </style>
 </head>
 <body>
-<div class="version">v3.1.0</div>
+<div class="version">v3.2.0</div>
 
 <div class="status-bar">
     <div class="status-left">
@@ -263,7 +263,7 @@
     <div id="poll-widget"></div>
 
     <div class="card">
-        <button id="create-char-btn">Создать персонажа</button>
+        <a href="character.html" style="text-decoration: none;"><button id="create-char-btn" style="width:100%;">Создать персонажа</button></a>
     </div>
 
     <div class="card">
@@ -296,26 +296,7 @@
     <div id="admin-link-place" class="admin-link"></div>
 </div>
 
-<!-- модалка создания персонажа -->
-<div id="char-modal" class="modal">
-    <div class="modal-content">
-        <h3>Новый персонаж</h3>
-        <input type="text" id="char-name" placeholder="Имя">
-        <select id="char-gender"><option>Мужской</option><option>Женский</option></select>
-        <input type="number" id="char-age" placeholder="Возраст">
-        <select id="char-profession">
-            <option>Воин</option><option>Маг</option><option>Лучник</option><option>Торговец</option><option>Другое</option>
-        </select>
-        <textarea id="char-history" rows="3" placeholder="История персонажа"></textarea>
-        <div class="modal-buttons">
-            <button id="submit-char">Отправить</button>
-            <button id="close-modal">Отмена</button>
-        </div>
-        <div id="char-error" style="color:#e06c6c;"></div>
-    </div>
-</div>
-
-<!-- модалка тикета -->
+<!-- модалка тикета (осталась) -->
 <div id="ticket-modal" class="modal">
     <div class="modal-content">
         <h3>Обращение в поддержку</h3>
@@ -332,7 +313,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -353,10 +334,6 @@
     const userPointsSpan = document.getElementById('user-points');
     const myProfileLink = document.getElementById('my-profile-link');
     const logoutBtn = document.getElementById('logout-btn');
-    const createCharBtn = document.getElementById('create-char-btn');
-    const charModal = document.getElementById('char-modal');
-    const closeModal = document.getElementById('close-modal');
-    const submitCharBtn = document.getElementById('submit-char');
     const ticketBtn = document.getElementById('ticket-btn');
     const ticketModal = document.getElementById('ticket-modal');
     const closeTicket = document.getElementById('close-ticket-modal');
@@ -438,27 +415,9 @@
             const c = docSnap.data();
             const div = document.createElement('div');
             div.className = 'character-item';
-            div.innerHTML = `<strong>${c.characterName}</strong><br>${c.profession}, ${c.age} лет<br><small>${c.history.substring(0,80)}...</small>`;
+            div.innerHTML = `<strong>${c.characterName}</strong> (${c.selectedRole || c.profession})<br>${c.age} лет<br><small>${c.history.substring(0,80)}...</small>`;
             container.appendChild(div);
         });
-    }
-
-    async function submitCharacter() {
-        const name = document.getElementById('char-name').value.trim();
-        const gender = document.getElementById('char-gender').value;
-        const age = parseInt(document.getElementById('char-age').value);
-        const profession = document.getElementById('char-profession').value;
-        const history = document.getElementById('char-history').value.trim();
-        const errorDiv = document.getElementById('char-error');
-        if (!name || !history || isNaN(age)) { errorDiv.innerText = 'Заполните все поля'; return; }
-        const approvedCount = (await getDocs(query(collection(db, "approved_characters"), where("userId", "==", currentUser.uid)))).size;
-        if (approvedCount >= 3) { errorDiv.innerText = 'Максимум 3 персонажа'; return; }
-        await addDoc(collection(db, "pending_characters"), {
-            userId: currentUser.uid, userNick: currentUserNick, characterName: name,
-            gender, age, history, profession, status: 'pending', createdAt: serverTimestamp()
-        });
-        alert('Заявка отправлена');
-        charModal.style.display = 'none';
     }
 
     async function submitTicketFn() {
@@ -474,77 +433,6 @@
         ticketModal.style.display = 'none';
     }
 
-    // Функция загрузки активного опроса (без заглушек)
-    async function loadActivePoll() {
-        const pollQuery = query(collection(db, "polls"), where("isActive", "==", true));
-        const pollSnap = await getDocs(pollQuery);
-        const container = document.getElementById('poll-widget');
-        if (pollSnap.empty) {
-            container.innerHTML = '';
-            return;
-        }
-        const pollDoc = pollSnap.docs[0];
-        const poll = pollDoc.data();
-        const options = poll.options || [];
-        const votes = poll.votes || new Array(options.length).fill(0);
-        
-        // Проверяем, голосовал ли текущий пользователь
-        let userVoteIdx = -1;
-        if (currentUser) {
-            const voteQuery = query(collection(db, "poll_votes"), where("userId", "==", currentUser.uid), where("pollId", "==", pollDoc.id));
-            const voteSnap = await getDocs(voteQuery);
-            if (!voteSnap.empty) userVoteIdx = voteSnap.docs[0].data().optionIndex;
-        }
-        
-        if (userVoteIdx === -1 && currentUser) {
-            // форма голосования
-            let html = `<div class="card poll-card"><strong>${poll.question}</strong><div class="poll-options">`;
-            options.forEach((opt, idx) => {
-                html += `<div class="poll-option" data-opt="${idx}">${opt}</div>`;
-            });
-            html += `</div></div>`;
-            container.innerHTML = html;
-            document.querySelectorAll('.poll-option').forEach(el => {
-                el.addEventListener('click', async () => {
-                    const optIdx = parseInt(el.getAttribute('data-opt'));
-                    // Записываем голос
-                    await addDoc(collection(db, "poll_votes"), {
-                        userId: currentUser.uid, pollId: pollDoc.id, optionIndex: optIdx, votedAt: serverTimestamp()
-                    });
-                    // Обновляем счётчик в опросе
-                    const newVotes = [...votes];
-                    newVotes[optIdx] = (newVotes[optIdx] || 0) + 1;
-                    await updateDoc(doc(db, "polls", pollDoc.id), { votes: newVotes });
-                    loadActivePoll(); // перезагружаем
-                });
-            });
-        } else if (currentUser) {
-            // показать результаты
-            const total = votes.reduce((a,b)=>a+b,0);
-            let resultsHtml = `<div class="card poll-card"><strong>${poll.question}</strong><div class="poll-results">`;
-            options.forEach((opt, idx) => {
-                const percent = total ? Math.round(votes[idx]/total*100) : 0;
-                resultsHtml += `<div>${opt}: ${votes[idx]} голосов (${percent}%)</div>`;
-            });
-            resultsHtml += `<div style="margin-top:0.5rem;">Вы проголосовали за: ${options[userVoteIdx]}</div>`;
-            resultsHtml += `</div></div>`;
-            container.innerHTML = resultsHtml;
-        } else {
-            // не авторизован – показываем только результаты без возможности голосовать
-            const total = votes.reduce((a,b)=>a+b,0);
-            let resultsHtml = `<div class="card poll-card"><strong>${poll.question}</strong><div class="poll-results">`;
-            options.forEach((opt, idx) => {
-                const percent = total ? Math.round(votes[idx]/total*100) : 0;
-                resultsHtml += `<div>${opt}: ${votes[idx]} голосов (${percent}%)</div>`;
-            });
-            resultsHtml += `</div></div>`;
-            container.innerHTML = resultsHtml;
-        }
-    }
-
-    createCharBtn.onclick = () => charModal.style.display = 'flex';
-    closeModal.onclick = () => charModal.style.display = 'none';
-    submitCharBtn.onclick = submitCharacter;
     ticketBtn.onclick = () => ticketModal.style.display = 'flex';
     closeTicket.onclick = () => ticketModal.style.display = 'none';
     submitTicket.onclick = submitTicketFn;
@@ -575,7 +463,6 @@
         loadBalance();
         loadNotifications();
         loadMyCharacters();
-        await loadActivePoll(); // загружаем опрос
         window.addEventListener('beforeunload', () => setOnlineStatus(false));
     });
 </script>
