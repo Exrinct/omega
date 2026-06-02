@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RP Server — Вход</title>
+    <title>Omega RolePlay — Вход</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,35 +11,16 @@
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0a0a;
-            background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 2rem;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: 0;
         }
 
         .card {
-            position: relative;
-            z-index: 1;
-            background: rgba(20, 20, 20, 0.9);
-            backdrop-filter: blur(4px);
+            background: #121212;
             border: 1px solid #2c2c2c;
             border-radius: 24px;
             padding: 2rem 2rem;
@@ -48,21 +29,12 @@
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
         }
 
-        .logo-img {
-            display: block;
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 20px;
-            margin: 0 auto 1rem auto;
-            border: 1px solid #3b6e4f;
-        }
-
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 500;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             text-align: center;
+            line-height: 1.4;
             letter-spacing: -0.3px;
         }
         .accent { color: #3b6e4f; }
@@ -144,12 +116,64 @@
             font-weight: 500;
         }
         .register-link:hover { text-decoration: underline; }
+
+        /* Модальное окно для ввода ника при Google */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #121212;
+            border: 1px solid #3b6e4f;
+            border-radius: 28px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .modal-content input {
+            margin: 1rem 0;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        .modal-buttons button {
+            padding: 0.5rem 1.2rem;
+            background: #2c2c2c;
+            border: 1px solid #3b6e4f;
+            border-radius: 30px;
+            cursor: pointer;
+            color: white;
+        }
+        .modal-buttons button:first-child {
+            background: #2d5a27;
+            border: none;
+        }
+        .modal-error {
+            color: #e06c6c;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
 <div class="card">
-    <img class="logo-img" src="https://i.imgur.com/8L0UQ7R.png" alt="RP Logo" onerror="this.src='https://placehold.co/80x80?text=RP'">
-    <h1>RP Server<span class="accent">.</span></h1>
+    <h1>Твоя легенда рождается здесь.<br><span class="accent">Omega RolePlay</span></h1>
 
     <button id="google-login" class="google-btn">Войти через Google</button>
 
@@ -191,9 +215,22 @@
     </div>
 </div>
 
+<!-- Модальное окно для ввода ника при Google -->
+<div id="nickname-modal" class="modal">
+    <div class="modal-content">
+        <h3>Введите ваш ник в Minecraft</h3>
+        <input type="text" id="modal-nick" placeholder="Ник" autocomplete="off">
+        <div class="modal-error" id="modal-error"></div>
+        <div class="modal-buttons">
+            <button id="modal-submit">Подтвердить</button>
+            <button id="modal-cancel">Отмена</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -223,7 +260,7 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // Вход
+    // Вход по паролю
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -252,7 +289,7 @@
         }
     });
 
-    // Регистрация
+    // Регистрация по паролю
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -309,7 +346,9 @@
         }
     });
 
-    // Google
+    // --- Вход через Google с кастомным диалогом ---
+    let pendingGoogleUser = null; // временно храним пользователя, пока вводит ник
+
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
@@ -317,33 +356,74 @@
             const profileRef = doc(db, "profiles", user.uid);
             const profileSnap = await getDoc(profileRef);
 
-            if (!profileSnap.exists()) {
-                let nickname = prompt("Придумайте ник в Minecraft (только латиница и цифры, без пробелов)");
-                while (!nickname || nickname.trim() === "") {
-                    nickname = prompt("Ник не может быть пустым. Придумайте ник:");
-                }
-                nickname = nickname.trim();
-
-                const profilesRef = collection(db, "profiles");
-                const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
-                const existing = await getDocs(q);
-                if (!existing.empty) {
-                    alert("Этот ник уже занят. Попробуйте другой.");
-                    await signOut(auth);
-                    return;
-                }
-
-                await setDoc(doc(db, "profiles", user.uid), {
-                    nickname: nickname,
-                    nickname_lower: nickname.toLowerCase(),
-                    email: user.email,
-                    createdAt: new Date()
-                });
-                alert("Аккаунт создан. Добро пожаловать, " + nickname);
+            if (profileSnap.exists()) {
+                // Уже есть профиль — пускаем
+                return;
             }
+
+            // Новый пользователь — показываем диалог для ввода ника
+            pendingGoogleUser = user;
+            const modal = document.getElementById('nickname-modal');
+            const input = document.getElementById('modal-nick');
+            const errorSpan = document.getElementById('modal-error');
+            input.value = '';
+            errorSpan.style.display = 'none';
+            modal.style.display = 'flex';
         } catch (error) {
+            console.error("Google login error:", error);
             alert("Ошибка входа через Google: " + error.message);
         }
+    });
+
+    // Обработка подтверждения ника в модалке
+    document.getElementById('modal-submit').addEventListener('click', async () => {
+        const nickname = document.getElementById('modal-nick').value.trim();
+        const errorSpan = document.getElementById('modal-error');
+        errorSpan.style.display = 'none';
+
+        if (!nickname) {
+            errorSpan.textContent = 'Введите ник';
+            errorSpan.style.display = 'block';
+            return;
+        }
+        if (!/^[a-zA-Z0-9_]{3,16}$/.test(nickname)) {
+            errorSpan.textContent = 'Ник должен быть от 3 до 16 символов (латиница, цифры, _)';
+            errorSpan.style.display = 'block';
+            return;
+        }
+
+        // Проверка уникальности
+        const profilesRef = collection(db, "profiles");
+        const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
+        const existing = await getDocs(q);
+        if (!existing.empty) {
+            errorSpan.textContent = 'Этот ник уже занят. Попробуйте другой.';
+            errorSpan.style.display = 'block';
+            return;
+        }
+
+        if (!pendingGoogleUser) return;
+
+        // Сохраняем профиль
+        await setDoc(doc(db, "profiles", pendingGoogleUser.uid), {
+            nickname: nickname,
+            nickname_lower: nickname.toLowerCase(),
+            email: pendingGoogleUser.email,
+            createdAt: new Date()
+        });
+
+        // Закрываем модалку и перенаправляем (onAuthStateChanged сам сработает)
+        document.getElementById('nickname-modal').style.display = 'none';
+        pendingGoogleUser = null;
+    });
+
+    document.getElementById('modal-cancel').addEventListener('click', async () => {
+        // Отмена — выходим из Google аккаунта
+        if (pendingGoogleUser) {
+            await signOut(auth);
+            pendingGoogleUser = null;
+        }
+        document.getElementById('nickname-modal').style.display = 'none';
     });
 
     onAuthStateChanged(auth, (user) => {
