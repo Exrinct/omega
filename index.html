@@ -2,148 +2,241 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omega RolePlay — Вход</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Omega RolePlay — вход</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 2rem;
-            position: relative;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .version {
-            position: fixed;
-            bottom: 12px;
-            right: 12px;
-            font-size: 0.7rem;
-            color: #3b6e4f;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 6px;
-            border-radius: 8px;
-            z-index: 100;
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #0A0A0A;
+            color: #E6E6E6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
         }
         .card {
-            background: #121212;
-            border: 1px solid #2c2c2c;
+            background: #111111;
+            border: 1px solid #222222;
             border-radius: 24px;
-            padding: 2rem;
+            padding: 2rem 1.8rem;
             width: 100%;
-            max-width: 460px;
+            max-width: 440px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.4);
         }
-        h1 { font-size: 1.6rem; margin-bottom: 2rem; text-align: center; }
-        .accent { color: #3b6e4f; }
+        .logo {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+        .logo h1 {
+            font-size: 1.7rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+        .logo span {
+            color: #3B6E4F;
+        }
         .google-btn {
             width: 100%;
-            background: #2c2c2c;
-            border: 1px solid #3b6e4f;
-            border-radius: 14px;
-            padding: 0.8rem;
-            font-size: 1rem;
+            background: #1A1A1A;
+            border: 1px solid #2C2C2C;
+            border-radius: 40px;
+            padding: 0.7rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            color: #e0e0e0;
+            color: #E6E6E6;
             cursor: pointer;
-            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 1.2rem;
         }
-        .google-btn:hover { background: #3b6e4f20; }
-        .divider { text-align: center; font-size: 0.75rem; color: #909090; margin: 1rem 0; }
-        .field { margin-bottom: 1.2rem; }
-        label { display: block; font-size: 0.8rem; margin-bottom: 0.4rem; color: #c0c0c0; }
+        .google-btn:hover {
+            background: #222;
+            border-color: #3B6E4F;
+        }
+        .divider {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6B6B6B;
+            margin: 1rem 0;
+            position: relative;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: #222;
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        .field {
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #A0A0A0;
+            margin-bottom: 0.4rem;
+        }
         input {
             width: 100%;
-            background: #1e1e1e;
-            border: 1px solid #333;
+            background: #1A1A1A;
+            border: 1px solid #2C2C2C;
             border-radius: 14px;
-            padding: 0.8rem;
-            color: #f0f0f0;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            color: #F0F0F0;
             outline: none;
+            transition: 0.2s;
         }
-        input:focus { border-color: #3b6e4f; }
-        .error { color: #e06c6c; font-size: 0.7rem; margin-top: 0.4rem; display: none; }
+        input:focus {
+            border-color: #3B6E4F;
+            box-shadow: 0 0 0 2px rgba(59,110,79,0.2);
+        }
+        .error {
+            color: #E06C6C;
+            font-size: 0.7rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
         button[type="submit"] {
             width: 100%;
-            background: #2d5a27;
+            background: #3B6E4F;
             border: none;
-            border-radius: 14px;
-            padding: 0.8rem;
+            border-radius: 40px;
+            padding: 0.7rem;
+            font-size: 0.9rem;
+            font-weight: 600;
             color: white;
-            font-weight: 500;
             cursor: pointer;
+            transition: 0.2s;
         }
-        .register-link { color: #3b6e4f; cursor: pointer; }
+        button[type="submit"]:hover {
+            background: #2D5A27;
+        }
+        .register-link {
+            color: #3B6E4F;
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: 0.3rem;
+        }
         .captcha-block {
-            background: #1e1e1e;
+            background: #1A1A1A;
             border-radius: 14px;
-            padding: 0.8rem;
+            padding: 0.6rem;
             margin: 1rem 0;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
         }
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            background: #121212;
-            border: 1px solid #3b6e4f;
+            background: #111;
+            border: 1px solid #2C2C2C;
             border-radius: 28px;
-            padding: 2rem;
-            max-width: 400px;
+            padding: 1.8rem;
+            max-width: 380px;
             width: 90%;
             text-align: center;
         }
-        .modal-buttons { display: flex; gap: 1rem; margin-top: 1rem; justify-content: center; }
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            justify-content: center;
+        }
         .modal-buttons button {
             padding: 0.5rem 1.2rem;
-            border-radius: 30px;
+            border-radius: 40px;
             cursor: pointer;
         }
-        #modal-submit { background: #2d5a27; border: none; color: white; }
-        #modal-cancel { background: none; border: 1px solid #666; color: #ccc; }
+        #modal-submit { background: #3B6E4F; border: none; color: white; }
+        #modal-cancel { background: none; border: 1px solid #3B6E4F; color: #ccc; }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.65rem;
+            color: #3B6E4F;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 20px;
+            z-index: 100;
+        }
+        @media (max-width: 480px) {
+            .card { padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-<div class="version">v3.0.0</div>
+<div class="version">v3.1.0</div>
 <div class="card">
-    <h1>Твоя легенда рождается здесь.<br><span class="accent">Omega RolePlay</span></h1>
-    <button id="google-login" class="google-btn">Войти через Google</button>
+    <div class="logo">
+        <h1>Omega<span>RolePlay</span></h1>
+        <p style="font-size:0.8rem; color:#888;">Твоя история начинается здесь</p>
+    </div>
+
+    <button id="google-login" class="google-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Войти через Google
+    </button>
+
     <div class="divider">или по паролю</div>
+
     <div>
         <div class="field">
             <label>Ник в Minecraft</label>
-            <input type="text" id="login-nick" placeholder="Введите ник">
+            <input type="text" id="login-nick" placeholder="ваш ник">
             <div class="error" id="nick-error"></div>
         </div>
         <div class="field">
             <label>Пароль</label>
-            <input type="password" id="login-pass" placeholder="Введите пароль">
+            <input type="password" id="login-pass" placeholder="••••••••">
             <div class="error" id="pass-error"></div>
         </div>
         <button type="submit" id="login-btn">Войти</button>
     </div>
-    <div class="divider">Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span></div>
-    <div id="register-block" style="display:none; margin-top:1.5rem;">
+
+    <div class="divider" style="margin-top:1.2rem;">
+        Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span>
+    </div>
+
+    <div id="register-block" style="display:none; margin-top:1rem;">
         <div class="field">
-            <label>Ник в Minecraft</label>
-            <input type="text" id="reg-nick" placeholder="Придумайте ник">
+            <label>Придумайте ник</label>
+            <input type="text" id="reg-nick" placeholder="ник">
             <div class="error" id="reg-nick-error"></div>
         </div>
         <div class="field">
             <label>Пароль (мин. 8 символов)</label>
-            <input type="password" id="reg-pass" placeholder="Минимум 8 символов">
+            <input type="password" id="reg-pass" placeholder="••••••••">
             <div class="error" id="reg-pass-error"></div>
         </div>
         <div class="captcha-block">
@@ -157,8 +250,8 @@
 
 <div id="nickname-modal" class="modal">
     <div class="modal-content">
-        <h3>Введите ваш ник в Minecraft</h3>
-        <input type="text" id="modal-nick" placeholder="Ник" autocomplete="off">
+        <h3>Введите ник в Minecraft</h3>
+        <input type="text" id="modal-nick" placeholder="ник" autocomplete="off">
         <div class="error" id="modal-error" style="margin-top:0.5rem;"></div>
         <div class="modal-buttons">
             <button id="modal-submit">Подтвердить</button>
@@ -199,7 +292,6 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // Функция создания профиля с полями rp_points и settings
     async function createProfile(userId, nickname, email) {
         await setDoc(doc(db, "profiles", userId), {
             nickname: nickname,
@@ -214,7 +306,7 @@
         });
     }
 
-    // Регистрация по паролю
+    // регистрация по паролю
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -237,7 +329,6 @@
         const btn = document.getElementById('register-btn');
         btn.disabled = true;
         btn.textContent = 'Проверка...';
-
         try {
             const profilesRef = collection(db, "profiles");
             const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
@@ -262,7 +353,7 @@
         }
     });
 
-    // Вход по паролю (обновляем lastSeen)
+    // вход по паролю
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -355,8 +446,7 @@
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            const profileRef = doc(db, "profiles", user.uid);
-            await updateDoc(profileRef, { lastSeen: serverTimestamp() }).catch(() => {});
+            await updateDoc(doc(db, "profiles", user.uid), { lastSeen: serverTimestamp() }).catch(() => {});
             window.location.href = 'server.html';
         }
     });
