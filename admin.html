@@ -2,113 +2,120 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Админ-панель — Omega RolePlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            padding: 2rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0A0A0A;
+            color: #E6E6E6;
+            padding: 1rem;
         }
         .version {
             position: fixed;
             bottom: 12px;
             right: 12px;
-            font-size: 0.7rem;
-            color: #3b6e4f;
+            font-size: 0.65rem;
+            color: #3B6E4F;
             background: rgba(0,0,0,0.5);
             padding: 2px 6px;
-            border-radius: 8px;
+            border-radius: 20px;
             z-index: 100;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { margin-bottom: 1.5rem; }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
         .back-link {
             display: inline-block;
-            margin-bottom: 1.5rem;
-            color: #3b6e4f;
+            margin-bottom: 1rem;
+            color: #3B6E4F;
             text-decoration: none;
+        }
+        h1 {
+            margin-bottom: 1.2rem;
+            font-weight: 500;
         }
         .tabs {
             display: flex;
+            flex-wrap: wrap;
             gap: 0.5rem;
             margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            background: #121212;
+            background: #111;
             padding: 0.5rem;
-            border-radius: 40px;
+            border-radius: 60px;
         }
         .tab {
-            padding: 0.5rem 1.2rem;
+            padding: 0.4rem 1rem;
             cursor: pointer;
-            color: #aaa;
-            border-radius: 30px;
-            transition: 0.2s;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #A0A0A0;
         }
         .tab.active {
-            background: #2d5a27;
+            background: #3B6E4F;
             color: white;
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card {
-            background: #121212;
-            border: 1px solid #2c2c2c;
-            border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 24px;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
         }
         .list-item {
-            background: #1a1a1a;
-            border-radius: 16px;
+            background: #1A1A1A;
+            border-radius: 20px;
             padding: 1rem;
-            margin-bottom: 1rem;
-            border-left: 3px solid #3b6e4f;
+            margin-bottom: 0.8rem;
+            border-left: 3px solid #3B6E4F;
         }
-        .actions { margin-top: 0.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
         button, .btn {
-            background: #2d5a27;
+            background: #3B6E4F;
             border: none;
-            border-radius: 30px;
+            border-radius: 40px;
             padding: 0.4rem 1rem;
             color: white;
             cursor: pointer;
             font-size: 0.8rem;
         }
-        .delete-btn { background: #5a2e2e; }
-        .delete-btn:hover { background: #7a3e3e; }
+        .delete-btn { background: #5A2E2E; }
         input, select, textarea {
-            background: #1e1e1e;
+            background: #1A1A1A;
             border: 1px solid #333;
-            border-radius: 10px;
-            padding: 0.4rem 0.6rem;
+            border-radius: 14px;
+            padding: 0.5rem;
             color: white;
             font-size: 0.8rem;
         }
-        .status-badge {
-            display: inline-block;
-            background: #2d5a27;
-            border-radius: 20px;
-            padding: 0.1rem 0.5rem;
-            font-size: 0.7rem;
-        }
         .grid-2 {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
+        }
+        @media (max-width: 700px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .tabs { border-radius: 20px; }
         }
     </style>
 </head>
 <body>
-<div class="version">v3.0.0</div>
+<div class="version">v3.1.0</div>
 <div class="container">
-    <a href="server.html" class="back-link">← Назад в панель</a>
+    <a href="server.html" class="back-link">← Назад</a>
     <h1>Админ-панель</h1>
     <div class="tabs">
-        <div class="tab active" data-tab="pending">Заявки (персонажи)</div>
+        <div class="tab active" data-tab="pending">Заявки</div>
         <div class="tab" data-tab="approved">Персонажи</div>
         <div class="tab" data-tab="nickname">Смена ника</div>
         <div class="tab" data-tab="tickets">Тикеты</div>
@@ -124,8 +131,8 @@
     <div id="nickname-tab" class="tab-content"><div class="card"><div id="nickname-list">Загрузка...</div></div></div>
     <div id="tickets-tab" class="tab-content"><div class="card"><div id="tickets-list">Загрузка...</div></div></div>
     <div id="polls-tab" class="tab-content"><div class="card"><button id="new-poll-btn" class="btn">Создать опрос</button><div id="polls-list">Загрузка...</div></div></div>
-    <div id="shop-tab" class="tab-content"><div class="card"><button id="new-item-btn" class="btn">Добавить товар</button><div id="shop-list">Загрузка...</div><hr><div class="grid-2"><div><h3>Выдать монеты</h3><input type="text" id="give-points-nick" placeholder="Ник игрока"><input type="number" id="give-points-amount" placeholder="Количество"><button id="give-points-btn">Выдать</button></div><div><h3>Списать монеты</h3><input type="text" id="remove-points-nick" placeholder="Ник игрока"><input type="number" id="remove-points-amount" placeholder="Количество"><button id="remove-points-btn">Списать</button></div></div></div></div>
-    <div id="achievements-tab" class="tab-content"><div class="card"><button id="new-ach-btn" class="btn">+ Новое достижение</button><hr><h3>Выдать достижение</h3><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><input type="text" id="give-nick" placeholder="Ник игрока"><select id="give-ach-select"></select><button id="give-ach-btn">Выдать</button></div><div id="ach-list">Загрузка...</div></div></div>
+    <div id="shop-tab" class="tab-content"><div class="card"><button id="new-item-btn" class="btn">Добавить товар</button><div id="shop-list">Загрузка...</div><hr style="margin:1rem 0"><div class="grid-2"><div><h3>Выдать монеты</h3><input type="text" id="give-points-nick" placeholder="Ник"><input type="number" id="give-points-amount" placeholder="Кол-во"><button id="give-points-btn">Выдать</button></div><div><h3>Списать монеты</h3><input type="text" id="remove-points-nick" placeholder="Ник"><input type="number" id="remove-points-amount" placeholder="Кол-во"><button id="remove-points-btn">Списать</button></div></div></div></div>
+    <div id="achievements-tab" class="tab-content"><div class="card"><button id="new-ach-btn" class="btn">+ Достижение</button><hr style="margin:1rem 0"><h3>Выдать достижение</h3><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><input type="text" id="give-nick" placeholder="Ник"><select id="give-ach-select"></select><button id="give-ach-btn">Выдать</button></div><div id="ach-list">Загрузка...</div></div></div>
     <div id="users-tab" class="tab-content"><div class="card"><div id="users-list">Загрузка...</div></div></div>
     <div id="notify-tab" class="tab-content"><div class="card"><h3>Массовое уведомление</h3><div style="display:flex; gap:0.5rem; flex-wrap:wrap;"><input type="text" id="notif-title" placeholder="Заголовок"><textarea id="notif-message" rows="2" placeholder="Текст" style="flex:1"></textarea><button id="send-mass-notif">Отправить</button></div></div></div>
 </div>
@@ -133,7 +140,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc, increment, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -148,12 +155,11 @@
     const db = getFirestore(app);
 
     let currentUser = null;
-
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = 'index.html'; return; }
         currentUser = user;
-        const profileSnap = await getDoc(doc(db, "profiles", user.uid));
-        if (!profileSnap.exists() || !['admin','reviewer'].includes(profileSnap.data().role)) {
+        const profile = await getDoc(doc(db, "profiles", user.uid));
+        if (!profile.exists() || !['admin','reviewer'].includes(profile.data().role)) {
             alert('Нет прав');
             window.location.href = 'server.html';
             return;
@@ -163,12 +169,12 @@
         loadNicknameRequests();
         loadTickets();
         loadPolls();
-        loadShop();
+        loadShopItems();
         loadAchievements();
         loadUsers();
     });
 
-    // === Заявки на персонажа ===
+    // === ЗАЯВКИ НА ПЕРСОНАЖА ===
     async function loadPending() {
         const q = query(collection(db, "pending_characters"), where("status", "==", "pending"));
         const snap = await getDocs(q);
@@ -209,9 +215,7 @@
             gender: data.gender, age: data.age, history: data.history, profession: data.profession,
             approvedAt: serverTimestamp(), approvedBy: currentUser.uid
         });
-        // Начисляем монеты за одобрение персонажа
-        await addPoints(data.userId, 10, 'одобрение персонажа');
-        await addDoc(collection(db, "notifications"), { userId: data.userId, title: 'Персонаж одобрен', message: `"${data.characterName}" принят. Вы получили 10 монет.`, isRead: false, createdAt: serverTimestamp() });
+        await addDoc(collection(db, "notifications"), { userId: data.userId, title: 'Персонаж одобрен', message: `"${data.characterName}" принят.`, isRead: false, createdAt: serverTimestamp() });
         await deleteDoc(pendingRef);
         loadPending();
         loadApproved();
@@ -226,7 +230,7 @@
         loadPending();
     }
 
-    // === Одобренные персонажи ===
+    // === ОДОБРЕННЫЕ ПЕРСОНАЖИ ===
     async function loadApproved() {
         const snap = await getDocs(collection(db, "approved_characters"));
         const container = document.getElementById('approved-list');
@@ -250,7 +254,7 @@
         }));
     }
 
-    // === Смена ника ===
+    // === СМЕНА НИКА ===
     async function loadNicknameRequests() {
         const q = query(collection(db, "nickname_requests"), where("status", "==", "pending"));
         const snap = await getDocs(q);
@@ -284,14 +288,13 @@
         }));
     }
 
-    // === Тикеты ===
+    // === ТИКЕТЫ ===
     async function loadTickets() {
-        const q = collection(db, "tickets");
-        const snap = await getDocs(q);
+        const snap = await getDocs(collection(db, "tickets"));
         const container = document.getElementById('tickets-list');
         if (snap.empty) { container.innerHTML = '<div>Нет тикетов</div>'; return; }
         const tickets = [];
-        snap.forEach(docSnap => { tickets.push({ id: docSnap.id, ...docSnap.data() }); });
+        snap.forEach(docSnap => tickets.push({ id: docSnap.id, ...docSnap.data() }));
         tickets.sort((a,b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
         container.innerHTML = '';
         for (const data of tickets) {
@@ -299,7 +302,7 @@
             const div = document.createElement('div');
             div.className = 'list-item';
             div.innerHTML = `
-                <div><strong>${data.userNick}</strong> — ${data.subject} <span class="status-badge ${!isOpen ? 'status-closed' : ''}">${isOpen ? 'Открыт' : 'Закрыт'}</span></div>
+                <div><strong>${data.userNick}</strong> — ${data.subject} <span style="display:inline-block; margin-left:0.5rem; background:${isOpen ? '#3B6E4F' : '#5A2E2E'}; border-radius:30px; padding:0.1rem 0.5rem; font-size:0.7rem;">${isOpen ? 'Открыт' : 'Закрыт'}</span></div>
                 <div><small>${data.message.substring(0,120)}</small></div>
                 ${data.adminResponse ? `<div><strong>Ответ админа:</strong> ${data.adminResponse}</div>` : ''}
                 <div class="actions">
@@ -320,63 +323,73 @@
             loadTickets();
         }));
         document.querySelectorAll('.delete-ticket').forEach(btn => btn.addEventListener('click', async () => {
-            if(confirm('Удалить тикет?')){ await deleteDoc(doc(db, "tickets", btn.getAttribute('data-id'))); loadTickets(); }
+            if (confirm('Удалить тикет?')) { await deleteDoc(doc(db, "tickets", btn.getAttribute('data-id'))); loadTickets(); }
         }));
     }
 
-    // === Опросы ===
+    // === ОПРОСЫ ===
     async function loadPolls() {
         const snap = await getDocs(collection(db, "polls"));
         const container = document.getElementById('polls-list');
-        if (snap.empty) { container.innerHTML = '<div>Нет опросов</div>'; return; }
+        if (snap.empty) { container.innerHTML = '<div>Нет опросов. Создайте первый.</div>'; return; }
         container.innerHTML = '';
         for (const docSnap of snap.docs) {
-            const data = docSnap.data();
+            const p = docSnap.data();
+            const options = p.options || [];
+            const votes = p.votes || [];
+            const optHtml = options.map((opt, idx) => `${opt}: ${votes[idx] || 0} голосов`).join(', ');
             const div = document.createElement('div');
             div.className = 'list-item';
             div.innerHTML = `
-                <div><strong>${data.question}</strong> ${data.isActive ? '(активен)' : '(завершён)'}</div>
-                <div>Варианты: ${data.options?.join(', ')}</div>
+                <div><strong>${p.question}</strong> ${p.isActive ? '<span style="color:#3B6E4F;">(активный)</span>' : '<span style="color:#888;">(завершён)</span>'}</div>
+                <div><small>${optHtml}</small></div>
                 <div class="actions">
-                    ${!data.isActive ? `<button class="activate-poll" data-id="${docSnap.id}">Активировать</button>` : `<button class="deactivate-poll" data-id="${docSnap.id}">Завершить</button>`}
-                    <button class="delete-poll delete-btn" data-id="${docSnap.id}">Удалить</button>
+                    ${!p.isActive ? '' : `<button class="end-poll" data-id="${docSnap.id}">Завершить</button>`}
+                    <button class="delete-poll" data-id="${docSnap.id}">Удалить</button>
                 </div>
             `;
             container.appendChild(div);
         }
-        document.querySelectorAll('.activate-poll').forEach(btn => btn.addEventListener('click', async () => {
-            await updateDoc(doc(db, "polls", btn.getAttribute('data-id')), { isActive: true });
-            loadPolls();
-        }));
-        document.querySelectorAll('.deactivate-poll').forEach(btn => btn.addEventListener('click', async () => {
+        document.querySelectorAll('.end-poll').forEach(btn => btn.addEventListener('click', async () => {
             await updateDoc(doc(db, "polls", btn.getAttribute('data-id')), { isActive: false });
             loadPolls();
         }));
         document.querySelectorAll('.delete-poll').forEach(btn => btn.addEventListener('click', async () => {
-            if(confirm('Удалить опрос?')){ await deleteDoc(doc(db, "polls", btn.getAttribute('data-id'))); loadPolls(); }
+            if (confirm('Удалить опрос?')) {
+                await deleteDoc(doc(db, "polls", btn.getAttribute('data-id')));
+                loadPolls();
+            }
         }));
     }
     document.getElementById('new-poll-btn').addEventListener('click', async () => {
         const question = prompt('Вопрос опроса');
         if (!question) return;
         let options = [];
-        let opt;
-        while ((opt = prompt('Вариант ответа (оставьте пустым для завершения)')) !== null && opt !== '') {
+        while (options.length < 2) {
+            const opt = prompt(`Вариант ответа ${options.length+1} (минимум 2)`);
+            if (!opt) return;
             options.push(opt);
         }
-        if (options.length < 2) { alert('Нужно минимум 2 варианта'); return; }
+        const addMore = confirm('Добавить ещё вариант?');
+        if (addMore) {
+            let more;
+            while (more !== null) {
+                more = prompt('Следующий вариант (Enter для завершения)');
+                if (more) options.push(more);
+            }
+        }
         await addDoc(collection(db, "polls"), {
             question, options, votes: new Array(options.length).fill(0),
-            isActive: false, createdAt: serverTimestamp(), createdBy: currentUser.uid
+            isActive: true, createdAt: serverTimestamp(), createdBy: currentUser.uid
         });
         loadPolls();
     });
 
-    // === Магазин ===
-    async function loadShop() {
+    // === МАГАЗИН (товары и монеты) ===
+    async function loadShopItems() {
         const snap = await getDocs(collection(db, "shop_items"));
         const container = document.getElementById('shop-list');
-        if (snap.empty) { container.innerHTML = '<div>Нет товаров</div>'; return; }
+        if (snap.empty) { container.innerHTML = '<div>Нет товаров. Создайте первый.</div>'; return; }
         container.innerHTML = '';
         for (const docSnap of snap.docs) {
             const item = docSnap.data();
@@ -384,63 +397,63 @@
             div.className = 'list-item';
             div.innerHTML = `
                 <div><strong>${item.name}</strong> — ${item.price} монет</div>
-                <div>${item.description}</div>
                 <div class="actions">
-                    <button class="delete-item delete-btn" data-id="${docSnap.id}">Удалить</button>
+                    <button class="delete-item" data-id="${docSnap.id}">Удалить</button>
                 </div>
             `;
             container.appendChild(div);
         }
         document.querySelectorAll('.delete-item').forEach(btn => btn.addEventListener('click', async () => {
-            if(confirm('Удалить товар?')){ await deleteDoc(doc(db, "shop_items", btn.getAttribute('data-id'))); loadShop(); }
+            if (confirm('Удалить товар?')) {
+                await deleteDoc(doc(db, "shop_items", btn.getAttribute('data-id')));
+                loadShopItems();
+            }
         }));
     }
     document.getElementById('new-item-btn').addEventListener('click', async () => {
         const name = prompt('Название товара');
         if (!name) return;
-        const desc = prompt('Описание товара');
+        const desc = prompt('Описание');
         if (!desc) return;
         const price = parseInt(prompt('Цена в монетах'));
         if (isNaN(price)) return;
         await addDoc(collection(db, "shop_items"), { name, description: desc, price, isActive: true });
-        loadShop();
+        loadShopItems();
     });
 
-    // === Управление монетами ===
-    async function addPoints(userId, amount, reason) {
-        const userRef = doc(db, "profiles", userId);
-        await updateDoc(userRef, { rp_points: increment(amount) });
-        await addDoc(collection(db, "notifications"), { userId: userId, title: 'Начислены монеты', message: `Вы получили ${amount} монет за: ${reason}`, isRead: false, createdAt: serverTimestamp() });
-    }
-    async function removePoints(userId, amount, reason) {
-        const userRef = doc(db, "profiles", userId);
-        await updateDoc(userRef, { rp_points: increment(-amount) });
-        await addDoc(collection(db, "notifications"), { userId: userId, title: 'Списаны монеты', message: `С вас списано ${amount} монет за: ${reason}`, isRead: false, createdAt: serverTimestamp() });
-    }
+    // === УПРАВЛЕНИЕ МОНЕТАМИ ===
     document.getElementById('give-points-btn')?.addEventListener('click', async () => {
         const nick = document.getElementById('give-points-nick').value.trim();
         const amount = parseInt(document.getElementById('give-points-amount').value);
-        if (!nick || isNaN(amount) || amount <= 0) { alert('Введите ник и количество'); return; }
+        if (!nick || isNaN(amount)) return alert('Заполните поля');
         const profiles = await getDocs(collection(db, "profiles"));
         let uid = null;
-        for (const p of profiles.docs) if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
-        if (!uid) { alert('Игрок не найден'); return; }
-        await addPoints(uid, amount, 'администратор');
-        alert('Монеты выданы');
+        for (const p of profiles.docs) {
+            if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
+        }
+        if (!uid) return alert('Игрок не найден');
+        await updateDoc(doc(db, "profiles", uid), { rp_points: increment(amount) });
+        alert(`Выдано ${amount} монет`);
+        document.getElementById('give-points-nick').value = '';
+        document.getElementById('give-points-amount').value = '';
     });
     document.getElementById('remove-points-btn')?.addEventListener('click', async () => {
         const nick = document.getElementById('remove-points-nick').value.trim();
         const amount = parseInt(document.getElementById('remove-points-amount').value);
-        if (!nick || isNaN(amount) || amount <= 0) { alert('Введите ник и количество'); return; }
+        if (!nick || isNaN(amount)) return alert('Заполните поля');
         const profiles = await getDocs(collection(db, "profiles"));
         let uid = null;
-        for (const p of profiles.docs) if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
-        if (!uid) { alert('Игрок не найден'); return; }
-        await removePoints(uid, amount, 'администратор');
-        alert('Монеты списаны');
+        for (const p of profiles.docs) {
+            if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
+        }
+        if (!uid) return alert('Игрок не найден');
+        await updateDoc(doc(db, "profiles", uid), { rp_points: increment(-amount) });
+        alert(`Списано ${amount} монет`);
+        document.getElementById('remove-points-nick').value = '';
+        document.getElementById('remove-points-amount').value = '';
     });
 
-    // === Достижения ===
+    // === ДОСТИЖЕНИЯ ===
     async function loadAchievements() {
         const snap = await getDocs(collection(db, "achievements"));
         const container = document.getElementById('ach-list');
@@ -463,30 +476,38 @@
             opt.textContent = a.title;
             select.appendChild(opt);
         });
-        document.querySelectorAll('.delete-ach').forEach(btn => btn.addEventListener('click', async () => { if(confirm('Удалить достижение?')){ await deleteDoc(doc(db, "achievements", btn.getAttribute('data-id'))); loadAchievements(); } }));
+        document.querySelectorAll('.delete-ach').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить достижение?')) {
+                await deleteDoc(doc(db, "achievements", btn.getAttribute('data-id')));
+                loadAchievements();
+            }
+        }));
     }
     document.getElementById('new-ach-btn')?.addEventListener('click', async () => {
-        const t = prompt('Название достижения'); if(!t) return;
-        const d = prompt('Описание'); if(!d) return;
+        const t = prompt('Название достижения');
+        if (!t) return;
+        const d = prompt('Описание');
+        if (!d) return;
         await addDoc(collection(db, "achievements"), { title: t, description: d });
         loadAchievements();
     });
     document.getElementById('give-ach-btn')?.addEventListener('click', async () => {
         const nick = document.getElementById('give-nick').value.trim();
         const achId = document.getElementById('give-ach-select').value;
-        if(!nick || !achId) return alert('Введите ник');
+        if (!nick || !achId) return alert('Введите ник');
         const profiles = await getDocs(collection(db, "profiles"));
         let uid = null;
-        for(const p of profiles.docs) if(p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
-        if(!uid) return alert('Игрок не найден');
+        for (const p of profiles.docs) {
+            if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
+        }
+        if (!uid) return alert('Игрок не найден');
         const existing = await getDocs(query(collection(db, "user_achievements"), where("userId", "==", uid), where("achievementId", "==", achId)));
-        if(!existing.empty) return alert('Уже есть');
+        if (!existing.empty) return alert('Уже есть');
         await addDoc(collection(db, "user_achievements"), { userId: uid, achievementId: achId, earnedAt: serverTimestamp() });
-        await addPoints(uid, 5, 'получение достижения');
-        alert('Достижение выдано, начислено 5 монет');
+        alert('Достижение выдано');
     });
 
-    // === Пользователи ===
+    // === ПОЛЬЗОВАТЕЛИ ===
     async function loadUsers() {
         const snap = await getDocs(collection(db, "profiles"));
         const container = document.getElementById('users-list');
@@ -497,14 +518,14 @@
             const role = data.role || 'user';
             const div = document.createElement('div');
             div.className = 'list-item';
-            div.innerHTML = `<div><strong>${data.nickname}</strong> — ${data.email} | 💰 ${data.rp_points || 0} монет</div>
+            div.innerHTML = `<div><strong>${data.nickname}</strong> — ${data.email}</div>
                 <div class="actions">
                     <select class="role-select" data-uid="${docSnap.id}">
                         <option value="user" ${role==='user' ? 'selected' : ''}>Пользователь</option>
                         <option value="reviewer" ${role==='reviewer' ? 'selected' : ''}>Анкетолог</option>
                         <option value="admin" ${role==='admin' ? 'selected' : ''}>Админ</option>
                     </select>
-                    <button class="save-role" data-uid="${docSnap.id}">Сохранить роль</button>
+                    <button class="save-role" data-uid="${docSnap.id}">Сохранить</button>
                 </div>`;
             container.appendChild(div);
         }
@@ -516,14 +537,16 @@
         }));
     }
 
-    // === Массовые уведомления ===
+    // === МАССОВЫЕ УВЕДОМЛЕНИЯ ===
     document.getElementById('send-mass-notif')?.addEventListener('click', async () => {
         const title = document.getElementById('notif-title').value.trim();
         const msg = document.getElementById('notif-message').value.trim();
-        if(!title || !msg) return alert('Заполните поля');
+        if (!title || !msg) return alert('Заполните поля');
         const profiles = await getDocs(collection(db, "profiles"));
-        for(const profile of profiles.docs) {
-            await addDoc(collection(db, "notifications"), { userId: profile.id, title, message: msg, isRead: false, createdAt: serverTimestamp() });
+        for (const profile of profiles.docs) {
+            await addDoc(collection(db, "notifications"), {
+                userId: profile.id, title, message: msg, isRead: false, createdAt: serverTimestamp()
+            });
         }
         alert(`Отправлено ${profiles.size} уведомлений`);
         document.getElementById('notif-title').value = '';
@@ -538,13 +561,13 @@
             tab.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
             document.getElementById(`${target}-tab`).classList.add('active');
-            if(target==='approved') loadApproved();
-            if(target==='nickname') loadNicknameRequests();
-            if(target==='tickets') loadTickets();
-            if(target==='polls') loadPolls();
-            if(target==='shop') loadShop();
-            if(target==='achievements') loadAchievements();
-            if(target==='users') loadUsers();
+            if (target === 'approved') loadApproved();
+            if (target === 'nickname') loadNicknameRequests();
+            if (target === 'tickets') loadTickets();
+            if (target === 'polls') loadPolls();
+            if (target === 'shop') loadShopItems();
+            if (target === 'achievements') loadAchievements();
+            if (target === 'users') loadUsers();
         });
     });
 </script>
