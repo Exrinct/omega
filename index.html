@@ -116,7 +116,7 @@
     </style>
 </head>
 <body>
-<div class="version">v1.1.0</div>
+<div class="version">v3.0.0</div>
 <div class="card">
     <h1>Твоя легенда рождается здесь.<br><span class="accent">Omega RolePlay</span></h1>
     <button id="google-login" class="google-btn">Войти через Google</button>
@@ -199,7 +199,22 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // Регистрация
+    // Функция создания профиля с полями rp_points и settings
+    async function createProfile(userId, nickname, email) {
+        await setDoc(doc(db, "profiles", userId), {
+            nickname: nickname,
+            nickname_lower: nickname.toLowerCase(),
+            email: email,
+            createdAt: new Date(),
+            role: "user",
+            rp_points: 0,
+            settings: { email_notifications: true, theme: "dark" },
+            isOnline: false,
+            lastSeen: serverTimestamp()
+        });
+    }
+
+    // Регистрация по паролю
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -237,13 +252,7 @@
             }
             const email = `user_${nick.toLowerCase()}@rp.local`;
             const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-            await setDoc(doc(db, "profiles", userCred.user.uid), {
-                nickname: nick,
-                nickname_lower: nick.toLowerCase(),
-                email: email,
-                createdAt: new Date(),
-                role: "user"
-            });
+            await createProfile(userCred.user.uid, nick, email);
         } catch (error) {
             nickErr.textContent = error.message;
             nickErr.style.display = 'block';
@@ -253,7 +262,7 @@
         }
     });
 
-    // Вход по паролю
+    // Вход по паролю (обновляем lastSeen)
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -269,13 +278,7 @@
             const profileRef = doc(db, "profiles", userCred.user.uid);
             const profileSnap = await getDoc(profileRef);
             if (!profileSnap.exists()) {
-                await setDoc(profileRef, {
-                    nickname: nick,
-                    nickname_lower: nick.toLowerCase(),
-                    email: email,
-                    createdAt: new Date(),
-                    role: "user"
-                });
+                await createProfile(userCred.user.uid, nick, email);
             } else {
                 await updateDoc(profileRef, { lastSeen: serverTimestamp() });
             }
@@ -339,14 +342,7 @@
             return;
         }
         if (!pendingGoogleUser) return;
-        await setDoc(doc(db, "profiles", pendingGoogleUser.uid), {
-            nickname: nickname,
-            nickname_lower: nickname.toLowerCase(),
-            email: pendingGoogleUser.email,
-            createdAt: new Date(),
-            role: "user",
-            lastSeen: serverTimestamp()
-        });
+        await createProfile(pendingGoogleUser.uid, nickname, pendingGoogleUser.email);
         document.getElementById('nickname-modal').style.display = 'none';
         pendingGoogleUser = null;
     });
