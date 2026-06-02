@@ -2,158 +2,153 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль игрока — Omega RolePlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Профиль — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            padding: 2rem;
-            position: relative;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0A0A0A;
+            color: #E6E6E6;
+            padding: 1rem;
         }
         .version {
             position: fixed;
             bottom: 12px;
             right: 12px;
-            font-size: 0.7rem;
-            color: #3b6e4f;
+            font-size: 0.65rem;
+            color: #3B6E4F;
             background: rgba(0,0,0,0.5);
             padding: 2px 6px;
-            border-radius: 8px;
+            border-radius: 20px;
             z-index: 100;
         }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
         .back-link {
             display: inline-block;
-            margin-bottom: 1.5rem;
-            color: #3b6e4f;
+            margin-bottom: 1.2rem;
+            color: #3B6E4F;
             text-decoration: none;
+            font-size: 0.85rem;
         }
         .profile-card {
-            background: #121212;
-            border: 1px solid #2c2c2c;
+            background: #111;
+            border: 1px solid #222;
             border-radius: 28px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
         }
         .profile-header {
             display: flex;
-            align-items: center;
-            gap: 2rem;
             flex-wrap: wrap;
-            border-bottom: 1px solid #2c2c2c;
-            padding-bottom: 1.5rem;
-            margin-bottom: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #222;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
         }
         .profile-nick {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #3b6e4f;
+            font-size: 1.8rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
         }
-        .profile-stats {
-            display: flex;
-            gap: 2rem;
-            font-size: 0.9rem;
-        }
-        .stat {
-            background: #1e1e1e;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-        }
-        .section-title {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: #ddd;
-        }
-        .char-grid, .achievement-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        .char-card {
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 1rem;
-            border-left: 3px solid #3b6e4f;
-        }
-        .char-name { font-weight: 600; font-size: 1.1rem; }
-        .char-meta { font-size: 0.8rem; color: #aaa; margin-top: 0.2rem; }
-        .achievement-card {
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 0.8rem;
-        }
-        .ach-title { font-weight: 500; }
-        .ach-desc { font-size: 0.75rem; color: #aaa; margin-top: 0.2rem; }
-        .empty-message { color: #888; font-style: italic; padding: 1rem; }
         .online-badge {
-            background: #2a5a2a;
-            border-radius: 20px;
+            background: #2E8B57;
+            border-radius: 30px;
             padding: 0.2rem 0.6rem;
             font-size: 0.7rem;
-            color: #aaffaa;
+            margin-left: 0.5rem;
             display: inline-block;
-            margin-left: 1rem;
         }
-        .btn-change, .save-settings {
-            background: #2d5a27;
-            border: none;
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+        .stat {
+            background: #1A1A1A;
+            padding: 0.2rem 0.8rem;
             border-radius: 30px;
-            padding: 0.4rem 1rem;
-            color: white;
+            font-size: 0.75rem;
+        }
+        .btn-outline {
+            background: none;
+            border: 1px solid #3B6E4F;
+            border-radius: 40px;
+            padding: 0.3rem 1rem;
+            color: #E6E6E6;
             cursor: pointer;
-            margin-top: 1rem;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
         }
         .settings-group {
-            margin: 1rem 0;
+            background: #1A1A1A;
+            border-radius: 20px;
             padding: 1rem;
-            background: #1a1a1a;
-            border-radius: 16px;
+            margin: 1rem 0;
         }
-        .settings-group label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 0.8rem;
+            margin: 1rem 0;
         }
+        .char-card, .achievement-card {
+            background: #1A1A1A;
+            border-radius: 20px;
+            padding: 0.8rem;
+            border-left: 3px solid #3B6E4F;
+        }
+        .char-name, .ach-title { font-weight: 500; margin-bottom: 0.2rem; }
+        .char-meta, .ach-desc { font-size: 0.7rem; color: #A0A0A0; }
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
+            top:0; left:0;
+            width:100%; height:100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
+            z-index:1000;
         }
         .modal-content {
-            background: #121212;
-            border: 1px solid #3b6e4f;
+            background: #111;
+            border: 1px solid #222;
             border-radius: 28px;
-            padding: 2rem;
+            padding: 1.5rem;
             max-width: 400px;
-            width: 90%;
+            width:90%;
         }
         .modal-content input {
-            width: 100%;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 0.6rem;
-            margin: 1rem 0;
-            color: white;
+            width:100%;
+            background: #1A1A1A;
+            border:1px solid #333;
+            border-radius:14px;
+            padding:0.6rem;
+            margin:1rem 0;
+            color:white;
         }
-        .modal-buttons { display: flex; gap: 1rem; }
-        .error { color: #e06c6c; margin-top: 0.5rem; }
+        .modal-buttons {
+            display: flex;
+            gap:0.8rem;
+        }
+        .error { color:#E06C6C; font-size:0.75rem; margin-top:0.3rem; }
+        @media (max-width: 640px) {
+            .profile-card { padding: 1rem; }
+            .profile-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+        }
     </style>
 </head>
 <body>
-<div class="version">v3.0.0</div>
+<div class="version">v3.1.0</div>
 <div class="container">
-    <a href="server.html" class="back-link">← Назад в панель</a>
+    <a href="server.html" class="back-link">← Назад</a>
     <div id="profile-content">Загрузка...</div>
 </div>
 
@@ -210,38 +205,35 @@
             const isOwnProfile = currentUserId === userId;
             
             const charsSnap = await getDocs(query(collection(db, "approved_characters"), where("userId", "==", userId)));
-            const characters = charsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            
-            const userAchSnap = await getDocs(query(collection(db, "user_achievements"), where("userId", "==", userId)));
-            const userAchievements = userAchSnap.docs.map(d => d.data());
-            const allAchievements = await getDocs(collection(db, "achievements"));
-            const achievementsMap = {};
-            allAchievements.forEach(d => { achievementsMap[d.id] = d.data(); });
-            const earnedAchievements = userAchievements.map(ua => achievementsMap[ua.achievementId]).filter(a => a);
-            
+            const characters = charsSnap.docs.map(d => d.data());
+            const achievementsSnap = await getDocs(query(collection(db, "user_achievements"), where("userId", "==", userId)));
+            const allAch = await getDocs(collection(db, "achievements"));
+            const achMap = {};
+            allAch.forEach(d => { achMap[d.id] = d.data(); });
+            const earned = achievementsSnap.docs.map(d => achMap[d.data().achievementId]).filter(a => a);
             const pendingSnap = await getDocs(query(collection(db, "pending_characters"), where("userId", "==", userId)));
             const pendingCount = pendingSnap.size;
             
             let settingsHtml = '';
             let changeNickButton = '';
             if (isOwnProfile) {
-                changeNickButton = `<button id="change-nick-btn" class="btn-change">Сменить ник</button>`;
+                changeNickButton = `<button id="change-nick-btn" class="btn-outline">Сменить ник</button>`;
                 const settings = profile.settings || { email_notifications: true, theme: "dark" };
                 settingsHtml = `
                     <div class="settings-group">
-                        <h3>Настройки</h3>
-                        <label>
+                        <h3 style="margin-bottom:0.5rem;">Настройки</h3>
+                        <label style="display:flex; align-items:center; gap:0.5rem;">
                             <input type="checkbox" id="email_notifications" ${settings.email_notifications ? 'checked' : ''}>
-                            Получать уведомления на email
+                            Уведомления на email
                         </label>
                         <div style="margin-top:0.5rem;">
-                            <label>Тема оформления:</label>
+                            <label>Тема:</label>
                             <select id="theme">
                                 <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Тёмная</option>
                                 <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Светлая (скоро)</option>
                             </select>
                         </div>
-                        <button id="save-settings" class="save-settings">Сохранить настройки</button>
+                        <button id="save-settings" class="btn-outline" style="margin-top:0.8rem;">Сохранить</button>
                     </div>
                 `;
             }
@@ -253,37 +245,33 @@
                             <span class="profile-nick">${escapeHtml(nickname)}</span>
                             ${isOnline ? '<span class="online-badge">В сети</span>' : '<span class="online-badge" style="background:#444;">Офлайн</span>'}
                         </div>
-                        <div class="profile-stats">
+                        <div class="stats">
                             <div class="stat">💰 ${profile.rp_points || 0} монет</div>
-                            <div class="stat">📜 Персонажей: ${characters.length} / 3</div>
+                            <div class="stat">📜 Персонажей: ${characters.length}/3</div>
                             <div class="stat">⏳ Заявок: ${pendingCount}</div>
-                            <div class="stat">🏆 Достижений: ${earnedAchievements.length}</div>
+                            <div class="stat">🏆 Достижений: ${earned.length}</div>
                         </div>
                     </div>
                     ${changeNickButton}
                     ${settingsHtml}
-                    <div style="margin-bottom: 2rem; margin-top: 1rem;">
-                        <h3 class="section-title">📖 Персонажи</h3>
-                        <div class="char-grid">
-                            ${characters.length === 0 ? '<div class="empty-message">Нет одобренных персонажей</div>' : characters.map(char => `
-                                <div class="char-card">
-                                    <div class="char-name">${escapeHtml(char.characterName)}</div>
-                                    <div class="char-meta">${escapeHtml(char.profession)} • ${escapeHtml(char.gender)} • ${char.age} лет</div>
-                                    <div class="char-meta">${escapeHtml(char.history.substring(0, 80))}...</div>
-                                </div>
-                            `).join('')}
-                        </div>
+                    <h3 style="margin:1rem 0 0.5rem;">Персонажи</h3>
+                    <div class="grid">
+                        ${characters.length === 0 ? '<div class="char-card">Нет одобренных персонажей</div>' : characters.map(c => `
+                            <div class="char-card">
+                                <div class="char-name">${escapeHtml(c.characterName)}</div>
+                                <div class="char-meta">${escapeHtml(c.profession)} • ${c.gender} • ${c.age} лет</div>
+                                <div class="char-meta">${escapeHtml(c.history.substring(0,80))}...</div>
+                            </div>
+                        `).join('')}
                     </div>
-                    <div>
-                        <h3 class="section-title">🏆 Достижения</h3>
-                        <div class="achievement-grid">
-                            ${earnedAchievements.length === 0 ? '<div class="empty-message">Нет заработанных достижений</div>' : earnedAchievements.map(ach => `
-                                <div class="achievement-card">
-                                    <div class="ach-title">${escapeHtml(ach.title)}</div>
-                                    <div class="ach-desc">${escapeHtml(ach.description)}</div>
-                                </div>
-                            `).join('')}
-                        </div>
+                    <h3 style="margin:1rem 0 0.5rem;">Достижения</h3>
+                    <div class="grid">
+                        ${earned.length === 0 ? '<div class="achievement-card">Нет достижений</div>' : earned.map(a => `
+                            <div class="achievement-card">
+                                <div class="ach-title">${escapeHtml(a.title)}</div>
+                                <div class="ach-desc">${escapeHtml(a.description)}</div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
@@ -291,9 +279,9 @@
             
             if (isOwnProfile) {
                 document.getElementById('save-settings')?.addEventListener('click', async () => {
-                    const email_notifications = document.getElementById('email_notifications').checked;
+                    const emailNotif = document.getElementById('email_notifications').checked;
                     const theme = document.getElementById('theme').value;
-                    await updateDoc(doc(db, "profiles", userId), { settings: { email_notifications, theme } });
+                    await updateDoc(doc(db, "profiles", userId), { settings: { email_notifications: emailNotif, theme } });
                     alert('Настройки сохранены');
                 });
                 const changeBtn = document.getElementById('change-nick-btn');
@@ -305,22 +293,20 @@
                 changeBtn.addEventListener('click', () => {
                     modal.style.display = 'flex';
                     nickInput.value = '';
-                    errorSpan.textContent = '';
+                    errorSpan.innerText = '';
                 });
                 cancelBtn.addEventListener('click', () => modal.style.display = 'none');
                 submitBtn.addEventListener('click', async () => {
                     const newNick = nickInput.value.trim();
-                    if (!newNick) { errorSpan.textContent = 'Введите новый ник'; return; }
+                    if (!newNick) { errorSpan.innerText = 'Введите новый ник'; return; }
                     if (!/^[a-zA-Z0-9_]{3,16}$/.test(newNick)) {
-                        errorSpan.textContent = 'Ник: 3-16 символов (латиница, цифры, _)';
+                        errorSpan.innerText = 'Ник: 3-16 символов, латиница, цифры, _';
                         return;
                     }
-                    const profilesRef = collection(db, "profiles");
-                    const q = query(profilesRef, where("nickname_lower", "==", newNick.toLowerCase()));
-                    const existing = await getDocs(q);
-                    if (!existing.empty) { errorSpan.textContent = 'Ник уже занят'; return; }
+                    const existing = await getDocs(query(collection(db, "profiles"), where("nickname_lower", "==", newNick.toLowerCase())));
+                    if (!existing.empty) { errorSpan.innerText = 'Ник уже занят'; return; }
                     await addDoc(collection(db, "nickname_requests"), {
-                        userId: userId, oldNickname: nickname, newNickname: newNick,
+                        userId, oldNickname: nickname, newNickname: newNick,
                         status: 'pending', createdAt: serverTimestamp()
                     });
                     alert('Заявка отправлена');
@@ -332,10 +318,7 @@
         }
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
-    }
+    function escapeHtml(str) { return str ? str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;') : ''; }
 </script>
 </body>
 </html>
