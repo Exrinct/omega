@@ -26,21 +26,24 @@
             border-radius: 8px;
             z-index: 100;
         }
-        /* Левая панель с онлайн и статистикой */
-        .left-panel {
-            width: 240px;
+        /* Левая панель - компактная */
+        .online-panel {
+            width: 200px;
             background: #121212;
             border-right: 1px solid #2c2c2c;
-            padding: 1.5rem 1rem;
+            padding: 1rem;
             position: fixed;
             left: 0;
             top: 0;
             bottom: 0;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
         }
-        .left-panel h3 {
+        .online-panel h3 {
             font-size: 0.9rem;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
             padding-bottom: 0.3rem;
             border-bottom: 1px solid #2c2c2c;
             color: #3b6e4f;
@@ -49,14 +52,15 @@
             display: flex;
             flex-direction: column;
             gap: 0.4rem;
-            margin-bottom: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
         }
         .online-badge {
             display: block;
             background: #1e1e1e;
             border-radius: 10px;
-            padding: 0.3rem 0.6rem;
-            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
             color: #aaffaa;
             text-decoration: none;
             transition: background 0.2s;
@@ -65,31 +69,30 @@
         .online-badge:hover {
             background: #2a5a2a;
         }
+        /* Блок статистики */
         .stats-block {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 0.6rem;
             margin-top: 0.5rem;
         }
-        .stat-item {
-            background: #1a1a1a;
-            border-radius: 10px;
-            padding: 0.3rem 0.6rem;
-            margin-bottom: 0.4rem;
-            font-size: 0.75rem;
+        .stats-block p {
+            font-size: 0.7rem;
+            margin: 0.2rem 0;
+            color: #aaa;
             display: flex;
             justify-content: space-between;
         }
-        .stat-label {
-            color: #aaa;
-        }
-        .stat-value {
+        .stats-block span {
             color: #3b6e4f;
-            font-weight: 500;
+            font-weight: 600;
         }
         /* Основной контент */
         .dashboard {
-            margin-left: 240px;
+            margin-left: 200px;
             flex: 1;
-            max-width: calc(100% - 240px);
-            padding: 2rem;
+            max-width: calc(100% - 200px);
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
@@ -100,94 +103,96 @@
             align-items: center;
             background: #121212;
             border: 1px solid #2c2c2c;
-            border-radius: 20px;
-            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            padding: 0.8rem 1.2rem;
             position: relative;
         }
         .user-greeting {
             margin-right: auto;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 500;
         }
         .user-greeting span { color: #3b6e4f; }
         .header-right {
             display: flex;
-            gap: 1rem;
+            gap: 0.8rem;
             align-items: center;
         }
-        .logout, .profile-link, .ticket-link {
+        .logout, .profile-link, .ticket-btn {
             background: none;
             border: 1px solid #3b6e4f;
-            padding: 0.5rem 1.2rem;
+            padding: 0.4rem 1rem;
             border-radius: 30px;
             color: #ccc;
             cursor: pointer;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
-        .ticket-link { background: #2d5a27; border-color: #2d5a27; }
-        .profile-link:hover, .logout:hover, .ticket-link:hover { background: #3b6e4f20; }
+        .ticket-btn { background: #2d5a27; border: none; color: white; }
+        .ticket-btn:hover { background: #3a6e34; }
+        .profile-link:hover, .logout:hover { background: #3b6e4f20; }
         .notif-icon {
             position: relative;
             cursor: pointer;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
         }
         .notif-badge {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -6px;
+            right: -6px;
             background: #3b6e4f;
             color: white;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             border-radius: 30px;
-            padding: 0 0.4rem;
-            min-width: 18px;
+            padding: 0 0.3rem;
+            min-width: 16px;
             text-align: center;
         }
         .notif-dropdown {
             display: none;
             position: absolute;
-            top: 50px;
+            top: 40px;
             right: 0;
-            width: 280px;
+            width: 260px;
             background: #1c1c1c;
             border: 1px solid #3b6e4f;
-            border-radius: 16px;
+            border-radius: 12px;
             z-index: 10;
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
         }
         .notif-dropdown.show { display: block; }
         .notif-item {
-            padding: 0.8rem;
+            padding: 0.6rem;
             border-bottom: 1px solid #2c2c2c;
             cursor: pointer;
+            font-size: 0.8rem;
         }
         .notif-item.unread { background: #2a2a2a; }
         .notif-item:hover { background: #252525; }
-        .notif-title { font-weight: 500; font-size: 0.9rem; }
-        .notif-message { font-size: 0.75rem; color: #aaa; margin-top: 0.2rem; }
+        .notif-title { font-weight: 500; }
+        .notif-message { font-size: 0.7rem; color: #aaa; margin-top: 0.2rem; }
         .card {
             background: #121212;
             border: 1px solid #2c2c2c;
-            border-radius: 20px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1.2rem;
         }
         .create-btn {
             background: #2d5a27;
             border: none;
             border-radius: 40px;
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             color: white;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
         }
-        .char-list { display: flex; flex-direction: column; gap: 1rem; }
+        .char-list { display: flex; flex-direction: column; gap: 0.8rem; }
         .char-card {
             background: #1a1a1a;
-            border-radius: 16px;
-            padding: 1rem;
+            border-radius: 12px;
+            padding: 0.8rem;
             border-left: 3px solid #3b6e4f;
         }
         .ip-box {
@@ -195,33 +200,31 @@
             justify-content: space-between;
             align-items: center;
             background: #1e1e1e;
-            border-radius: 14px;
-            padding: 0.8rem 1rem;
-            border: 1px solid #2c2c2c;
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
         }
         .copy-btn {
             background: #2c2c2c;
             border: 1px solid #3b6e4f;
-            border-radius: 30px;
-            padding: 0.4rem 1.2rem;
-            color: #c0c0c0;
+            border-radius: 20px;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
             cursor: pointer;
         }
         .lore-btn {
             display: inline-block;
             background: #2c2c2c;
             border: 1px solid #3b6e4f;
-            border-radius: 40px;
-            padding: 0.7rem 1.8rem;
-            color: #ddd;
+            border-radius: 30px;
+            padding: 0.5rem 1.2rem;
             text-decoration: none;
-            text-align: center;
+            color: #ddd;
         }
-        .modpack-link { color: #3b6e4f; text-decoration: none; border-bottom: 1px solid transparent; }
-        .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem; }
-        .social-links a { color: #aaa; text-decoration: none; font-size: 0.9rem; }
-        .admin-link { display: inline-block; margin-top: 1rem; text-align: center; color: #3b6e4f; text-decoration: none; font-size: 0.8rem; }
-        .char-counter { font-size: 0.8rem; color: #aaa; margin-top: 0.5rem; }
+        .modpack-link { color: #3b6e4f; text-decoration: none; font-size: 0.9rem; }
+        .social-links { display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem; }
+        .social-links a { color: #aaa; text-decoration: none; font-size: 0.8rem; }
+        .admin-link { display: inline-block; margin-top: 0.8rem; text-align: center; color: #3b6e4f; text-decoration: none; font-size: 0.75rem; }
+        .char-counter { font-size: 0.75rem; color: #aaa; margin-top: 0.3rem; }
         .modal {
             display: none;
             position: fixed;
@@ -235,39 +238,37 @@
         .modal-content {
             background: #121212;
             border: 1px solid #3b6e4f;
-            border-radius: 28px;
-            padding: 2rem;
-            max-width: 500px;
+            border-radius: 24px;
+            padding: 1.5rem;
+            max-width: 450px;
             width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
         }
         .field { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.8rem; margin-bottom: 0.3rem; color: #aaa; }
+        label { font-size: 0.75rem; margin-bottom: 0.2rem; display: block; color: #aaa; }
         input, select, textarea {
             width: 100%;
             background: #1e1e1e;
             border: 1px solid #333;
-            border-radius: 12px;
-            padding: 0.6rem;
+            border-radius: 10px;
+            padding: 0.5rem;
             color: white;
             font-family: inherit;
         }
         .modal-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 0.8rem;
             margin-top: 1rem;
         }
         .modal-buttons button {
             flex: 1;
-            padding: 0.6rem;
+            padding: 0.5rem;
             border-radius: 30px;
             cursor: pointer;
         }
-        .submit-char { background: #2d5a27; border: none; color: white; }
-        .cancel-char { background: none; border: 1px solid #666; color: #ccc; }
+        .submit-btn { background: #2d5a27; border: none; color: white; }
+        .cancel-btn { background: none; border: 1px solid #666; color: #ccc; }
         @media (max-width: 768px) {
-            .left-panel { width: 100%; position: relative; height: auto; border-right: none; border-bottom: 1px solid #2c2c2c; }
+            .online-panel { width: 100%; position: relative; height: auto; border-right: none; border-bottom: 1px solid #2c2c2c; flex-direction: row; flex-wrap: wrap; }
             .dashboard { margin-left: 0; max-width: 100%; }
             body { flex-direction: column; }
         }
@@ -275,17 +276,16 @@
 </head>
 <body>
 <div class="version">v2.2.0</div>
-<div class="left-panel">
-    <h3>🟢 Онлайн игроки</h3>
-    <div id="online-players" class="online-list">Загрузка...</div>
-    <div class="stats-block">
-        <h3>📊 Статистика</h3>
-        <div id="server-stats" class="stats-block">
-            <div class="stat-item"><span class="stat-label">Всего игроков:</span><span id="total-players" class="stat-value">-</span></div>
-            <div class="stat-item"><span class="stat-label">Онлайн:</span><span id="online-count" class="stat-value">-</span></div>
-            <div class="stat-item"><span class="stat-label">Персонажей:</span><span id="total-chars" class="stat-value">-</span></div>
-            <div class="stat-item"><span class="stat-label">Заявок:</span><span id="pending-count" class="stat-value">-</span></div>
-        </div>
+<div class="online-panel">
+    <div>
+        <h3>🟢 Онлайн</h3>
+        <div id="online-players" class="online-list">Загрузка...</div>
+    </div>
+    <div class="stats-block" id="server-stats">
+        <p>👥 Всего игроков: <span id="stat-total-users">-</span></p>
+        <p>📜 Одобрено персонажей: <span id="stat-total-chars">-</span></p>
+        <p>⏳ Заявок на рассмотрении: <span id="stat-pending-chars">-</span></p>
+        <p>✅ Завершено тикетов: <span id="stat-closed-tickets">-</span></p>
     </div>
 </div>
 <div class="dashboard">
@@ -297,36 +297,36 @@
                 <span id="notif-badge" class="notif-badge" style="display: none;">0</span>
                 <div id="notif-dropdown" class="notif-dropdown"></div>
             </div>
+            <button id="ticket-btn" class="ticket-btn">📩 Обращение</button>
             <a href="#" id="my-profile-link" class="profile-link">Мой профиль</a>
-            <a href="#" id="ticket-link" class="ticket-link">Поддержка</a>
             <button class="logout" id="logout-btn">Выйти</button>
         </div>
     </div>
 
-    <button class="create-btn" id="create-char-btn">СОЗДАТЬ ПЕРСОНАЖА</button>
+    <button class="create-btn" id="create-char-btn">➕ СОЗДАТЬ ПЕРСОНАЖА</button>
 
     <div class="card">
-        <h3 style="margin-bottom: 1rem;">Мои персонажи</h3>
+        <h3 style="margin-bottom: 0.8rem; font-size:1.1rem;">🎭 Мои персонажи</h3>
         <div id="my-characters" class="char-list">Загрузка...</div>
         <div id="char-counter" class="char-counter"></div>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom: 0.8rem;">Адрес сервера</h3>
+        <h3 style="margin-bottom: 0.5rem;">🌐 Адрес сервера</h3>
         <div class="ip-box">
-            <span class="ip-text">play.rp-minecraft.ru</span>
+            <span>play.rp-minecraft.ru</span>
             <button class="copy-btn" id="copy-ip-btn">Копировать</button>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom: 0.5rem;">Сборка модов</h3>
-        <p>Скачайте сборку для версии 1.20.1 (Forge)</p>
-        <a href="#" class="modpack-link">Скачать ModPack (Google Диск)</a>
+        <h3 style="margin-bottom: 0.3rem;">📦 Сборка модов</h3>
+        <p style="font-size:0.8rem;">Версия 1.20.1 (Forge)</p>
+        <a href="#" class="modpack-link">Скачать ModPack</a>
     </div>
 
     <div class="card" style="text-align: center;">
-        <a href="lore.html" class="lore-btn">Перейти к лору проекта</a>
+        <a href="lore.html" class="lore-btn">📖 Лор проекта</a>
     </div>
 
     <div class="social-links">
@@ -334,6 +334,48 @@
         <a href="https://t.me/Omega1RolePlay" target="_blank">Telegram</a>
     </div>
     <div id="admin-link-place" style="text-align: center;"></div>
+</div>
+
+<!-- Модалка создания персонажа (без изменений) -->
+<div id="char-modal" class="modal">
+    <div class="modal-content">
+        <h3>Создание персонажа</h3>
+        <div class="field">
+            <label>Имя персонажа</label>
+            <input type="text" id="char-name" placeholder="Например: Эльрин">
+        </div>
+        <div class="field">
+            <label>Пол</label>
+            <select id="char-gender">
+                <option>Мужской</option><option>Женский</option><option>Другой</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Возраст</label>
+            <input type="number" id="char-age" placeholder="18">
+        </div>
+        <div class="field">
+            <label>Профессия</label>
+            <select id="char-profession">
+                <option>Воин</option><option>Маг</option><option>Лучник</option><option>Торговец</option>
+                <option>Вор</option><option>Жрец</option><option>Алхимик</option><option>Наёмник</option>
+                <option>Другое</option>
+            </select>
+        </div>
+        <div class="field" id="custom-prof-field" style="display:none;">
+            <label>Укажите профессию</label>
+            <input type="text" id="custom-prof">
+        </div>
+        <div class="field">
+            <label>История персонажа</label>
+            <textarea id="char-history" rows="3" placeholder="Расскажите о прошлом..."></textarea>
+        </div>
+        <div class="modal-buttons">
+            <button class="submit-btn" id="submit-char">Отправить</button>
+            <button class="cancel-btn" id="close-modal">Отмена</button>
+        </div>
+        <div id="char-error" style="color:#e06c6c; margin-top:0.5rem;"></div>
+    </div>
 </div>
 
 <!-- Модалка создания тикета -->
@@ -346,70 +388,20 @@
         </div>
         <div class="field">
             <label>Сообщение</label>
-            <textarea id="ticket-message" rows="5" placeholder="Подробно опишите вашу проблему..."></textarea>
+            <textarea id="ticket-message" rows="4" placeholder="Подробно опишите ситуацию..."></textarea>
         </div>
         <div class="modal-buttons">
-            <button id="submit-ticket" class="submit-char">Отправить</button>
-            <button id="cancel-ticket" class="cancel-char">Отмена</button>
+            <button id="submit-ticket" class="submit-btn">Отправить</button>
+            <button id="close-ticket-modal" class="cancel-btn">Отмена</button>
         </div>
-        <div id="ticket-error" style="color: #e06c6c; margin-top: 0.5rem; display: none;"></div>
-    </div>
-</div>
-
-<!-- Модалка создания персонажа (как была) -->
-<div id="char-modal" class="modal">
-    <div class="modal-content">
-        <h3>Создание персонажа</h3>
-        <div class="field">
-            <label>Имя персонажа</label>
-            <input type="text" id="char-name" placeholder="Например: Эльрин Светлый">
-        </div>
-        <div class="field">
-            <label>Пол</label>
-            <select id="char-gender">
-                <option value="Мужской">Мужской</option>
-                <option value="Женский">Женский</option>
-                <option value="Другой">Другой</option>
-            </select>
-        </div>
-        <div class="field">
-            <label>Возраст</label>
-            <input type="number" id="char-age" placeholder="18">
-        </div>
-        <div class="field">
-            <label>Профессия</label>
-            <select id="char-profession">
-                <option value="Воин">Воин</option>
-                <option value="Маг">Маг</option>
-                <option value="Лучник">Лучник</option>
-                <option value="Торговец">Торговец</option>
-                <option value="Вор">Вор</option>
-                <option value="Жрец">Жрец</option>
-                <option value="Алхимик">Алхимик</option>
-                <option value="Наёмник">Наёмник</option>
-                <option value="Другое">Другое</option>
-            </select>
-        </div>
-        <div class="field" id="custom-prof-field" style="display: none;">
-            <label>Укажите профессию</label>
-            <input type="text" id="custom-prof" placeholder="Например: Инженер">
-        </div>
-        <div class="field">
-            <label>История персонажа</label>
-            <textarea id="char-history" rows="4" placeholder="Расскажите о прошлом вашего героя..."></textarea>
-        </div>
-        <div class="modal-buttons">
-            <button class="submit-char" id="submit-char">Отправить на модерацию</button>
-            <button class="cancel-char" id="close-modal">Отмена</button>
-        </div>
-        <div id="char-error" style="color: #e06c6c; margin-top: 0.5rem; display: none;"></div>
+        <div id="ticket-error" style="color:#e06c6c; margin-top:0.5rem;"></div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -432,7 +424,7 @@
     const logoutBtn = document.getElementById('logout-btn');
     const createCharBtn = document.getElementById('create-char-btn');
     const charModal = document.getElementById('char-modal');
-    const closeModalBtn = document.getElementById('close-modal');
+    const charModalClose = document.getElementById('close-modal');
     const submitCharBtn = document.getElementById('submit-char');
     const professionSelect = document.getElementById('char-profession');
     const customProfField = document.getElementById('custom-prof-field');
@@ -445,17 +437,12 @@
     const copyIpBtn = document.getElementById('copy-ip-btn');
     const onlinePlayersDiv = document.getElementById('online-players');
     const myProfileLink = document.getElementById('my-profile-link');
-    const ticketLink = document.getElementById('ticket-link');
+    const ticketBtn = document.getElementById('ticket-btn');
     const ticketModal = document.getElementById('ticket-modal');
+    const closeTicketModal = document.getElementById('close-ticket-modal');
     const submitTicketBtn = document.getElementById('submit-ticket');
-    const cancelTicketBtn = document.getElementById('cancel-ticket');
 
-    // Статистика
-    const totalPlayersSpan = document.getElementById('total-players');
-    const onlineCountSpan = document.getElementById('online-count');
-    const totalCharsSpan = document.getElementById('total-chars');
-    const pendingCountSpan = document.getElementById('pending-count');
-
+    // Копирование IP
     copyIpBtn.addEventListener('click', () => {
         navigator.clipboard.writeText("play.rp-minecraft.ru").then(() => {
             copyIpBtn.textContent = 'Скопировано';
@@ -463,89 +450,103 @@
         });
     });
 
+    // Статус онлайн
     async function setOnlineStatus(isOnline) {
         if (!currentUser) return;
-        const profileRef = doc(db, "profiles", currentUser.uid);
-        await updateDoc(profileRef, { isOnline: isOnline, lastSeen: serverTimestamp() }).catch(() => {});
+        await updateDoc(doc(db, "profiles", currentUser.uid), { isOnline: isOnline, lastSeen: serverTimestamp() }).catch(()=>{});
     }
 
+    // Онлайн игроки (кликабельные)
     function loadOnlinePlayers() {
         const q = query(collection(db, "profiles"), where("isOnline", "==", true));
         onSnapshot(q, (snapshot) => {
             if (snapshot.empty) {
-                onlinePlayersDiv.innerHTML = '<span class="online-badge" style="background:#2c2c2c; color:#888;">Никого нет в сети</span>';
-                onlineCountSpan.textContent = '0';
+                onlinePlayersDiv.innerHTML = '<span class="online-badge" style="background:#2c2c2c; color:#888;">—</span>';
                 return;
             }
             onlinePlayersDiv.innerHTML = '';
-            onlineCountSpan.textContent = snapshot.size;
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
                 const nick = data.nickname || "Unknown";
-                const uid = docSnap.id;
                 const span = document.createElement('a');
                 span.className = 'online-badge';
                 span.textContent = nick;
-                span.href = `profile.html?uid=${uid}`;
+                span.href = `profile.html?uid=${docSnap.id}`;
                 span.style.textDecoration = 'none';
-                span.style.display = 'block';
                 onlinePlayersDiv.appendChild(span);
             });
         });
     }
 
+    // Статистика сервера
     async function loadServerStats() {
-        const profiles = await getDocs(collection(db, "profiles"));
-        totalPlayersSpan.textContent = profiles.size;
-        const chars = await getDocs(collection(db, "approved_characters"));
-        totalCharsSpan.textContent = chars.size;
-        const pending = await getDocs(query(collection(db, "pending_characters"), where("status", "==", "pending")));
-        pendingCountSpan.textContent = pending.size;
+        const usersSnap = await getDocs(collection(db, "profiles"));
+        const totalUsers = usersSnap.size;
+        const charsSnap = await getDocs(collection(db, "approved_characters"));
+        const totalChars = charsSnap.size;
+        const pendingSnap = await getDocs(query(collection(db, "pending_characters"), where("status", "==", "pending")));
+        const pendingChars = pendingSnap.size;
+        const closedTicketsSnap = await getDocs(query(collection(db, "tickets"), where("status", "==", "closed")));
+        const closedTickets = closedTicketsSnap.size;
+        document.getElementById('stat-total-users').innerText = totalUsers;
+        document.getElementById('stat-total-chars').innerText = totalChars;
+        document.getElementById('stat-pending-chars').innerText = pendingChars;
+        document.getElementById('stat-closed-tickets').innerText = closedTickets;
     }
 
+    // Уведомления
     function loadNotifications() {
         if (!currentUser) return;
         const q = query(collection(db, "notifications"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             let unreadCount = 0;
             notifDropdown.innerHTML = '';
-            if (snapshot.empty) { notifDropdown.innerHTML = '<div class="notif-item">Нет уведомлений</div>'; notifBadge.style.display = 'none'; return; }
+            if (snapshot.empty) {
+                notifDropdown.innerHTML = '<div class="notif-item">Нет уведомлений</div>';
+                notifBadge.style.display = 'none';
+                return;
+            }
             snapshot.forEach(docSnap => {
                 const n = docSnap.data();
                 if (!n.isRead) unreadCount++;
                 const div = document.createElement('div');
                 div.className = `notif-item ${!n.isRead ? 'unread' : ''}`;
                 div.innerHTML = `<div class="notif-title">${n.title}</div><div class="notif-message">${n.message}</div>`;
-                div.addEventListener('click', async () => { if (!n.isRead) await updateDoc(docSnap.ref, { isRead: true }); });
+                div.addEventListener('click', async () => {
+                    if (!n.isRead) await updateDoc(docSnap.ref, { isRead: true });
+                });
                 notifDropdown.appendChild(div);
             });
-            notifBadge.style.display = unreadCount ? 'block' : 'none';
-            notifBadge.textContent = unreadCount;
+            if (unreadCount) {
+                notifBadge.style.display = 'block';
+                notifBadge.textContent = unreadCount;
+            } else {
+                notifBadge.style.display = 'none';
+            }
         });
     }
 
+    // Мои персонажи
     async function loadMyCharacters() {
         if (!currentUser) return;
         const q = query(collection(db, "approved_characters"), where("userId", "==", currentUser.uid));
         const snapshot = await getDocs(q);
-        charCounterSpan.textContent = `Одобрено персонажей: ${snapshot.size} / 3`;
-        if (snapshot.empty) { myCharactersDiv.innerHTML = '<div class="char-card">У вас пока нет одобренных персонажей. Создайте заявку.</div>'; return; }
+        charCounterSpan.textContent = `Одобрено: ${snapshot.size} / 3`;
+        if (snapshot.empty) {
+            myCharactersDiv.innerHTML = '<div class="char-card">Пока нет одобренных персонажей</div>';
+            return;
+        }
         myCharactersDiv.innerHTML = '';
         snapshot.forEach(docSnap => {
             const char = docSnap.data();
             const card = document.createElement('div');
             card.className = 'char-card';
-            card.innerHTML = `
-                <div>
-                    <strong>${escapeHtml(char.characterName)}</strong> (${escapeHtml(char.profession)})<br>
-                    Пол: ${escapeHtml(char.gender)}, Возраст: ${char.age}<br>
-                    <small>История: ${escapeHtml(char.history.substring(0, 100))}...</small>
-                </div>
-            `;
+            card.innerHTML = `<strong>${escapeHtml(char.characterName)}</strong> (${escapeHtml(char.profession)})<br>Пол: ${escapeHtml(char.gender)}, Возраст: ${char.age}<br><small>${escapeHtml(char.history.substring(0,80))}...</small>`;
             myCharactersDiv.appendChild(card);
         });
     }
 
+    // Создание персонажа
     async function submitCharacter() {
         const name = document.getElementById('char-name').value.trim();
         const gender = document.getElementById('char-gender').value;
@@ -554,97 +555,70 @@
         const customProf = document.getElementById('custom-prof').value.trim();
         const history = document.getElementById('char-history').value.trim();
         const errorDiv = document.getElementById('char-error');
-
-        if (!name || !history || isNaN(age) || age < 1) {
-            errorDiv.textContent = 'Заполните все поля корректно.';
-            errorDiv.style.display = 'block';
+        if (!name || !history || isNaN(age)) {
+            errorDiv.textContent = 'Заполните все поля';
             return;
         }
         let finalProf = profession;
         if (profession === 'Другое') {
-            if (!customProf) { errorDiv.textContent = 'Укажите профессию в поле "Другое"'; errorDiv.style.display = 'block'; return; }
+            if (!customProf) { errorDiv.textContent = 'Укажите профессию'; return; }
             finalProf = customProf;
         }
         const approvedCount = (await getDocs(query(collection(db, "approved_characters"), where("userId", "==", currentUser.uid)))).size;
         if (approvedCount >= 3) {
-            errorDiv.textContent = 'Вы уже имеете 3 одобренных персонажа. Удалите одного, чтобы создать нового.';
-            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'Максимум 3 персонажа. Удалите одного, чтобы создать нового.';
             return;
         }
-        errorDiv.style.display = 'none';
-        try {
-            await addDoc(collection(db, "pending_characters"), {
-                userId: currentUser.uid,
-                userNick: currentUserNick,
-                characterName: name,
-                gender, age, history, profession: finalProf,
-                status: 'pending', createdAt: serverTimestamp()
-            });
-            alert('Заявка отправлена на модерацию.');
-            charModal.style.display = 'none';
-            document.getElementById('char-name').value = '';
-            document.getElementById('char-history').value = '';
-            document.getElementById('char-age').value = '';
-            professionSelect.value = 'Воин';
-            customProfField.style.display = 'none';
-            document.getElementById('custom-prof').value = '';
-            loadServerStats();
-        } catch (err) {
-            errorDiv.textContent = 'Ошибка: ' + err.message;
-            errorDiv.style.display = 'block';
-        }
+        errorDiv.textContent = '';
+        await addDoc(collection(db, "pending_characters"), {
+            userId: currentUser.uid, userNick: currentUserNick, characterName: name,
+            gender, age, history, profession: finalProf, status: 'pending', createdAt: serverTimestamp()
+        });
+        alert('Заявка отправлена на модерацию');
+        charModal.style.display = 'none';
+        document.getElementById('char-name').value = '';
+        document.getElementById('char-history').value = '';
+        document.getElementById('char-age').value = '';
+        professionSelect.value = 'Воин';
+        customProfField.style.display = 'none';
+        document.getElementById('custom-prof').value = '';
     }
 
-    // Тикеты
-    function openTicketModal() { ticketModal.style.display = 'flex'; }
-    function closeTicketModal() { ticketModal.style.display = 'none'; }
-    ticketLink.onclick = openTicketModal;
-    cancelTicketBtn.onclick = closeTicketModal;
-    submitTicketBtn.addEventListener('click', async () => {
+    // Создание тикета
+    async function submitTicket() {
         const subject = document.getElementById('ticket-subject').value.trim();
         const message = document.getElementById('ticket-message').value.trim();
         const errorDiv = document.getElementById('ticket-error');
-        errorDiv.style.display = 'none';
         if (!subject || !message) {
             errorDiv.textContent = 'Заполните тему и сообщение';
-            errorDiv.style.display = 'block';
             return;
         }
-        try {
-            await addDoc(collection(db, "tickets"), {
-                userId: currentUser.uid,
-                userNick: currentUserNick,
-                subject: subject,
-                message: message,
-                status: 'open',
-                createdAt: serverTimestamp(),
-                adminResponse: null,
-                respondedAt: null
-            });
-            alert('Обращение отправлено. Администратор ответит в ближайшее время.');
-            closeTicketModal();
-            document.getElementById('ticket-subject').value = '';
-            document.getElementById('ticket-message').value = '';
-        } catch (err) {
-            errorDiv.textContent = 'Ошибка: ' + err.message;
-            errorDiv.style.display = 'block';
-        }
-    });
+        errorDiv.textContent = '';
+        await addDoc(collection(db, "tickets"), {
+            userId: currentUser.uid, userNick: currentUserNick, subject, message,
+            status: 'open', createdAt: serverTimestamp()
+        });
+        alert('Ваше обращение отправлено. Администратор ответит в ближайшее время.');
+        ticketModal.style.display = 'none';
+        document.getElementById('ticket-subject').value = '';
+        document.getElementById('ticket-message').value = '';
+    }
 
-    professionSelect.addEventListener('change', () => { customProfField.style.display = professionSelect.value === 'Другое' ? 'block' : 'none'; });
+    professionSelect.addEventListener('change', () => {
+        customProfField.style.display = professionSelect.value === 'Другое' ? 'block' : 'none';
+    });
     createCharBtn.onclick = () => charModal.style.display = 'flex';
-    closeModalBtn.onclick = () => charModal.style.display = 'none';
+    charModalClose.onclick = () => charModal.style.display = 'none';
     submitCharBtn.onclick = submitCharacter;
     window.onclick = (e) => { if (e.target === charModal) charModal.style.display = 'none'; if (e.target === ticketModal) ticketModal.style.display = 'none'; };
     notifIcon.onclick = (e) => { e.stopPropagation(); notifDropdown.classList.toggle('show'); };
     document.addEventListener('click', () => notifDropdown.classList.remove('show'));
-    logoutBtn.onclick = async () => {
-        await setOnlineStatus(false);
-        await signOut(auth);
-        window.location.href = 'index.html';
-    };
+    logoutBtn.onclick = async () => { await setOnlineStatus(false); await signOut(auth); window.location.href = 'index.html'; };
+    ticketBtn.onclick = () => ticketModal.style.display = 'flex';
+    closeTicketModal.onclick = () => ticketModal.style.display = 'none';
+    submitTicketBtn.onclick = submitTicket;
 
-    function escapeHtml(str) { return str ? str.replace(/[&<>]/g, function(m){ return m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'; }) : ''; }
+    function escapeHtml(str) { return str ? str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;') : ''; }
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = 'index.html'; return; }
@@ -665,12 +639,12 @@
                 adminLink.className = 'admin-link';
                 adminLinkPlace.appendChild(adminLink);
             }
-        } else { displayNickSpan.textContent = "Игрок"; }
+        }
         loadNotifications();
         loadMyCharacters();
         loadOnlinePlayers();
         loadServerStats();
-        window.addEventListener('beforeunload', () => { setOnlineStatus(false); });
+        window.addEventListener('beforeunload', () => setOnlineStatus(false));
     });
 </script>
 </body>
