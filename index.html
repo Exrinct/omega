@@ -116,7 +116,7 @@
     </style>
 </head>
 <body>
-<div class="version">v1.0.1</div>
+<div class="version">v1.1.0</div>
 <div class="card">
     <h1>Твоя легенда рождается здесь.<br><span class="accent">Omega RolePlay</span></h1>
     <button id="google-login" class="google-btn">Войти через Google</button>
@@ -170,7 +170,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -199,7 +199,6 @@
         block.style.display = block.style.display === 'none' ? 'block' : 'none';
     };
 
-    // =============== РЕГИСТРАЦИЯ С ОТЛАДКОЙ ===============
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -211,38 +210,23 @@
         passErr.style.display = 'none';
         captchaErr.style.display = 'none';
 
-        console.log("🔍 НАЧАЛО РЕГИСТРАЦИИ");
-        console.log("Ник:", nick);
-        console.log("Длина пароля:", pass.length);
-        console.log("Капча ответ:", answer);
-
         if (parseInt(answer) !== captchaNum1 + captchaNum2) {
-            console.error("❌ Капча неверна");
             captchaErr.style.display = 'block';
             generateCaptcha();
             return;
         }
-        if (!nick) {
-            nickErr.textContent = 'Введите ник';
-            nickErr.style.display = 'block';
-            return;
-        }
-        if (pass.length < 8) {
-            passErr.style.display = 'block';
-            return;
-        }
+        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
+        if (pass.length < 8) { passErr.style.display = 'block'; return; }
 
         const btn = document.getElementById('register-btn');
         btn.disabled = true;
         btn.textContent = 'Проверка...';
 
         try {
-            // Проверка уникальности ника
             const profilesRef = collection(db, "profiles");
             const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
             const existing = await getDocs(q);
             if (!existing.empty) {
-                console.warn("⚠️ Ник уже занят");
                 nickErr.textContent = 'Ник уже занят';
                 nickErr.style.display = 'block';
                 btn.disabled = false;
@@ -250,24 +234,16 @@
                 generateCaptcha();
                 return;
             }
-
             const email = `user_${nick.toLowerCase()}@rp.local`;
-            console.log("📧 Создаю пользователя с email:", email);
-            
             const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-            console.log("✅ Пользователь создан в Authentication, UID:", userCred.user.uid);
-            
-            console.log("📝 Пытаюсь сохранить профиль в Firestore...");
             await setDoc(doc(db, "profiles", userCred.user.uid), {
                 nickname: nick,
                 nickname_lower: nick.toLowerCase(),
                 email: email,
-                createdAt: new Date()
+                createdAt: new Date(),
+                role: "user"
             });
-            console.log("✅ Профиль успешно сохранён в Firestore!");
-            
         } catch (error) {
-            console.error("❌ ОШИБКА РЕГИСТРАЦИИ:", error);
             nickErr.textContent = error.message;
             nickErr.style.display = 'block';
             btn.disabled = false;
@@ -276,7 +252,6 @@
         }
     });
 
-    // =============== ВХОД ===============
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -292,13 +267,15 @@
             const profileRef = doc(db, "profiles", userCred.user.uid);
             const profileSnap = await getDoc(profileRef);
             if (!profileSnap.exists()) {
-                console.warn("⚠️ Профиль отсутствует, создаю автоматически");
                 await setDoc(profileRef, {
                     nickname: nick,
                     nickname_lower: nick.toLowerCase(),
                     email: email,
-                    createdAt: new Date()
+                    createdAt: new Date(),
+                    role: "user"
                 });
+            } else {
+                await updateDoc(profileRef, { lastSeen: serverTimestamp() });
             }
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
@@ -313,7 +290,6 @@
         }
     });
 
-    // =============== GOOGLE ВХОД ===============
     let pendingGoogleUser = null;
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
@@ -321,7 +297,10 @@
             const user = result.user;
             const profileRef = doc(db, "profiles", user.uid);
             const profileSnap = await getDoc(profileRef);
-            if (profileSnap.exists()) return;
+            if (profileSnap.exists()) {
+                await updateDoc(profileRef, { lastSeen: serverTimestamp() });
+                return;
+            }
             pendingGoogleUser = user;
             const modal = document.getElementById('nickname-modal');
             const input = document.getElementById('modal-nick');
@@ -361,7 +340,9 @@
             nickname: nickname,
             nickname_lower: nickname.toLowerCase(),
             email: pendingGoogleUser.email,
-            createdAt: new Date()
+            createdAt: new Date(),
+            role: "user",
+            lastSeen: serverTimestamp()
         });
         document.getElementById('nickname-modal').style.display = 'none';
         pendingGoogleUser = null;
@@ -373,8 +354,12 @@
         pendingGoogleUser = null;
     });
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) window.location.href = 'server.html';
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const profileRef = doc(db, "profiles", user.uid);
+            await updateDoc(profileRef, { lastSeen: serverTimestamp() }).catch(() => {});
+            window.location.href = 'server.html';
+        }
     });
 </script>
 </body>
