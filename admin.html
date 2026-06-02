@@ -25,7 +25,7 @@
             border-radius: 8px;
             z-index: 100;
         }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 1100px; margin: 0 auto; }
         h1 { margin-bottom: 1.5rem; }
         .tabs {
             display: flex;
@@ -39,10 +39,7 @@
             cursor: pointer;
             color: #aaa;
         }
-        .tab.active {
-            color: #3b6e4f;
-            border-bottom: 2px solid #3b6e4f;
-        }
+        .tab.active { color: #3b6e4f; border-bottom: 2px solid #3b6e4f; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card {
@@ -60,7 +57,7 @@
             border-left: 3px solid #3b6e4f;
         }
         .actions { margin-top: 0.8rem; display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
-        button {
+        button, .btn {
             background: #2d5a27;
             border: none;
             border-radius: 30px;
@@ -70,13 +67,13 @@
         }
         .delete-btn { background: #5a2e2e; }
         .delete-btn:hover { background: #7a3e3e; }
-        .role-select {
+        input, select, textarea {
             background: #1e1e1e;
             border: 1px solid #333;
             border-radius: 12px;
-            padding: 0.3rem;
+            padding: 0.5rem;
             color: white;
-            margin-left: 0.5rem;
+            font-family: inherit;
         }
         .back-link {
             display: inline-block;
@@ -84,61 +81,35 @@
             color: #3b6e4f;
             text-decoration: none;
         }
-        .mass-notif { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
-        .mass-notif input, .mass-notif textarea {
-            flex: 1;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 0.6rem;
-            color: white;
-            font-family: inherit;
-        }
     </style>
 </head>
 <body>
-<div class="version">v1.1.0</div>
+<div class="version">v2.0.0 (no storage)</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <h1>Админ-панель</h1>
-    
     <div class="tabs">
         <div class="tab active" data-tab="pending">Заявки</div>
         <div class="tab" data-tab="approved">Персонажи</div>
+        <div class="tab" data-tab="achievements">Достижения</div>
         <div class="tab" data-tab="users">Пользователи</div>
         <div class="tab" data-tab="notify">Уведомления</div>
     </div>
 
     <div id="pending-tab" class="tab-content active">
-        <div class="card">
-            <h3>Заявки на создание персонажа</h3>
-            <div id="pending-list">Загрузка...</div>
-        </div>
+        <div class="card"><h3>Заявки на создание персонажа</h3><div id="pending-list">Загрузка...</div></div>
     </div>
-
     <div id="approved-tab" class="tab-content">
-        <div class="card">
-            <h3>Одобренные персонажи (можно удалять)</h3>
-            <div id="approved-list">Загрузка...</div>
-        </div>
+        <div class="card"><h3>Одобренные персонажи (можно удалять)</h3><div id="approved-list">Загрузка...</div></div>
     </div>
-
+    <div id="achievements-tab" class="tab-content">
+        <div class="card"><h3>Управление достижениями</h3><button id="new-ach-btn" class="btn">+ Новое достижение</button><div id="ach-list">Загрузка...</div></div>
+    </div>
     <div id="users-tab" class="tab-content">
-        <div class="card">
-            <h3>Управление пользователями</h3>
-            <div id="users-list">Загрузка...</div>
-        </div>
+        <div class="card"><h3>Управление пользователями</h3><div id="users-list">Загрузка...</div></div>
     </div>
-
     <div id="notify-tab" class="tab-content">
-        <div class="card">
-            <h3>Массовое уведомление</h3>
-            <div class="mass-notif">
-                <input type="text" id="notif-title" placeholder="Заголовок">
-                <textarea id="notif-message" rows="2" placeholder="Текст уведомления"></textarea>
-                <button id="send-mass-notif">Отправить всем</button>
-            </div>
-        </div>
+        <div class="card"><h3>Массовое уведомление</h3><div class="mass-notif" style="display:flex; gap:1rem; flex-wrap:wrap;"><input type="text" id="notif-title" placeholder="Заголовок"><textarea id="notif-message" rows="2" placeholder="Текст"></textarea><button id="send-mass-notif">Отправить</button></div></div>
     </div>
 </div>
 
@@ -175,9 +146,11 @@
         }
         loadPending();
         loadApproved();
+        loadAchievements();
         loadUsers();
     });
 
+    // ========== ЗАЯВКИ ==========
     async function loadPending() {
         const q = query(collection(db, "pending_characters"), where("status", "==", "pending"));
         const snap = await getDocs(q);
@@ -196,7 +169,7 @@
                 <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
                 <div><strong>История:</strong> ${data.history}</div>
                 <div class="actions">
-                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" style="background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.3rem;">
+                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" style="max-width:200px;">
                     <button class="approve-btn" data-id="${docSnap.id}">Одобрить</button>
                     <button class="reject-btn" data-id="${docSnap.id}">Отклонить</button>
                 </div>
@@ -222,8 +195,7 @@
             approvedAt: serverTimestamp(), approvedBy: currentUser.uid
         });
         await addDoc(collection(db, "notifications"), {
-            userId: data.userId, title: 'Персонаж одобрен',
-            message: `Ваш персонаж "${data.characterName}" одобрен.`, isRead: false, createdAt: serverTimestamp()
+            userId: data.userId, title: 'Персонаж одобрен', message: `Ваш персонаж "${data.characterName}" одобрен.`, isRead: false, createdAt: serverTimestamp()
         });
         await deleteDoc(pendingRef);
         loadPending();
@@ -236,17 +208,17 @@
         if (!pendingSnap.exists()) return;
         const data = pendingSnap.data();
         await addDoc(collection(db, "notifications"), {
-            userId: data.userId, title: 'Персонаж отклонён',
-            message: `Ваш персонаж "${data.characterName}" отклонён. Причина: ${reason}`, isRead: false, createdAt: serverTimestamp()
+            userId: data.userId, title: 'Персонаж отклонён', message: `Ваш персонаж "${data.characterName}" отклонён. Причина: ${reason}`, isRead: false, createdAt: serverTimestamp()
         });
         await deleteDoc(pendingRef);
         loadPending();
     }
 
+    // ========== ОДОБРЕННЫЕ ПЕРСОНАЖИ ==========
     async function loadApproved() {
         const snap = await getDocs(collection(db, "approved_characters"));
         const container = document.getElementById('approved-list');
-        if (snap.empty) { container.innerHTML = '<div>Нет одобренных персонажей</div>'; return; }
+        if (snap.empty) { container.innerHTML = '<div>Нет персонажей</div>'; return; }
         container.innerHTML = '';
         for (const docSnap of snap.docs) {
             const data = docSnap.data();
@@ -255,17 +227,14 @@
             const div = document.createElement('div');
             div.className = 'list-item';
             div.innerHTML = `
-                <div><strong>Игрок:</strong> ${userNick}</div>
-                <div><strong>Персонаж:</strong> ${data.characterName} (${data.profession})</div>
-                <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
-                <div><strong>История:</strong> ${data.history.substring(0, 100)}...</div>
+                <div><strong>${data.characterName}</strong> (игрок: ${userNick}) — ${data.profession}, возраст ${data.age}</div>
                 <div class="actions">
-                    <button class="delete-char-btn" data-id="${docSnap.id}">Удалить персонажа</button>
+                    <button class="delete-char" data-id="${docSnap.id}">Удалить персонажа</button>
                 </div>
             `;
             container.appendChild(div);
         }
-        document.querySelectorAll('.delete-char-btn').forEach(btn => {
+        document.querySelectorAll('.delete-char').forEach(btn => {
             btn.addEventListener('click', async () => {
                 if (confirm('Удалить персонажа?')) {
                     await deleteDoc(doc(db, "approved_characters", btn.getAttribute('data-id')));
@@ -275,6 +244,43 @@
         });
     }
 
+    // ========== ДОСТИЖЕНИЯ ==========
+    async function loadAchievements() {
+        const snap = await getDocs(collection(db, "achievements"));
+        const container = document.getElementById('ach-list');
+        if (snap.empty) { container.innerHTML = '<p>Нет достижений. Создайте первое.</p>'; return; }
+        container.innerHTML = '';
+        snap.forEach(docSnap => {
+            const a = docSnap.data();
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>${a.title}</strong> — ${a.description}</div>
+                <div class="actions">
+                    <button class="delete-ach" data-id="${docSnap.id}">Удалить</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        document.querySelectorAll('.delete-ach').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('Удалить достижение? Оно пропадёт из профилей игроков.')) {
+                    await deleteDoc(doc(db, "achievements", btn.getAttribute('data-id')));
+                    loadAchievements();
+                }
+            });
+        });
+    }
+    document.getElementById('new-ach-btn')?.addEventListener('click', async () => {
+        const title = prompt('Название достижения');
+        if (!title) return;
+        const desc = prompt('Описание');
+        if (!desc) return;
+        await addDoc(collection(db, "achievements"), { title, description: desc });
+        loadAchievements();
+    });
+
+    // ========== ПОЛЬЗОВАТЕЛИ ==========
     async function loadUsers() {
         const snap = await getDocs(collection(db, "profiles"));
         const container = document.getElementById('users-list');
@@ -286,54 +292,59 @@
             const div = document.createElement('div');
             div.className = 'list-item';
             div.innerHTML = `
-                <div><strong>Ник:</strong> ${data.nickname}</div>
-                <div><strong>Email:</strong> ${data.email}</div>
-                <div><strong>Роль:</strong> 
+                <div><strong>${data.nickname}</strong> — ${data.email}</div>
+                <div class="actions">
                     <select class="role-select" data-uid="${docSnap.id}">
                         <option value="user" ${role === 'user' ? 'selected' : ''}>Пользователь</option>
                         <option value="reviewer" ${role === 'reviewer' ? 'selected' : ''}>Анкетолог</option>
-                        <option value="admin" ${role === 'admin' ? 'selected' : ''}>Администратор</option>
+                        <option value="admin" ${role === 'admin' ? 'selected' : ''}>Админ</option>
                     </select>
+                    <button class="save-role" data-uid="${docSnap.id}">Сохранить роль</button>
                 </div>
             `;
             container.appendChild(div);
         }
-        document.querySelectorAll('.role-select').forEach(select => {
-            select.addEventListener('change', async () => {
-                if (currentUserRole !== 'admin') { alert('Только админ'); return; }
-                const uid = select.getAttribute('data-uid');
-                await updateDoc(doc(db, "profiles", uid), { role: select.value });
+        document.querySelectorAll('.save-role').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const uid = btn.getAttribute('data-uid');
+                const select = document.querySelector(`.role-select[data-uid="${uid}"]`);
+                const newRole = select.value;
+                await updateDoc(doc(db, "profiles", uid), { role: newRole });
                 alert('Роль обновлена');
             });
         });
     }
 
-    document.getElementById('send-mass-notif').addEventListener('click', async () => {
-        if (currentUserRole !== 'admin') { alert('Только администратор'); return; }
+    // ========== УВЕДОМЛЕНИЯ ==========
+    document.getElementById('send-mass-notif')?.addEventListener('click', async () => {
+        if (currentUserRole !== 'admin') { alert('Только админ'); return; }
         const title = document.getElementById('notif-title').value.trim();
         const message = document.getElementById('notif-message').value.trim();
         if (!title || !message) { alert('Заполните поля'); return; }
         const profiles = await getDocs(collection(db, "profiles"));
         const batch = [];
-        profiles.forEach(doc => {
+        profiles.forEach(profile => {
             batch.push(addDoc(collection(db, "notifications"), {
-                userId: doc.id, title, message, isRead: false, createdAt: serverTimestamp()
+                userId: profile.id, title, message, isRead: false, createdAt: serverTimestamp()
             }));
         });
         await Promise.all(batch);
-        alert(`Отправлено ${batch.length} пользователям`);
+        alert(`Отправлено ${batch.length} уведомлений`);
         document.getElementById('notif-title').value = '';
         document.getElementById('notif-message').value = '';
     });
 
+    // Переключение табов
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
+            const target = tab.getAttribute('data-tab');
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-            document.getElementById(`${tab.getAttribute('data-tab')}-tab`).classList.add('active');
-            if (tab.getAttribute('data-tab') === 'approved') loadApproved();
-            if (tab.getAttribute('data-tab') === 'users') loadUsers();
+            document.getElementById(`${target}-tab`).classList.add('active');
+            if (target === 'approved') loadApproved();
+            if (target === 'achievements') loadAchievements();
+            if (target === 'users') loadUsers();
         });
     });
 </script>
