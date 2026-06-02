@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 { margin-bottom: 1.5rem; }
+        .card {
+            background: #121212;
+            border: 1px solid #2c2c2c;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .pending-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .pending-item {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 1rem;
+            border-left: 3px solid #e0a000;
+        }
+        .actions {
+            margin-top: 0.8rem;
+            display: flex;
+            gap: 0.8rem;
+        }
+        button {
+            background: #2d5a27;
+            border: none;
+            border-radius: 30px;
+            padding: 0.4rem 1rem;
+            color: white;
+            cursor: pointer;
+        }
+        .reject-btn { background: #5a2e2e; }
+        .reject-btn:hover { background: #7a3e3e; }
+        .approve-btn:hover { background: #3a6e34; }
+        .comment-input {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 0.4rem;
+            width: 200px;
+            color: white;
+        }
+        .mass-notif {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .mass-notif input, .mass-notif textarea {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 0.6rem;
+            color: white;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #3b6e4f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="server.html" class="back-link">← Назад в панель</a>
+    <h1>Админ-панель</h1>
+    
+    <div class="card">
+        <h3>Заявки на создание персонажа</h3>
+        <div id="pending-list" class="pending-list">Загрузка...</div>
+    </div>
+
+    <div class="card">
+        <h3>Массовое уведомление</h3>
+        <div class="mass-notif">
+            <input type="text" id="notif-title" placeholder="Заголовок">
+            <textarea id="notif-message" rows="2" placeholder="Текст уведомления"></textarea>
+            <button id="send-mass-notif">Отправить всем</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+
+    // Проверка админа
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+        currentUser = user;
+        const profileRef = doc(db, "profiles", user.uid);
+        const profileSnap = await getDoc(profileRef);
+        if (!profileSnap.exists() || profileSnap.data().isAdmin !== true) {
+            alert('У вас нет прав администратора');
+            window.location.href = 'server.html';
+            return;
+        }
+        loadPendingCharacters();
+    });
+
+    async function loadPendingCharacters() {
+        const pendingRef = collection(db, "pending_characters");
+        const q = query(pendingRef, where("status", "==", "pending"));
+        const snapshot = await getDocs(q);
+        const container = document.getElementById('pending-list');
+        if (snapshot.empty) {
+            container.innerHTML = '<div>Нет заявок на модерацию</div>';
+            return;
+        }
+        container.innerHTML = '';
+        for (const docSnap of snapshot.docs) {
+            const data = docSnap.data();
+            const userId = data.userId;
+            // Получаем ник из profiles (может не быть, но есть userNick)
+            const userProfileRef = doc(db, "profiles", userId);
+            const userProfile = await getDoc(userProfileRef);
+            const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
+            
+            const div = document.createElement('div');
+            div.className = 'pending-item';
+            div.innerHTML = `
+                <div><strong>Игрок:</strong> ${userNick}</div>
+                <div><strong>Персонаж:</strong> ${data.characterName} (${data.profession})</div>
+                <div><strong>Пол:</strong> ${data.gender}, <strong>Возраст:</strong> ${data.age}</div>
+                <div><strong>История:</strong> ${data.history}</div>
+                <div class="actions">
+                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа (если нужно)" class="comment-input">
+                    <button class="approve-btn" data-id="${docSnap.id}">Одобрить</button>
+                    <button class="reject-btn" data-id="${docSnap.id}">Отклонить</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        // Обработчики
+        document.querySelectorAll('.approve-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                await approveCharacter(id);
+            });
+        });
+        document.querySelectorAll('.reject-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const commentInput = document.getElementById(`comment-${id}`);
+                const comment = commentInput.value.trim();
+                await rejectCharacter(id, comment || 'Не указана причина');
+            });
+        });
+    }
+
+    async function approveCharacter(pendingId) {
+        const pendingRef = doc(db, "pending_characters", pendingId);
+        const pendingSnap = await getDoc(pendingRef);
+        if (!pendingSnap.exists()) return;
+        const data = pendingSnap.data();
+        
+        // Копируем в approved_characters
+        await addDoc(collection(db, "approved_characters"), {
+            userId: data.userId,
+            userNick: data.userNick,
+            characterName: data.characterName,
+            gender: data.gender,
+            age: data.age,
+            history: data.history,
+            profession: data.profession,
+            approvedAt: serverTimestamp(),
+            approvedBy: currentUser.uid
+        });
+        
+        // Отправляем уведомление пользователю
+        await addDoc(collection(db, "notifications"), {
+            userId: data.userId,
+            title: 'Персонаж одобрен',
+            message: `Ваш персонаж "${data.characterName}" был одобрен администрацией. Добро пожаловать в мир ролевой игры!`,
+            isRead: false,
+            createdAt: serverTimestamp()
+        });
+        
+        // Удаляем заявку
+        await deleteDoc(pendingRef);
+        loadPendingCharacters(); // обновляем список
+    }
+
+    async function rejectCharacter(pendingId, reason) {
+        const pendingRef = doc(db, "pending_characters", pendingId);
+        const pendingSnap = await getDoc(pendingRef);
+        if (!pendingSnap.exists()) return;
+        const data = pendingSnap.data();
+        
+        await addDoc(collection(db, "notifications"), {
+            userId: data.userId,
+            title: 'Персонаж отклонён',
+            message: `Ваш персонаж "${data.characterName}" был отклонён. Причина: ${reason}. Вы можете создать новую заявку.`,
+            isRead: false,
+            createdAt: serverTimestamp()
+        });
+        
+        await deleteDoc(pendingRef);
+        loadPendingCharacters();
+    }
+
+    // Массовое уведомление
+    document.getElementById('send-mass-notif').addEventListener('click', async () => {
+        const title = document.getElementById('notif-title').value.trim();
+        const message = document.getElementById('notif-message').value.trim();
+        if (!title || !message) {
+            alert('Заполните заголовок и текст');
+            return;
+        }
+        // Получаем всех пользователей из коллекции profiles
+        const profilesRef = collection(db, "profiles");
+        const profilesSnap = await getDocs(profilesRef);
+        const batch = [];
+        profilesSnap.forEach(doc => {
+            const userId = doc.id;
+            batch.push(addDoc(collection(db, "notifications"), {
+                userId: userId,
+                title: title,
+                message: message,
+                isRead: false,
+                createdAt: serverTimestamp()
+            }));
+        });
+        await Promise.all(batch);
+        alert(`Уведомление отправлено ${batch.length} пользователям`);
+        document.getElementById('notif-title').value = '';
+        document.getElementById('notif-message').value = '';
+    });
+</script>
+</body>
+</html>
