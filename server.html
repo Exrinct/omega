@@ -6,7 +6,6 @@
     <title>Omega RolePlay — Панель</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* стили как в предыдущей версии, без изменений */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -146,7 +145,7 @@
         .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem; }
         .social-links a { color: #aaa; text-decoration: none; font-size: 0.9rem; }
         .admin-link { display: inline-block; margin-top: 1rem; text-align: center; color: #3b6e4f; text-decoration: none; font-size: 0.8rem; }
-        .forum-link { display: inline-block; margin-top: 0.5rem; text-align: center; color: #3b6e4f; text-decoration: none; font-size: 0.8rem; margin-left: 1rem; }
+        .char-counter { font-size: 0.8rem; color: #aaa; margin-top: 0.5rem; }
         .modal {
             display: none;
             position: fixed;
@@ -192,11 +191,10 @@
         }
         .submit-char { background: #2d5a27; border: none; color: white; }
         .cancel-char { background: none; border: 1px solid #666; color: #ccc; }
-        .char-counter { font-size: 0.8rem; color: #aaa; margin-top: 0.5rem; }
     </style>
 </head>
 <body>
-<div class="version">v1.2.0</div>
+<div class="version">v1.1.0</div>
 <div class="dashboard">
     <div class="header">
         <div class="user-greeting">Привет, <span id="display-nick">...</span></div>
@@ -234,7 +232,6 @@
 
     <div class="card" style="text-align: center;">
         <a href="lore.html" class="lore-btn">Перейти к лору проекта</a>
-        <a href="forum.html" class="forum-link">Перейти на форум</a>
     </div>
 
     <div class="social-links">
@@ -244,7 +241,7 @@
     <div id="admin-link-place" style="text-align: center;"></div>
 </div>
 
-<!-- модалка создания персонажа (как была) -->
+<!-- модалка создания персонажа -->
 <div id="char-modal" class="modal">
     <div class="modal-content">
         <h3>Создание персонажа</h3>
@@ -299,7 +296,14 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = { ... }; // твой конфиг
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
