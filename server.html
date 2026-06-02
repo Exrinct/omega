@@ -23,7 +23,6 @@
             border-radius: 20px;
             z-index: 100;
         }
-        /* статус-бар более плотный */
         .status-bar {
             background: #111;
             border-bottom: 1px solid #222;
@@ -136,7 +135,22 @@
         .poll-card {
             background: #1A1A1A;
             border-left: 3px solid #3B6E4F;
-            margin-bottom: 1rem;
+        }
+        .poll-option {
+            display: block;
+            margin: 0.5rem 0;
+            padding: 0.3rem 0.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .poll-option:hover {
+            background: #252525;
+        }
+        .poll-results {
+            font-size: 0.75rem;
+            color: #A0A0A0;
+            margin-top: 0.5rem;
         }
         .grid {
             display: grid;
@@ -282,7 +296,7 @@
     <div id="admin-link-place" class="admin-link"></div>
 </div>
 
-<!-- модалка создания персонажа (упрощённая) -->
+<!-- модалка создания персонажа -->
 <div id="char-modal" class="modal">
     <div class="modal-content">
         <h3>Новый персонаж</h3>
@@ -318,7 +332,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, orderBy, onSnapshot, serverTimestamp, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -460,6 +474,74 @@
         ticketModal.style.display = 'none';
     }
 
+    // Функция загрузки активного опроса (без заглушек)
+    async function loadActivePoll() {
+        const pollQuery = query(collection(db, "polls"), where("isActive", "==", true));
+        const pollSnap = await getDocs(pollQuery);
+        const container = document.getElementById('poll-widget');
+        if (pollSnap.empty) {
+            container.innerHTML = '';
+            return;
+        }
+        const pollDoc = pollSnap.docs[0];
+        const poll = pollDoc.data();
+        const options = poll.options || [];
+        const votes = poll.votes || new Array(options.length).fill(0);
+        
+        // Проверяем, голосовал ли текущий пользователь
+        let userVoteIdx = -1;
+        if (currentUser) {
+            const voteQuery = query(collection(db, "poll_votes"), where("userId", "==", currentUser.uid), where("pollId", "==", pollDoc.id));
+            const voteSnap = await getDocs(voteQuery);
+            if (!voteSnap.empty) userVoteIdx = voteSnap.docs[0].data().optionIndex;
+        }
+        
+        if (userVoteIdx === -1 && currentUser) {
+            // форма голосования
+            let html = `<div class="card poll-card"><strong>${poll.question}</strong><div class="poll-options">`;
+            options.forEach((opt, idx) => {
+                html += `<div class="poll-option" data-opt="${idx}">${opt}</div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+            document.querySelectorAll('.poll-option').forEach(el => {
+                el.addEventListener('click', async () => {
+                    const optIdx = parseInt(el.getAttribute('data-opt'));
+                    // Записываем голос
+                    await addDoc(collection(db, "poll_votes"), {
+                        userId: currentUser.uid, pollId: pollDoc.id, optionIndex: optIdx, votedAt: serverTimestamp()
+                    });
+                    // Обновляем счётчик в опросе
+                    const newVotes = [...votes];
+                    newVotes[optIdx] = (newVotes[optIdx] || 0) + 1;
+                    await updateDoc(doc(db, "polls", pollDoc.id), { votes: newVotes });
+                    loadActivePoll(); // перезагружаем
+                });
+            });
+        } else if (currentUser) {
+            // показать результаты
+            const total = votes.reduce((a,b)=>a+b,0);
+            let resultsHtml = `<div class="card poll-card"><strong>${poll.question}</strong><div class="poll-results">`;
+            options.forEach((opt, idx) => {
+                const percent = total ? Math.round(votes[idx]/total*100) : 0;
+                resultsHtml += `<div>${opt}: ${votes[idx]} голосов (${percent}%)</div>`;
+            });
+            resultsHtml += `<div style="margin-top:0.5rem;">Вы проголосовали за: ${options[userVoteIdx]}</div>`;
+            resultsHtml += `</div></div>`;
+            container.innerHTML = resultsHtml;
+        } else {
+            // не авторизован – показываем только результаты без возможности голосовать
+            const total = votes.reduce((a,b)=>a+b,0);
+            let resultsHtml = `<div class="card poll-card"><strong>${poll.question}</strong><div class="poll-results">`;
+            options.forEach((opt, idx) => {
+                const percent = total ? Math.round(votes[idx]/total*100) : 0;
+                resultsHtml += `<div>${opt}: ${votes[idx]} голосов (${percent}%)</div>`;
+            });
+            resultsHtml += `</div></div>`;
+            container.innerHTML = resultsHtml;
+        }
+    }
+
     createCharBtn.onclick = () => charModal.style.display = 'flex';
     closeModal.onclick = () => charModal.style.display = 'none';
     submitCharBtn.onclick = submitCharacter;
@@ -493,12 +575,7 @@
         loadBalance();
         loadNotifications();
         loadMyCharacters();
-        // опрос
-        const pollSnap = await getDocs(query(collection(db, "polls"), where("isActive", "==", true)));
-        if (!pollSnap.empty) {
-            const poll = pollSnap.docs[0].data();
-            document.getElementById('poll-widget').innerHTML = `<div class="card poll-card"><strong>Опрос:</strong> ${poll.question}</div>`;
-        }
+        await loadActivePoll(); // загружаем опрос
         window.addEventListener('beforeunload', () => setOnlineStatus(false));
     });
 </script>
