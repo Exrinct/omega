@@ -97,7 +97,7 @@
     </style>
 </head>
 <body>
-<div class="version">v1.2.0</div>
+<div class="version">v1.1.0</div>
 <div class="container">
     <a href="server.html" class="back-link">← Назад в панель</a>
     <h1>Админ-панель</h1>
@@ -106,7 +106,6 @@
         <div class="tab active" data-tab="pending">Заявки</div>
         <div class="tab" data-tab="approved">Персонажи</div>
         <div class="tab" data-tab="users">Пользователи</div>
-        <div class="tab" data-tab="forum">Форум</div>
         <div class="tab" data-tab="notify">Уведомления</div>
     </div>
 
@@ -131,18 +130,6 @@
         </div>
     </div>
 
-    <div id="forum-tab" class="tab-content">
-        <div class="card">
-            <h3>Управление форумом</h3>
-            <div style="margin-bottom:1rem;">
-                <button id="create-category-btn" class="btn">Создать раздел</button>
-                <button id="ban-user-btn" class="btn delete-btn">Бан/мут игрока</button>
-            </div>
-            <div id="forum-categories-list"></div>
-            <div id="forum-topics-list"></div>
-        </div>
-    </div>
-
     <div id="notify-tab" class="tab-content">
         <div class="card">
             <h3>Массовое уведомление</h3>
@@ -155,38 +142,10 @@
     </div>
 </div>
 
-<!-- Модалки для форума -->
-<div id="new-category-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
-    <div class="modal-content" style="background:#121212; border:1px solid #3b6e4f; border-radius:28px; padding:2rem; max-width:400px; width:90%;">
-        <h3>Новый раздел</h3>
-        <input type="text" id="category-name" placeholder="Название" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin:1rem 0;">
-        <div class="modal-buttons" style="display:flex; gap:1rem;">
-            <button id="submit-category" class="btn">Создать</button>
-            <button id="cancel-category" class="btn delete-btn">Отмена</button>
-        </div>
-    </div>
-</div>
-
-<div id="ban-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
-    <div class="modal-content" style="background:#121212; border:1px solid #3b6e4f; border-radius:28px; padding:2rem; max-width:400px; width:90%;">
-        <h3>Бан/мут игрока на форуме</h3>
-        <input type="text" id="ban-user-nick" placeholder="Ник игрока" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin:1rem 0;">
-        <select id="ban-type" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin-bottom:1rem;">
-            <option value="ban">Бан (полная блокировка форума)</option>
-            <option value="mute">Мут (не может писать)</option>
-        </select>
-        <input type="datetime-local" id="ban-until" placeholder="Дата окончания (опционально)" style="width:100%; background:#1e1e1e; border:1px solid #333; border-radius:12px; padding:0.6rem; margin-bottom:1rem;">
-        <div class="modal-buttons" style="display:flex; gap:1rem;">
-            <button id="submit-ban" class="btn">Применить</button>
-            <button id="cancel-ban" class="btn delete-btn">Отмена</button>
-        </div>
-    </div>
-</div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc, setDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc, addDoc, deleteDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
@@ -217,8 +176,6 @@
         loadPending();
         loadApproved();
         loadUsers();
-        loadForumCategories();
-        loadForumTopics();
     });
 
     async function loadPending() {
@@ -351,117 +308,6 @@
         });
     }
 
-    // --- Управление форумом ---
-    async function loadForumCategories() {
-        const snap = await getDocs(collection(db, "forum_categories"));
-        const container = document.getElementById('forum-categories-list');
-        container.innerHTML = '<h4>Разделы форума</h4>';
-        snap.forEach(docSnap => {
-            const cat = docSnap.data();
-            const div = document.createElement('div');
-            div.style.padding = '0.5rem 0';
-            div.innerHTML = `${cat.name} <button class="delete-cat-btn" data-id="${docSnap.id}" style="background:#5a2e2e; border:none; border-radius:20px; padding:0.2rem 0.6rem; margin-left:0.5rem;">Удалить</button>`;
-            container.appendChild(div);
-        });
-        document.querySelectorAll('.delete-cat-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (confirm('Удалить раздел со всеми темами?')) {
-                    const id = btn.getAttribute('data-id');
-                    const topics = await getDocs(query(collection(db, "forum_topics"), where("categoryId", "==", id)));
-                    for (const t of topics.docs) {
-                        const posts = await getDocs(query(collection(db, "forum_posts"), where("topicId", "==", t.id)));
-                        posts.forEach(p => deleteDoc(p.ref));
-                        await deleteDoc(t.ref);
-                    }
-                    await deleteDoc(doc(db, "forum_categories", id));
-                    loadForumCategories();
-                    loadForumTopics();
-                }
-            });
-        });
-    }
-
-    async function loadForumTopics() {
-        const snap = await getDocs(collection(db, "forum_topics"));
-        const container = document.getElementById('forum-topics-list');
-        container.innerHTML = '<h4>Темы форума</h4>';
-        for (const docSnap of snap.docs) {
-            const topic = docSnap.data();
-            const author = await getUserNick(topic.authorId);
-            const div = document.createElement('div');
-            div.style.padding = '0.5rem 0';
-            div.innerHTML = `${topic.title} (автор: ${author}) 
-                <button class="toggle-topic-btn" data-id="${docSnap.id}" style="background:#2d5a27; border:none; border-radius:20px; padding:0.2rem 0.6rem; margin-left:0.5rem;">${topic.closed ? 'Открыть' : 'Закрыть'}</button>
-                <button class="delete-topic-btn" data-id="${docSnap.id}" style="background:#5a2e2e; border:none; border-radius:20px; padding:0.2rem 0.6rem;">Удалить</button>`;
-            container.appendChild(div);
-        }
-        document.querySelectorAll('.toggle-topic-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.getAttribute('data-id');
-                const topicRef = doc(db, "forum_topics", id);
-                const topicSnap = await getDoc(topicRef);
-                await updateDoc(topicRef, { closed: !topicSnap.data().closed });
-                loadForumTopics();
-            });
-        });
-        document.querySelectorAll('.delete-topic-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (confirm('Удалить тему?')) {
-                    const id = btn.getAttribute('data-id');
-                    const posts = await getDocs(query(collection(db, "forum_posts"), where("topicId", "==", id)));
-                    posts.forEach(p => deleteDoc(p.ref));
-                    await deleteDoc(doc(db, "forum_topics", id));
-                    loadForumTopics();
-                }
-            });
-        });
-    }
-
-    async function getUserNick(uid) {
-        const profile = await getDoc(doc(db, "profiles", uid));
-        return profile.exists() ? profile.data().nickname : "Unknown";
-    }
-
-    document.getElementById('create-category-btn').addEventListener('click', () => {
-        document.getElementById('new-category-modal').style.display = 'flex';
-    });
-    document.getElementById('submit-category').addEventListener('click', async () => {
-        const name = document.getElementById('category-name').value.trim();
-        if (!name) return;
-        await addDoc(collection(db, "forum_categories"), { name, topicsCount: 0 });
-        document.getElementById('new-category-modal').style.display = 'none';
-        loadForumCategories();
-    });
-    document.getElementById('cancel-category').addEventListener('click', () => {
-        document.getElementById('new-category-modal').style.display = 'none';
-    });
-
-    document.getElementById('ban-user-btn').addEventListener('click', () => {
-        document.getElementById('ban-modal').style.display = 'flex';
-    });
-    document.getElementById('submit-ban').addEventListener('click', async () => {
-        const nick = document.getElementById('ban-user-nick').value.trim();
-        const type = document.getElementById('ban-type').value;
-        let until = null;
-        const untilStr = document.getElementById('ban-until').value;
-        if (untilStr) until = new Date(untilStr);
-        const profiles = await getDocs(collection(db, "profiles"));
-        let targetUid = null;
-        for (const docSnap of profiles.docs) {
-            if (docSnap.data().nickname.toLowerCase() === nick.toLowerCase()) {
-                targetUid = docSnap.id;
-                break;
-            }
-        }
-        if (!targetUid) { alert('Игрок не найден'); return; }
-        await setDoc(doc(db, "forum_bans", targetUid), { type, until: until ? serverTimestamp() : null, untilDate: until });
-        alert('Бан/мут применён');
-        document.getElementById('ban-modal').style.display = 'none';
-    });
-    document.getElementById('cancel-ban').addEventListener('click', () => {
-        document.getElementById('ban-modal').style.display = 'none';
-    });
-
     document.getElementById('send-mass-notif').addEventListener('click', async () => {
         if (currentUserRole !== 'admin') { alert('Только администратор'); return; }
         const title = document.getElementById('notif-title').value.trim();
@@ -480,7 +326,6 @@
         document.getElementById('notif-message').value = '';
     });
 
-    // Переключение табов
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -489,7 +334,6 @@
             document.getElementById(`${tab.getAttribute('data-tab')}-tab`).classList.add('active');
             if (tab.getAttribute('data-tab') === 'approved') loadApproved();
             if (tab.getAttribute('data-tab') === 'users') loadUsers();
-            if (tab.getAttribute('data-tab') === 'forum') { loadForumCategories(); loadForumTopics(); }
         });
     });
 </script>
