@@ -11,10 +11,6 @@
             font-family: 'Inter', system-ui, sans-serif;
             background: #0A0A0A;
             color: #E6E6E6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             padding: 1.5rem;
         }
         .version {
@@ -28,49 +24,245 @@
             border-radius: 20px;
             z-index: 100;
         }
-        .card {
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
             background: #111;
             border: 1px solid #222;
             border-radius: 28px;
             padding: 2rem;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
         }
         h1 {
             font-weight: 500;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
-        p {
-            margin: 1.5rem 0;
+        .sub {
             color: #A0A0A0;
-            line-height: 1.5;
-        }
-        .btn {
-            display: inline-block;
-            background: #3B6E4F;
-            color: white;
-            text-decoration: none;
-            border-radius: 40px;
-            padding: 0.8rem 1.8rem;
-            font-weight: 500;
+            font-size: 0.85rem;
             margin-bottom: 1.5rem;
         }
         .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
             color: #3B6E4F;
             text-decoration: none;
+        }
+        .field {
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: #C0C0C0;
+        }
+        input, select, textarea {
+            width: 100%;
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 0.7rem;
+            color: white;
+            font-family: inherit;
             font-size: 0.9rem;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button {
+            background: #3B6E4F;
+            border: none;
+            border-radius: 40px;
+            padding: 0.7rem 1.5rem;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+        button:disabled {
+            background: #2A2A2A;
+            cursor: not-allowed;
+        }
+        .error {
+            color: #E06C6C;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+        }
+        .info {
+            background: #1A1A1A;
+            border-radius: 16px;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            font-size: 0.8rem;
+            color: #A0A0A0;
         }
     </style>
 </head>
 <body>
 <div class="version">v3.1.0</div>
-<div class="card">
+<div class="container">
+    <a href="server.html" class="back-link">← Назад</a>
     <h1>Анкета персонажа</h1>
-    <p>Для создания персонажа заполните Google-форму. Укажите имя, историю и другие детали.</p>
-    <a href="https://forms.gle/C9xFskgkDuPWiNMW6" target="_blank" class="btn">Заполнить анкету</a>
-    <br>
-    <a href="server.html" class="back-link">← Назад в панель</a>
+    <div class="sub">Хаймфель, декабрь 1876</div>
+
+    <div class="field">
+        <label>Ваш ник в Minecraft</label>
+        <input type="text" id="mc-nick" placeholder="Игровой ник (латиница)">
+    </div>
+    <div class="field">
+        <label>Имя персонажа</label>
+        <input type="text" id="char-name" placeholder="Например: Фриц Мюллер">
+    </div>
+    <div class="field">
+        <label>Возраст</label>
+        <input type="number" id="char-age" placeholder="От 16 до 80">
+    </div>
+    <div class="field">
+        <label>Роль в деревне</label>
+        <select id="char-role">
+            <option value="">-- выберите роль --</option>
+            <option value="Староста">Староста</option>
+            <option value="Трактирщик">Трактирщик</option>
+            <option value="Кузнец">Кузнец</option>
+            <option value="Аптекарь">Аптекарь</option>
+            <option value="Священник">Священник</option>
+            <option value="Лесник">Лесник</option>
+            <option value="Мельник">Мельник</option>
+            <option value="Учитель">Учитель</option>
+            <option value="Пастух">Пастух</option>
+            <option value="Охотник">Охотник</option>
+            <option value="Пекарь">Пекарь</option>
+            <option value="Доярка">Доярка</option>
+            <option value="Плотник">Плотник</option>
+            <option value="Травник">Травник</option>
+            <option value="Странник">Странник (без постоянного дома)</option>
+        </select>
+        <div class="error" id="role-error" style="display:none;">Эта роль уже занята другим игроком</div>
+    </div>
+    <div class="field">
+        <label>История персонажа (не менее 300 символов)</label>
+        <textarea id="char-history" rows="5" placeholder="Кто вы? Откуда пришли? Есть ли у вас тайны? Почему остались в деревне?"></textarea>
+    </div>
+    <div class="info">Каждая роль может быть выбрана только одним игроком. Заявки рассматриваются администрацией. После одобрения вы получите уведомление на сайте.</div>
+    <button id="submit-btn">Отправить заявку</button>
+    <div id="submit-error" class="error" style="margin-top:1rem;"></div>
 </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const roleSelect = document.getElementById('char-role');
+    const roleError = document.getElementById('role-error');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitError = document.getElementById('submit-error');
+
+    // Проверка, свободна ли роль
+    async function isRoleFree(role) {
+        if (!role) return false;
+        const approvedQuery = query(collection(db, "approved_characters"), where("selectedRole", "==", role));
+        const approvedSnap = await getDocs(approvedQuery);
+        if (!approvedSnap.empty) return false;
+        const pendingQuery = query(collection(db, "pending_characters"), where("selectedRole", "==", role), where("status", "==", "pending"));
+        const pendingSnap = await getDocs(pendingQuery);
+        if (!pendingSnap.empty) return false;
+        return true;
+    }
+
+    roleSelect.addEventListener('change', async () => {
+        const selectedRole = roleSelect.value;
+        if (!selectedRole) {
+            roleError.style.display = 'none';
+            submitBtn.disabled = false;
+            return;
+        }
+        const free = await isRoleFree(selectedRole);
+        if (!free) {
+            roleError.style.display = 'block';
+            submitBtn.disabled = true;
+        } else {
+            roleError.style.display = 'none';
+            submitBtn.disabled = false;
+        }
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        submitError.textContent = '';
+        const user = auth.currentUser;
+        if (!user) {
+            submitError.textContent = 'Вы не авторизованы. Войдите на сайт.';
+            return;
+        }
+        const mcNick = document.getElementById('mc-nick').value.trim();
+        const charName = document.getElementById('char-name').value.trim();
+        const age = parseInt(document.getElementById('char-age').value);
+        const selectedRole = roleSelect.value;
+        const history = document.getElementById('char-history').value.trim();
+
+        if (!mcNick || !charName || !selectedRole || !history || !age) {
+            submitError.textContent = 'Заполните все поля.';
+            return;
+        }
+        if (isNaN(age) || age < 16 || age > 80) {
+            submitError.textContent = 'Возраст должен быть от 16 до 80 лет.';
+            return;
+        }
+        if (history.length < 300) {
+            submitError.textContent = 'История должна содержать не менее 300 символов.';
+            return;
+        }
+
+        const stillFree = await isRoleFree(selectedRole);
+        if (!stillFree) {
+            roleError.style.display = 'block';
+            submitBtn.disabled = true;
+            submitError.textContent = 'Эта роль уже занята. Выберите другую.';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Отправка...';
+
+        try {
+            const profileRef = doc(db, "profiles", user.uid);
+            const profileSnap = await getDoc(profileRef);
+            const userNick = profileSnap.exists() ? profileSnap.data().nickname : user.displayName || mcNick;
+
+            await addDoc(collection(db, "pending_characters"), {
+                userId: user.uid,
+                userNick: userNick,
+                minecraftNick: mcNick,
+                characterName: charName,
+                age: age,
+                selectedRole: selectedRole,
+                history: history,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            });
+            alert('Заявка отправлена на модерацию.');
+            window.location.href = 'server.html';
+        } catch (err) {
+            console.error(err);
+            submitError.textContent = 'Ошибка при отправке: ' + err.message;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Отправить заявку';
+        }
+    });
+</script>
 </body>
 </html>
