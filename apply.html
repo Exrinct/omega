@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Набор в команду — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #0A0A0A;
+            color: #E6E6E6;
+            padding: 1.5rem;
+        }
+        .version {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            font-size: 0.65rem;
+            color: #3B6E4F;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 20px;
+            z-index: 100;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 28px;
+            padding: 2rem;
+        }
+        h1 {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .sub {
+            color: #A0A0A0;
+            margin-bottom: 1.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #3B6E4F;
+            text-decoration: none;
+        }
+        .field {
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: #C0C0C0;
+        }
+        input, select, textarea {
+            width: 100%;
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 0.7rem;
+            color: white;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button {
+            background: #3B6E4F;
+            border: none;
+            border-radius: 40px;
+            padding: 0.7rem 1.5rem;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+        button:disabled {
+            background: #2A2A2A;
+            cursor: not-allowed;
+        }
+        .error {
+            color: #E06C6C;
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+        }
+        .info {
+            background: #1A1A1A;
+            border-radius: 16px;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            font-size: 0.8rem;
+            color: #A0A0A0;
+        }
+    </style>
+</head>
+<body>
+<div class="version">v3.4.0</div>
+<div class="container">
+    <a href="server.html" class="back-link">← Назад</a>
+    <h1>Набор в команду проекта</h1>
+    <div class="sub">Заполните анкету, мы свяжемся с вами в Discord</div>
+
+    <div class="field">
+        <label>Discord username (с #0000 или без)</label>
+        <input type="text" id="discord" placeholder="например: user#1234 или user">
+    </div>
+    <div class="field">
+        <label>Ваше имя (как к вам обращаться)</label>
+        <input type="text" id="realname" placeholder="например: Александр">
+    </div>
+    <div class="field">
+        <label>Возраст</label>
+        <input type="number" id="age" placeholder="от 16 лет">
+    </div>
+    <div class="field">
+        <label>Навыки и опыт (роль в проекте, знание Minecraft, администрирование, модерация, дизайн, кодинг, организация RP и т.д.)</label>
+        <textarea id="skills" rows="4" placeholder="Опишите, что вы умеете и чем хотите помогать"></textarea>
+    </div>
+    <div class="field">
+        <label>Почему вы хотите в команду?</label>
+        <textarea id="motivation" rows="3" placeholder="Ваша мотивация"></textarea>
+    </div>
+    <div class="info">Заявки рассматриваются администрацией. После одобрения вы получите уведомление на сайте.</div>
+    <button id="submit-btn">Отправить заявку</button>
+    <div id="submit-error" class="error" style="margin-top:1rem;"></div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
+        authDomain: "omega-5de05.firebaseapp.com",
+        projectId: "omega-5de05",
+        storageBucket: "omega-5de05.firebasestorage.app",
+        messagingSenderId: "438319801454",
+        appId: "1:438319801454:web:775924ab8ef4417760b27f"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const submitBtn = document.getElementById('submit-btn');
+    const submitError = document.getElementById('submit-error');
+
+    submitBtn.addEventListener('click', async () => {
+        submitError.textContent = '';
+        const user = auth.currentUser;
+        if (!user) {
+            submitError.textContent = 'Вы не авторизованы. Войдите на сайт.';
+            return;
+        }
+        const discord = document.getElementById('discord').value.trim();
+        const realname = document.getElementById('realname').value.trim();
+        const age = parseInt(document.getElementById('age').value);
+        const skills = document.getElementById('skills').value.trim();
+        const motivation = document.getElementById('motivation').value.trim();
+
+        if (!discord || !realname || !age || !skills || !motivation) {
+            submitError.textContent = 'Заполните все поля.';
+            return;
+        }
+        if (isNaN(age) || age < 16) {
+            submitError.textContent = 'Возраст должен быть от 16 лет.';
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Отправка...';
+
+        try {
+            const profileSnap = await getDoc(doc(db, "profiles", user.uid));
+            const userNick = profileSnap.exists() ? profileSnap.data().nickname : "Неизвестно";
+
+            await addDoc(collection(db, "team_applications"), {
+                userId: user.uid,
+                userNick: userNick,
+                discord: discord,
+                realName: realname,
+                age: age,
+                skills: skills,
+                motivation: motivation,
+                status: 'pending',
+                createdAt: serverTimestamp()
+            });
+            alert('Заявка отправлена. С вами свяжутся в Discord.');
+            window.location.href = 'server.html';
+        } catch (err) {
+            console.error(err);
+            submitError.textContent = 'Ошибка при отправке: ' + err.message;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Отправить заявку';
+        }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = 'index.html';
+    });
+</script>
+</body>
+</html>
