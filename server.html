@@ -162,6 +162,11 @@
             border-radius: 16px;
             padding: 0.8rem;
             border-left: 3px solid #3B6E4F;
+            /* фикс длинного текста */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow: auto;
+            max-height: 200px;
         }
         button, .download-btn {
             background: #3B6E4F;
@@ -201,50 +206,73 @@
             text-align: center;
             margin-top: 0.8rem;
         }
-        .modal {
+        /* Информационное модальное окно */
+        .info-modal {
             display: none;
             position: fixed;
-            top:0; left:0;
-            width:100%; height:100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
-            z-index:1000;
+            z-index: 2000;
         }
-        .modal-content {
+        .info-modal-content {
             background: #111;
-            border: 1px solid #222;
+            border: 1px solid #3B6E4F;
             border-radius: 28px;
-            padding: 1.5rem;
+            padding: 2rem;
             max-width: 450px;
-            width:90%;
+            width: 90%;
+            text-align: center;
+            color: #E6E6E6;
+            position: relative;
         }
-        .modal-content input, .modal-content select, .modal-content textarea {
-            width:100%;
-            background: #1A1A1A;
-            border:1px solid #333;
-            border-radius:14px;
-            padding:0.6rem;
-            margin:0.5rem 0;
-            color:white;
+        .info-modal-content h2 {
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #3B6E4F;
         }
-        .modal-buttons {
-            display:flex;
-            gap:0.8rem;
-            margin-top:1rem;
+        .info-modal-content p {
+            margin-bottom: 1rem;
+            line-height: 1.5;
         }
-        .modal-buttons button { flex:1; }
+        .info-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+        .info-modal-close:hover {
+            color: #E6E6E6;
+        }
+        .info-btn {
+            background: #3B6E4F;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .ticket-modal, .apply-modal { /* стили модалок, если нужно */ }
         @media (max-width: 680px) {
             .status-bar { flex-direction: column; align-items: stretch; }
             .status-left { justify-content: space-between; }
             .container { padding: 0 1rem; }
             .download-group { flex-direction: column; }
+            .character-item { max-height: none; }
         }
     </style>
 </head>
 <body>
-<div class="version">v3.2.0</div>
+<div class="version">v3.4.0</div>
 
 <div class="status-bar">
     <div class="status-left">
@@ -259,6 +287,7 @@
     <div class="status-right">
         <a href="shop.html" class="nav-link">Магазин</a>
         <button id="ticket-btn" class="nav-link">Поддержка</button>
+        <button id="apply-team-btn" class="nav-link">В команду проекта</button>
         <a href="#" id="my-profile-link" class="nav-link">Профиль</a>
         <div class="notif-icon">
             <button id="notif-icon" class="nav-link">Уведомления</button>
@@ -289,7 +318,6 @@
         </div>
     </div>
 
-    <!-- Блок сборки модов с тремя вариантами загрузки -->
     <div class="card">
         <h3 style="font-weight:500;">Сборка модов</h3>
         <p style="font-size:0.8rem; margin-top:0.2rem;">Forge 1.20.1 | Omega RolePlay Modpack</p>
@@ -309,6 +337,19 @@
         <a href="https://t.me/Omega1RolePlay" target="_blank">Telegram</a>
     </div>
     <div id="admin-link-place" class="admin-link"></div>
+</div>
+
+<!-- Информационное окно о проекте -->
+<div id="info-modal" class="info-modal">
+    <div class="info-modal-content">
+        <span class="info-modal-close" id="close-info-modal">&times;</span>
+        <h2>Omega RolePlay</h2>
+        <p><strong>Minecraft RolePlay проект</strong></p>
+        <p>Игра проходит сессиями несколько раз в неделю. Мы ценим качественный отыгрыш, умение создавать историю для себя и других.</p>
+        <p>Формат: <strong>голосовой чат + текст</strong> (по ситуации).</p>
+        <p>Присоединяйся, создай персонажа и начни свою историю в Хаймфеле.</p>
+        <button class="info-btn" id="info-got-it">Понятно</button>
+    </div>
 </div>
 
 <!-- модалка тикета -->
@@ -357,6 +398,10 @@
     const notifIcon = document.getElementById('notif-icon');
     const notifDropdown = document.getElementById('notif-dropdown');
     const notifBadge = document.getElementById('notif-badge');
+    const applyTeamBtn = document.getElementById('apply-team-btn');
+
+    // Кнопка "В команду проекта" -> переход на страницу apply.html
+    if (applyTeamBtn) applyTeamBtn.onclick = () => window.location.href = 'apply.html';
 
     copyIpBtn.addEventListener('click', () => {
         navigator.clipboard.writeText("play.rp-minecraft.ru").then(() => {
@@ -454,6 +499,19 @@
     notifIcon.onclick = (e) => { e.stopPropagation(); notifDropdown.classList.toggle('show'); };
     document.addEventListener('click', () => notifDropdown.classList.remove('show'));
     logoutBtn.onclick = async () => { await setOnlineStatus(false); await signOut(auth); window.location.href = 'index.html'; };
+
+    // Информационное окно (показывается один раз)
+    const infoModal = document.getElementById('info-modal');
+    const closeInfo = document.getElementById('close-info-modal');
+    const gotItBtn = document.getElementById('info-got-it');
+    if (!localStorage.getItem('infoShown')) {
+        infoModal.style.display = 'flex';
+        localStorage.setItem('infoShown', 'true');
+    }
+    const closeModalInfo = () => { infoModal.style.display = 'none'; };
+    if (closeInfo) closeInfo.addEventListener('click', closeModalInfo);
+    if (gotItBtn) gotItBtn.addEventListener('click', closeModalInfo);
+    window.addEventListener('click', (e) => { if (e.target === infoModal) closeModalInfo(); });
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = 'index.html'; return; }
