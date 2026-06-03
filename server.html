@@ -162,7 +162,6 @@
             border-radius: 16px;
             padding: 0.8rem;
             border-left: 3px solid #3B6E4F;
-            /* фикс длинного текста */
             word-wrap: break-word;
             overflow-wrap: break-word;
             overflow: auto;
@@ -206,7 +205,6 @@
             text-align: center;
             margin-top: 0.8rem;
         }
-        /* Информационное модальное окно */
         .info-modal {
             display: none;
             position: fixed;
@@ -261,7 +259,50 @@
             cursor: pointer;
             margin-top: 0.5rem;
         }
-        .ticket-modal, .apply-modal { /* стили модалок, если нужно */ }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 28px;
+            padding: 1.5rem;
+            max-width: 450px;
+            width: 90%;
+        }
+        .modal-content input, .modal-content textarea {
+            width: 100%;
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 14px;
+            padding: 0.6rem;
+            margin: 0.5rem 0;
+            color: white;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .modal-buttons button {
+            flex: 1;
+            background: #3B6E4F;
+            border: none;
+            border-radius: 40px;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: white;
+        }
         @media (max-width: 680px) {
             .status-bar { flex-direction: column; align-items: stretch; }
             .status-left { justify-content: space-between; }
@@ -272,7 +313,7 @@
     </style>
 </head>
 <body>
-<div class="version">v3.4.0</div>
+<div class="version">v3.4.1</div>
 
 <div class="status-bar">
     <div class="status-left">
@@ -286,8 +327,8 @@
     </div>
     <div class="status-right">
         <a href="shop.html" class="nav-link">Магазин</a>
+        <a href="apply.html" class="nav-link">В команду проекта</a>
         <button id="ticket-btn" class="nav-link">Поддержка</button>
-        <button id="apply-team-btn" class="nav-link">В команду проекта</button>
         <a href="#" id="my-profile-link" class="nav-link">Профиль</a>
         <div class="notif-icon">
             <button id="notif-icon" class="nav-link">Уведомления</button>
@@ -339,7 +380,7 @@
     <div id="admin-link-place" class="admin-link"></div>
 </div>
 
-<!-- Информационное окно о проекте -->
+<!-- Информационное окно (один раз) -->
 <div id="info-modal" class="info-modal">
     <div class="info-modal-content">
         <span class="info-modal-close" id="close-info-modal">&times;</span>
@@ -362,7 +403,7 @@
             <button id="submit-ticket">Отправить</button>
             <button id="close-ticket-modal">Отмена</button>
         </div>
-        <div id="ticket-error" style="color:#e06c6c;"></div>
+        <div id="ticket-error" style="color:#e06c6c; margin-top:0.5rem;"></div>
     </div>
 </div>
 
@@ -398,10 +439,6 @@
     const notifIcon = document.getElementById('notif-icon');
     const notifDropdown = document.getElementById('notif-dropdown');
     const notifBadge = document.getElementById('notif-badge');
-    const applyTeamBtn = document.getElementById('apply-team-btn');
-
-    // Кнопка "В команду проекта" -> переход на страницу apply.html
-    if (applyTeamBtn) applyTeamBtn.onclick = () => window.location.href = 'apply.html';
 
     copyIpBtn.addEventListener('click', () => {
         navigator.clipboard.writeText("play.rp-minecraft.ru").then(() => {
@@ -500,7 +537,7 @@
     document.addEventListener('click', () => notifDropdown.classList.remove('show'));
     logoutBtn.onclick = async () => { await setOnlineStatus(false); await signOut(auth); window.location.href = 'index.html'; };
 
-    // Информационное окно (показывается один раз)
+    // Информационное окно (один раз)
     const infoModal = document.getElementById('info-modal');
     const closeInfo = document.getElementById('close-info-modal');
     const gotItBtn = document.getElementById('info-got-it');
