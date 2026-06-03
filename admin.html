@@ -165,15 +165,179 @@
         loadUsers();
     });
 
-    // === Заявки на персонажа (как раньше) ===
-    async function loadPending() { /* ... полная версия из предыдущего admin.html, не меняется */ }
-    async function approveCharacter(pendingId) { /* ... */ }
-    async function rejectCharacter(pendingId, reason) { /* ... */ }
-    async function loadApproved() { /* ... */ }
-    async function loadNicknameRequests() { /* ... */ }
-    async function loadTickets() { /* ... */ }
+    // ========== ЗАЯВКИ НА ПЕРСОНАЖА ==========
+    async function loadPending() {
+        const q = query(collection(db, "pending_characters"), where("status", "==", "pending"));
+        const snap = await getDocs(q);
+        const container = document.getElementById('pending-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет заявок</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const data = docSnap.data();
+            const userProfile = await getDoc(doc(db, "profiles", data.userId));
+            const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>${userNick}</strong> (Minecraft ник: ${data.minecraftNick || data.userNick})</div>
+                <div>Роль: <strong>${data.selectedRole}</strong> | Персонаж: ${data.characterName}, возраст ${data.age}</div>
+                <div><small>${data.history.substring(0,150)}...</small></div>
+                <div class="actions">
+                    <input type="text" id="comment-${docSnap.id}" placeholder="Причина отказа" style="max-width:180px;">
+                    <button class="approve-char" data-id="${docSnap.id}">Одобрить</button>
+                    <button class="reject-char" data-id="${docSnap.id}">Отклонить</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.approve-char').forEach(btn => btn.addEventListener('click', async () => approveCharacter(btn.getAttribute('data-id'))));
+        document.querySelectorAll('.reject-char').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const comment = document.getElementById(`comment-${id}`).value.trim();
+            await rejectCharacter(id, comment || 'Не указана');
+        }));
+    }
+    async function approveCharacter(pendingId) {
+        const pendingRef = doc(db, "pending_characters", pendingId);
+        const pendingSnap = await getDoc(pendingRef);
+        if (!pendingSnap.exists()) return;
+        const data = pendingSnap.data();
+        await addDoc(collection(db, "approved_characters"), {
+            userId: data.userId,
+            userNick: data.userNick,
+            minecraftNick: data.minecraftNick,
+            characterName: data.characterName,
+            age: data.age,
+            selectedRole: data.selectedRole,
+            history: data.history,
+            approvedAt: serverTimestamp(),
+            approvedBy: currentUser.uid
+        });
+        await addDoc(collection(db, "notifications"), {
+            userId: data.userId,
+            title: 'Персонаж одобрен',
+            message: `Ваш персонаж "${data.characterName}" (роль ${data.selectedRole}) принят.`,
+            isRead: false,
+            createdAt: serverTimestamp()
+        });
+        await deleteDoc(pendingRef);
+        loadPending();
+        loadApproved();
+    }
+    async function rejectCharacter(pendingId, reason) {
+        const pendingRef = doc(db, "pending_characters", pendingId);
+        const pendingSnap = await getDoc(pendingRef);
+        if (!pendingSnap.exists()) return;
+        const data = pendingSnap.data();
+        await addDoc(collection(db, "notifications"), {
+            userId: data.userId,
+            title: 'Персонаж отклонён',
+            message: `Ваша заявка на роль "${data.selectedRole}" отклонена. Причина: ${reason}`,
+            isRead: false,
+            createdAt: serverTimestamp()
+        });
+        await deleteDoc(pendingRef);
+        loadPending();
+    }
 
-    // === НОВАЯ: ЗАЯВКИ В КОМАНДУ ===
+    // ========== ОДОБРЕННЫЕ ПЕРСОНАЖИ ==========
+    async function loadApproved() {
+        const snap = await getDocs(collection(db, "approved_characters"));
+        const container = document.getElementById('approved-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет персонажей</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const data = docSnap.data();
+            const userProfile = await getDoc(doc(db, "profiles", data.userId));
+            const userNick = userProfile.exists() ? userProfile.data().nickname : data.userNick;
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `<div><strong>${data.characterName}</strong> (${data.selectedRole}) — игрок ${userNick}, возраст ${data.age}</div>
+                <div class="actions"><button class="delete-char" data-id="${docSnap.id}">Удалить</button></div>`;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.delete-char').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить персонажа?')) {
+                await deleteDoc(doc(db, "approved_characters", btn.getAttribute('data-id')));
+                loadApproved();
+            }
+        }));
+    }
+
+    // ========== СМЕНА НИКА ==========
+    async function loadNicknameRequests() {
+        const q = query(collection(db, "nickname_requests"), where("status", "==", "pending"));
+        const snap = await getDocs(q);
+        const container = document.getElementById('nickname-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет заявок</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const data = docSnap.data();
+            const userProfile = await getDoc(doc(db, "profiles", data.userId));
+            const userNick = userProfile.exists() ? userProfile.data().nickname : data.userId;
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `<div><strong>${userNick}</strong> просит сменить ник на <strong>${data.newNickname}</strong></div>
+                <div class="actions"><button class="approve-nick" data-id="${docSnap.id}" data-uid="${data.userId}" data-newname="${data.newNickname}">Одобрить</button><button class="reject-nick" data-id="${docSnap.id}">Отклонить</button></div>`;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.approve-nick').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id'), uid = btn.getAttribute('data-uid'), newName = btn.getAttribute('data-newname');
+            await updateDoc(doc(db, "profiles", uid), { nickname: newName, nickname_lower: newName.toLowerCase() });
+            await updateDoc(doc(db, "nickname_requests", id), { status: 'approved' });
+            await addDoc(collection(db, "notifications"), { userId: uid, title: 'Ник изменён', message: `Ваш ник изменён на "${newName}"`, isRead: false, createdAt: serverTimestamp() });
+            loadNicknameRequests();
+        }));
+        document.querySelectorAll('.reject-nick').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const req = await getDoc(doc(db, "nickname_requests", id));
+            const data = req.data();
+            await updateDoc(doc(db, "nickname_requests", id), { status: 'rejected' });
+            await addDoc(collection(db, "notifications"), { userId: data.userId, title: 'Смена ника отклонена', message: `Заявка на ник "${data.newNickname}" отклонена.`, isRead: false, createdAt: serverTimestamp() });
+            loadNicknameRequests();
+        }));
+    }
+
+    // ========== ТИКЕТЫ ==========
+    async function loadTickets() {
+        const snap = await getDocs(collection(db, "tickets"));
+        const container = document.getElementById('tickets-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет тикетов</div>'; return; }
+        const tickets = [];
+        snap.forEach(docSnap => tickets.push({ id: docSnap.id, ...docSnap.data() }));
+        tickets.sort((a,b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+        container.innerHTML = '';
+        for (const data of tickets) {
+            const isOpen = data.status === 'open';
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>${data.userNick}</strong> — ${data.subject} <span style="display:inline-block; margin-left:0.5rem; background:${isOpen ? '#3B6E4F' : '#5A2E2E'}; border-radius:30px; padding:0.1rem 0.5rem; font-size:0.7rem;">${isOpen ? 'Открыт' : 'Закрыт'}</span></div>
+                <div><small>${data.message.substring(0,120)}</small></div>
+                ${data.adminResponse ? `<div><strong>Ответ админа:</strong> ${data.adminResponse}</div>` : ''}
+                <div class="actions">
+                    ${isOpen ? `<textarea id="resp-${data.id}" placeholder="Ваш ответ" rows="2" style="width:250px;"></textarea><button class="reply-ticket" data-id="${data.id}">Ответить и закрыть</button>` : ''}
+                    ${!isOpen ? `<button class="delete-ticket" data-id="${data.id}">Удалить</button>` : ''}
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.reply-ticket').forEach(btn => btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-id');
+            const response = document.getElementById(`resp-${id}`).value.trim();
+            if (!response) return alert('Введите ответ');
+            await updateDoc(doc(db, "tickets", id), { adminResponse: response, status: 'closed', closedAt: serverTimestamp() });
+            const ticket = await getDoc(doc(db, "tickets", id));
+            const data = ticket.data();
+            await addDoc(collection(db, "notifications"), { userId: data.userId, title: 'Ответ по обращению', message: `По вашему обращению "${data.subject}" дан ответ: ${response}`, isRead: false, createdAt: serverTimestamp() });
+            loadTickets();
+        }));
+        document.querySelectorAll('.delete-ticket').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить тикет?')) { await deleteDoc(doc(db, "tickets", btn.getAttribute('data-id'))); loadTickets(); }
+        }));
+    }
+
+    // ========== ЗАЯВКИ В КОМАНДУ ==========
     async function loadTeamApplications() {
         const q = query(collection(db, "team_applications"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
@@ -195,18 +359,16 @@
                 <div><strong>Навыки:</strong> ${data.skills.substring(0,200)}</div>
                 <div><strong>Мотивация:</strong> ${data.motivation.substring(0,200)}</div>
                 <div class="actions">
-                    <button class="review-team" data-id="${docSnap.id}" data-userid="${data.userId}" data-discord="${data.discord}">Отметить как просмотрено</button>
+                    <button class="review-team" data-id="${docSnap.id}" data-discord="${data.discord}">Отметить как просмотрено</button>
                     <button class="delete-team" data-id="${docSnap.id}">Удалить заявку</button>
                 </div>
             `;
             container.appendChild(div);
         }
-        // Обработчики (просто удаление или отметка, можно расширить)
         document.querySelectorAll('.review-team').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const id = btn.getAttribute('data-id');
                 const discord = btn.getAttribute('data-discord');
-                // Можно отправить уведомление в Discord или пометить как прочитанное
                 alert(`Свяжитесь с ${discord} в Discord.`);
                 await deleteDoc(doc(db, "team_applications", id));
                 loadTeamApplications();
@@ -222,8 +384,221 @@
         });
     }
 
-    // === Остальные функции (опросы, магазин, достижения, пользователи, уведомления) остаются без изменений, их нужно скопировать из предыдущей версии admin.html ===
-    // Для краткости я их не дублирую, но они должны быть. Если нужно, я пришлю полный файл.
+    // ========== ОПРОСЫ ==========
+    async function loadPolls() {
+        const snap = await getDocs(collection(db, "polls"));
+        const container = document.getElementById('polls-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет опросов. Создайте первый.</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const p = docSnap.data();
+            const options = p.options || [];
+            const votes = p.votes || [];
+            const optHtml = options.map((opt, idx) => `${opt}: ${votes[idx] || 0} голосов`).join(', ');
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>${p.question}</strong> ${p.isActive ? '<span style="color:#3B6E4F;">(активный)</span>' : '<span style="color:#888;">(завершён)</span>'}</div>
+                <div><small>${optHtml}</small></div>
+                <div class="actions">
+                    ${!p.isActive ? '' : `<button class="end-poll" data-id="${docSnap.id}">Завершить</button>`}
+                    <button class="delete-poll" data-id="${docSnap.id}">Удалить</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.end-poll').forEach(btn => btn.addEventListener('click', async () => {
+            await updateDoc(doc(db, "polls", btn.getAttribute('data-id')), { isActive: false });
+            loadPolls();
+        }));
+        document.querySelectorAll('.delete-poll').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить опрос?')) {
+                await deleteDoc(doc(db, "polls", btn.getAttribute('data-id')));
+                loadPolls();
+            }
+        }));
+    }
+    document.getElementById('new-poll-btn').addEventListener('click', async () => {
+        const question = prompt('Вопрос опроса');
+        if (!question) return;
+        let options = [];
+        while (options.length < 2) {
+            const opt = prompt(`Вариант ответа ${options.length+1} (минимум 2)`);
+            if (!opt) return;
+            options.push(opt);
+        }
+        const addMore = confirm('Добавить ещё вариант?');
+        if (addMore) {
+            let more;
+            while (more !== null) {
+                more = prompt('Следующий вариант (Enter для завершения)');
+                if (more) options.push(more);
+            }
+        }
+        await addDoc(collection(db, "polls"), {
+            question, options, votes: new Array(options.length).fill(0),
+            isActive: true, createdAt: serverTimestamp(), createdBy: currentUser.uid
+        });
+        loadPolls();
+    });
+
+    // ========== МАГАЗИН ==========
+    async function loadShopItems() {
+        const snap = await getDocs(collection(db, "shop_items"));
+        const container = document.getElementById('shop-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет товаров. Создайте первый.</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const item = docSnap.data();
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `
+                <div><strong>${item.name}</strong> — ${item.price} монет</div>
+                <div class="actions"><button class="delete-item" data-id="${docSnap.id}">Удалить</button></div>
+            `;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.delete-item').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить товар?')) {
+                await deleteDoc(doc(db, "shop_items", btn.getAttribute('data-id')));
+                loadShopItems();
+            }
+        }));
+    }
+    document.getElementById('new-item-btn').addEventListener('click', async () => {
+        const name = prompt('Название товара');
+        if (!name) return;
+        const desc = prompt('Описание');
+        if (!desc) return;
+        const price = parseInt(prompt('Цена в монетах'));
+        if (isNaN(price)) return;
+        await addDoc(collection(db, "shop_items"), { name, description: desc, price, isActive: true });
+        loadShopItems();
+    });
+    document.getElementById('give-points-btn').addEventListener('click', async () => {
+        const nick = document.getElementById('give-points-nick').value.trim();
+        const amount = parseInt(document.getElementById('give-points-amount').value);
+        if (!nick || isNaN(amount)) return alert('Заполните поля');
+        const profiles = await getDocs(collection(db, "profiles"));
+        let uid = null;
+        for (const p of profiles.docs) {
+            if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
+        }
+        if (!uid) return alert('Игрок не найден');
+        await updateDoc(doc(db, "profiles", uid), { rp_points: increment(amount) });
+        alert(`Выдано ${amount} монет`);
+    });
+    document.getElementById('remove-points-btn').addEventListener('click', async () => {
+        const nick = document.getElementById('remove-points-nick').value.trim();
+        const amount = parseInt(document.getElementById('remove-points-amount').value);
+        if (!nick || isNaN(amount)) return alert('Заполните поля');
+        const profiles = await getDocs(collection(db, "profiles"));
+        let uid = null;
+        for (const p of profiles.docs) {
+            if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
+        }
+        if (!uid) return alert('Игрок не найден');
+        await updateDoc(doc(db, "profiles", uid), { rp_points: increment(-amount) });
+        alert(`Списано ${amount} монет`);
+    });
+
+    // ========== ДОСТИЖЕНИЯ ==========
+    async function loadAchievements() {
+        const snap = await getDocs(collection(db, "achievements"));
+        const container = document.getElementById('ach-list');
+        const select = document.getElementById('give-ach-select');
+        if (snap.empty) {
+            container.innerHTML = '<p>Нет достижений</p>';
+            select.innerHTML = '<option>Нет</option>';
+            return;
+        }
+        container.innerHTML = '';
+        select.innerHTML = '';
+        snap.forEach(docSnap => {
+            const a = docSnap.data();
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `<div><strong>${a.title}</strong> — ${a.description}</div><div class="actions"><button class="delete-ach" data-id="${docSnap.id}">Удалить</button></div>`;
+            container.appendChild(div);
+            const opt = document.createElement('option');
+            opt.value = docSnap.id;
+            opt.textContent = a.title;
+            select.appendChild(opt);
+        });
+        document.querySelectorAll('.delete-ach').forEach(btn => btn.addEventListener('click', async () => {
+            if (confirm('Удалить достижение?')) {
+                await deleteDoc(doc(db, "achievements", btn.getAttribute('data-id')));
+                loadAchievements();
+            }
+        }));
+    }
+    document.getElementById('new-ach-btn').addEventListener('click', async () => {
+        const t = prompt('Название достижения');
+        if (!t) return;
+        const d = prompt('Описание');
+        if (!d) return;
+        await addDoc(collection(db, "achievements"), { title: t, description: d });
+        loadAchievements();
+    });
+    document.getElementById('give-ach-btn').addEventListener('click', async () => {
+        const nick = document.getElementById('give-nick').value.trim();
+        const achId = document.getElementById('give-ach-select').value;
+        if (!nick || !achId) return alert('Введите ник');
+        const profiles = await getDocs(collection(db, "profiles"));
+        let uid = null;
+        for (const p of profiles.docs) {
+            if (p.data().nickname.toLowerCase() === nick.toLowerCase()) { uid = p.id; break; }
+        }
+        if (!uid) return alert('Игрок не найден');
+        const existing = await getDocs(query(collection(db, "user_achievements"), where("userId", "==", uid), where("achievementId", "==", achId)));
+        if (!existing.empty) return alert('Уже есть');
+        await addDoc(collection(db, "user_achievements"), { userId: uid, achievementId: achId, earnedAt: serverTimestamp() });
+        alert('Достижение выдано');
+    });
+
+    // ========== ПОЛЬЗОВАТЕЛИ ==========
+    async function loadUsers() {
+        const snap = await getDocs(collection(db, "profiles"));
+        const container = document.getElementById('users-list');
+        if (snap.empty) { container.innerHTML = '<div>Нет пользователей</div>'; return; }
+        container.innerHTML = '';
+        for (const docSnap of snap.docs) {
+            const data = docSnap.data();
+            const role = data.role || 'user';
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.innerHTML = `<div><strong>${data.nickname}</strong> — ${data.email}</div>
+                <div class="actions">
+                    <select class="role-select" data-uid="${docSnap.id}">
+                        <option value="user" ${role==='user' ? 'selected' : ''}>Пользователь</option>
+                        <option value="reviewer" ${role==='reviewer' ? 'selected' : ''}>Анкетолог</option>
+                        <option value="admin" ${role==='admin' ? 'selected' : ''}>Админ</option>
+                    </select>
+                    <button class="save-role" data-uid="${docSnap.id}">Сохранить</button>
+                </div>`;
+            container.appendChild(div);
+        }
+        document.querySelectorAll('.save-role').forEach(btn => btn.addEventListener('click', async () => {
+            const uid = btn.getAttribute('data-uid');
+            const select = document.querySelector(`.role-select[data-uid="${uid}"]`);
+            await updateDoc(doc(db, "profiles", uid), { role: select.value });
+            alert('Роль обновлена');
+        }));
+    }
+
+    // ========== МАССОВЫЕ УВЕДОМЛЕНИЯ ==========
+    document.getElementById('send-mass-notif').addEventListener('click', async () => {
+        const title = document.getElementById('notif-title').value.trim();
+        const msg = document.getElementById('notif-message').value.trim();
+        if (!title || !msg) return alert('Заполните поля');
+        const profiles = await getDocs(collection(db, "profiles"));
+        for (const profile of profiles.docs) {
+            await addDoc(collection(db, "notifications"), {
+                userId: profile.id, title, message: msg, isRead: false, createdAt: serverTimestamp()
+            });
+        }
+        alert(`Отправлено ${profiles.size} уведомлений`);
+    });
 
     // Переключение вкладок
     document.querySelectorAll('.tab').forEach(tab => {
