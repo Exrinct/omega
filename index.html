@@ -3,199 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Omega RolePlay — вход в систему">
     <title>Omega RolePlay — вход</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #3B6E4F;
+            --primary-hover: #4D8A66;
+            --primary-light: rgba(59, 110, 79, 0.12);
+            --background: #0A0A0A;
+            --surface: #111111;
+            --surface-elevated: #1A1A1A;
+            --text-primary: #E6E6E6;
+            --text-secondary: #A0A0A0;
+            --text-tertiary: #6B6B6B;
+            --border: #222222;
+            --border-light: #2C2C2C;
+            --error: #E06C6C;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+            --transition: all 0.2s cubic-bezier(0.2,0,0,1);
         }
+        
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: #0A0A0A;
-            color: #E6E6E6;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
             padding: 1.5rem;
+            position: relative;
+            background-image: radial-gradient(circle at 15% 30%, rgba(59,110,79,0.03) 0%, transparent 50%);
         }
+        
+        .version {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            background: rgba(0,0,0,0.5);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            z-index: 100;
+        }
+        
         .card {
-            background: #111111;
-            border: 1px solid #222222;
-            border-radius: 24px;
-            padding: 2rem 1.8rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
             width: 100%;
             max-width: 440px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s;
         }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
         .logo {
             text-align: center;
-            margin-bottom: 1.8rem;
+            margin-bottom: 2rem;
         }
+        
         .logo h1 {
-            font-size: 1.7rem;
-            font-weight: 500;
+            font-size: 1.8rem;
+            font-weight: 600;
             letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .logo span {
-            color: #3B6E4F;
+        
+        .logo p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.3rem;
         }
+        
         .google-btn {
             width: 100%;
-            background: #1A1A1A;
-            border: 1px solid #2C2C2C;
-            border-radius: 40px;
-            padding: 0.7rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 0.75rem;
             font-size: 0.9rem;
             font-weight: 500;
-            color: #E6E6E6;
+            color: var(--text-primary);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 0.5rem;
             margin-bottom: 1.2rem;
         }
+        
         .google-btn:hover {
-            background: #222;
-            border-color: #3B6E4F;
+            border-color: var(--primary);
+            background: rgba(59,110,79,0.08);
+            transform: scale(1.01);
         }
+        
         .divider {
             text-align: center;
             font-size: 0.75rem;
-            color: #6B6B6B;
+            color: var(--text-tertiary);
             margin: 1rem 0;
             position: relative;
         }
-        .divider::before, .divider::after {
+        
+        .divider::before,
+        .divider::after {
             content: '';
             position: absolute;
             top: 50%;
             width: 35%;
             height: 1px;
-            background: #222;
+            background: var(--border);
         }
+        
         .divider::before { left: 0; }
         .divider::after { right: 0; }
+        
         .field {
             margin-bottom: 1.2rem;
         }
+        
         label {
             display: block;
             font-size: 0.75rem;
             font-weight: 500;
-            color: #A0A0A0;
+            color: var(--text-secondary);
             margin-bottom: 0.4rem;
         }
+        
         input {
             width: 100%;
-            background: #1A1A1A;
-            border: 1px solid #2C2C2C;
-            border-radius: 14px;
-            padding: 0.7rem 1rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
             font-size: 0.9rem;
-            color: #F0F0F0;
+            color: var(--text-primary);
             outline: none;
-            transition: 0.2s;
+            transition: var(--transition);
         }
+        
         input:focus {
-            border-color: #3B6E4F;
-            box-shadow: 0 0 0 2px rgba(59,110,79,0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
+        
         .error {
-            color: #E06C6C;
+            color: var(--error);
             font-size: 0.7rem;
             margin-top: 0.3rem;
             display: none;
         }
+        
         button[type="submit"] {
             width: 100%;
-            background: #3B6E4F;
+            background: var(--primary);
             border: none;
-            border-radius: 40px;
-            padding: 0.7rem;
+            border-radius: var(--radius-lg);
+            padding: 0.75rem;
             font-size: 0.9rem;
             font-weight: 600;
             color: white;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
         }
+        
         button[type="submit"]:hover {
-            background: #2D5A27;
+            background: var(--primary-hover);
+            transform: scale(1.01);
         }
+        
         .register-link {
-            color: #3B6E4F;
+            color: var(--primary);
             cursor: pointer;
             font-weight: 500;
-            margin-left: 0.3rem;
+            transition: var(--transition);
         }
+        
+        .register-link:hover {
+            color: var(--primary-hover);
+        }
+        
         .captcha-block {
-            background: #1A1A1A;
-            border-radius: 14px;
+            background: var(--surface-elevated);
+            border-radius: var(--radius-md);
             padding: 0.6rem;
             margin: 1rem 0;
             display: flex;
             align-items: center;
             gap: 0.8rem;
         }
+        
+        .captcha-block span {
+            font-size: 0.9rem;
+        }
+        
+        .captcha-block input {
+            width: 70px;
+            text-align: center;
+            padding: 0.5rem;
+        }
+        
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
+        
         .modal-content {
-            background: #111;
-            border: 1px solid #2C2C2C;
-            border-radius: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
             padding: 1.8rem;
             max-width: 380px;
             width: 90%;
             text-align: center;
+            animation: fadeInUp 0.2s ease;
         }
+        
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .modal-content input {
+            margin: 1rem 0;
+        }
+        
         .modal-buttons {
             display: flex;
             gap: 1rem;
-            margin-top: 1.2rem;
             justify-content: center;
         }
+        
         .modal-buttons button {
             padding: 0.5rem 1.2rem;
-            border-radius: 40px;
+            border-radius: var(--radius-lg);
             cursor: pointer;
         }
-        #modal-submit { background: #3B6E4F; border: none; color: white; }
-        #modal-cancel { background: none; border: 1px solid #3B6E4F; color: #ccc; }
-        .version {
-            position: fixed;
-            bottom: 12px;
-            right: 12px;
-            font-size: 0.65rem;
-            color: #3B6E4F;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 6px;
-            border-radius: 20px;
-            z-index: 100;
+        
+        #modal-submit {
+            background: var(--primary);
+            border: none;
+            color: white;
         }
+        
+        #modal-cancel {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         @media (max-width: 480px) {
             .card { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
-<div class="version">v3.1.0</div>
+<div class="version">v4.0.0</div>
 <div class="card">
     <div class="logo">
-        <h1>Omega<span>RolePlay</span></h1>
-        <p style="font-size:0.8rem; color:#888;">Твоя история начинается здесь</p>
+        <h1>Omega</h1>
+        <p>Твоя история начинается здесь</p>
     </div>
 
     <button id="google-login" class="google-btn">
@@ -205,10 +311,10 @@
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
         </svg>
-        Войти через Google
+        Google
     </button>
 
-    <div class="divider">или по паролю</div>
+    <div class="divider">или</div>
 
     <div>
         <div class="field">
@@ -225,7 +331,7 @@
     </div>
 
     <div class="divider" style="margin-top:1.2rem;">
-        Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span>
+        Нет аккаунта? <span id="show-register" class="register-link">Регистрация</span>
     </div>
 
     <div id="register-block" style="display:none; margin-top:1rem;">
@@ -241,7 +347,7 @@
         </div>
         <div class="captcha-block">
             <span id="captcha-question"></span>
-            <input type="text" id="captcha-answer" style="width:70px;" placeholder="?">
+            <input type="text" id="captcha-answer" placeholder="?">
         </div>
         <div class="error" id="captcha-error"></div>
         <button id="register-btn">Зарегистрироваться</button>
@@ -250,7 +356,7 @@
 
 <div id="nickname-modal" class="modal">
     <div class="modal-content">
-        <h3>Введите ник в Minecraft</h3>
+        <h3>Введите ваш ник в Minecraft</h3>
         <input type="text" id="modal-nick" placeholder="ник" autocomplete="off">
         <div class="error" id="modal-error" style="margin-top:0.5rem;"></div>
         <div class="modal-buttons">
@@ -306,7 +412,6 @@
         });
     }
 
-    // регистрация по паролю
     document.getElementById('register-btn').addEventListener('click', async () => {
         const nick = document.getElementById('reg-nick').value.trim();
         const pass = document.getElementById('reg-pass').value;
@@ -353,7 +458,6 @@
         }
     });
 
-    // вход по паролю
     document.getElementById('login-btn').addEventListener('click', async () => {
         const nick = document.getElementById('login-nick').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -375,7 +479,7 @@
             }
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
-                nickErr.textContent = 'Пользователь не найден. Зарегистрируйтесь.';
+                nickErr.textContent = 'Пользователь не найден';
                 nickErr.style.display = 'block';
             } else if (error.code === 'auth/wrong-password') {
                 passErr.style.display = 'block';
@@ -386,7 +490,6 @@
         }
     });
 
-    // Google вход
     let pendingGoogleUser = null;
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
@@ -406,7 +509,7 @@
             errorSpan.style.display = 'none';
             modal.style.display = 'flex';
         } catch (error) {
-            alert("Ошибка входа через Google: " + error.message);
+            alert("Ошибка: " + error.message);
         }
     });
 
