@@ -3,166 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Профиль — Omega RolePlay</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <title>Omega RolePlay — профиль</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg:          #141618;
+            --bg-deep:     #0f1011;
+            --surface:     #1c1e21;
+            --surface-2:   #222528;
+            --surface-3:   #2a2d31;
+            --border:      rgba(255,255,255,0.07);
+            --border-mid:  rgba(255,255,255,0.11);
+            --border-hi:   rgba(255,255,255,0.18);
+            --accent:      #4ade80;
+            --accent-dim:  #22c55e;
+            --accent-mute: rgba(74,222,128,0.10);
+            --text:        #f0f0f0;
+            --text-2:      #9ca3af;
+            --text-3:      #4b5563;
+            --red:         #f87171;
+            --radius:      14px;
+            --radius-lg:   20px;
+            --ease-out:    cubic-bezier(.16,1,.3,1);
+        }
+        html { height: 100%; }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: #0A0A0A;
-            color: #E6E6E6;
-            padding: 1rem;
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
         }
-        .version {
-            position: fixed;
-            bottom: 12px;
-            right: 12px;
-            font-size: 0.65rem;
-            color: #3B6E4F;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 6px;
-            border-radius: 20px;
-            z-index: 100;
+        /* LEFT PANEL */
+        .left-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem 2.2rem;
+            background: var(--bg-deep);
+            overflow: hidden;
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 20% 10%, rgba(74,222,128,0.06) 0%, transparent 60%),
+                        radial-gradient(ellipse 50% 50% at 80% 90%, rgba(74,222,128,0.03) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        .left-brand { position: relative; z-index: 1; animation: fadeUp .7s var(--ease-out) both; }
+        .brand-logo { display: flex; align-items: center; gap: .6rem; }
+        .brand-mark {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 1px rgba(74,222,128,0.3), 0 8px 24px rgba(74,222,128,0.18);
+        }
+        .brand-mark svg { width: 18px; height: 18px; fill: #0f1011; }
+        .brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.35rem; color: var(--text); }
+        .left-hero { position: relative; z-index: 1; margin-top: 1rem; animation: fadeUp .7s .12s var(--ease-out) both; }
+        .left-hero h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            font-weight: 400; line-height: 1.15;
+            margin-bottom: 1rem;
+        }
+        .left-hero h2 em { font-style: italic; color: var(--accent); }
+        .left-hero p { font-size: .9rem; line-height: 1.7; color: var(--text-2); max-width: 340px; font-weight: 300; }
+        .features { position: relative; z-index: 1; display: flex; flex-direction: column; gap: .7rem; margin-bottom: 2rem; animation: fadeUp .7s .22s var(--ease-out) both; }
+        .feature { display: flex; align-items: center; gap: .8rem; }
+        .feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .6; }
+        .feature span { font-size: .82rem; color: var(--text-3); font-weight: 400; }
+        /* RIGHT PANEL */
+        .right-panel {
+            position: relative;
+            background: var(--bg);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 2rem 2.5rem;
+        }
+        .right-panel::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
         }
         .back-link {
-            display: inline-block;
-            margin-bottom: 1.2rem;
-            color: #3B6E4F;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-2);
             text-decoration: none;
             font-size: 0.85rem;
+            transition: color 0.2s;
         }
+        .back-link:hover { color: var(--accent); }
         .profile-card {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border-mid);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
         }
         .profile-header {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid var(--border);
             padding-bottom: 1rem;
             margin-bottom: 1rem;
         }
         .profile-nick {
             font-size: 1.8rem;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: -0.02em;
         }
         .online-badge {
-            background: #2E8B57;
+            background: var(--accent);
             border-radius: 30px;
             padding: 0.2rem 0.6rem;
             font-size: 0.7rem;
             margin-left: 0.5rem;
             display: inline-block;
+            color: #0f1011;
+            font-weight: 500;
         }
         .stats {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
+            gap: 0.8rem;
             margin-top: 0.5rem;
         }
         .stat {
-            background: #1A1A1A;
-            padding: 0.2rem 0.8rem;
+            background: var(--surface-2);
+            padding: 0.3rem 0.8rem;
             border-radius: 30px;
             font-size: 0.75rem;
+            font-weight: 500;
         }
         .btn-outline {
-            background: none;
-            border: 1px solid #3B6E4F;
+            background: transparent;
+            border: 1px solid var(--border-mid);
             border-radius: 40px;
-            padding: 0.3rem 1rem;
-            color: #E6E6E6;
+            padding: 0.4rem 1rem;
+            color: var(--text-2);
             cursor: pointer;
-            margin: 0.5rem 0;
+            transition: all 0.2s;
             font-size: 0.8rem;
+            margin: 0.5rem 0;
+        }
+        .btn-outline:hover {
+            background: var(--surface);
+            color: var(--text);
         }
         .settings-group {
-            background: #1A1A1A;
-            border-radius: 20px;
+            background: var(--surface-2);
+            border-radius: var(--radius);
             padding: 1rem;
             margin: 1rem 0;
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 0.8rem;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
             margin: 1rem 0;
         }
         .char-card, .achievement-card {
-            background: #1A1A1A;
-            border-radius: 20px;
+            background: var(--surface-2);
+            border-radius: var(--radius);
             padding: 0.8rem;
-            border-left: 3px solid #3B6E4F;
+            border-left: 3px solid var(--accent);
+            transition: transform 0.15s;
         }
-        .char-name, .ach-title { font-weight: 500; margin-bottom: 0.2rem; }
-        .char-meta, .ach-desc { font-size: 0.7rem; color: #A0A0A0; }
+        .char-card:hover, .achievement-card:hover { transform: translateY(-2px); }
+        .char-name, .ach-title { font-weight: 600; margin-bottom: 0.2rem; }
+        .char-meta, .ach-desc { font-size: 0.7rem; color: var(--text-2); }
         .modal {
             display: none;
             position: fixed;
-            top:0; left:0;
-            width:100%; height:100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            backdrop-filter: blur(16px);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            z-index:1000;
-        }
-        .modal-content {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 28px;
             padding: 1.5rem;
-            max-width: 400px;
-            width:90%;
         }
-        .modal-content input {
-            width:100%;
-            background: #1A1A1A;
-            border:1px solid #333;
-            border-radius:14px;
-            padding:0.6rem;
-            margin:1rem 0;
-            color:white;
+        .modal-card {
+            background: var(--surface);
+            border: 1px solid var(--border-hi);
+            border-radius: var(--radius-lg);
+            padding: 1.8rem;
+            max-width: 400px;
+            width: 100%;
+            animation: scaleIn .25s var(--ease-out) both;
+        }
+        .modal-card h3 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.3rem; margin-bottom: 1rem; }
+        .modal-card input {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border-mid);
+            border-radius: var(--radius);
+            padding: 0.7rem;
+            margin: 0.5rem 0;
+            color: var(--text);
         }
         .modal-buttons {
             display: flex;
-            gap:0.8rem;
+            gap: 0.8rem;
+            margin-top: 1rem;
         }
-        .error { color:#E06C6C; font-size:0.75rem; margin-top:0.3rem; }
-        @media (max-width: 640px) {
-            .profile-card { padding: 1rem; }
-            .profile-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+        .error { color: var(--red); font-size: 0.75rem; margin-top: 0.3rem; }
+        .version {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.68rem;
+            color: var(--text-3);
+            z-index: 100;
+        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @media (max-width: 860px) {
+            body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow-y: auto; }
+            .left-panel { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+            .right-panel { border-left: none; padding: 1.5rem; }
+        }
+        @media (max-width: 480px) {
+            .left-panel { padding: 1rem; }
+            .right-panel { padding: 1rem; }
+            .profile-nick { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
-<div class="version">v3.1.0</div>
-<div class="container">
+<div class="left-panel">
+    <div class="left-brand">
+        <div class="brand-logo">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.8 1.56 5.24 3.87 6.54L8 20h2.5v-1c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v1H16l-.87-4.46C17.44 14.24 19 11.8 19 9c0-3.87-3.13-7-7-7z"/></svg>
+            </div>
+            <span class="brand-name">Omega</span>
+        </div>
+    </div>
+    <div class="left-hero">
+        <h2>Личный<br>профиль <em>игрока</em></h2>
+        <p>Персонажи, достижения, настройки — всё в одном месте.</p>
+    </div>
+    <div class="features">
+        <div class="feature"><div class="feature-dot"></div><span>История твоих героев</span></div>
+        <div class="feature"><div class="feature-dot"></div><span>Заработанные достижения</span></div>
+        <div class="feature"><div class="feature-dot"></div><span>Управление аккаунтом</span></div>
+    </div>
+</div>
+<div class="right-panel">
     <a href="server.html" class="back-link">← Назад</a>
     <div id="profile-content">Загрузка...</div>
 </div>
 
 <div id="nickname-modal" class="modal">
-    <div class="modal-content">
+    <div class="modal-card">
         <h3>Смена ника</h3>
         <input type="text" id="new-nickname" placeholder="Новый ник">
         <div class="modal-buttons">
-            <button id="submit-nickname">Отправить заявку</button>
-            <button id="cancel-nickname">Отмена</button>
+            <button id="submit-nickname" class="btn-outline" style="background:var(--accent); color:#0f1011;">Отправить заявку</button>
+            <button id="cancel-nickname" class="btn-outline">Отмена</button>
         </div>
         <div id="nick-error" class="error"></div>
     </div>
 </div>
+
+<div class="version">v4.0.0</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -243,7 +360,7 @@
                     <div class="profile-header">
                         <div>
                             <span class="profile-nick">${escapeHtml(nickname)}</span>
-                            ${isOnline ? '<span class="online-badge">В сети</span>' : '<span class="online-badge" style="background:#444;">Офлайн</span>'}
+                            ${isOnline ? '<span class="online-badge">В сети</span>' : '<span class="online-badge" style="background:#444; color:var(--text-2);">Офлайн</span>'}
                         </div>
                         <div class="stats">
                             <div class="stat">💰 ${profile.rp_points || 0} монет</div>
