@@ -3,95 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Omega RolePlay — главная панель управления">
     <title>Omega RolePlay — панель</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3B6E4F;
+            --primary-hover: #4D8A66;
+            --primary-light: rgba(59, 110, 79, 0.12);
+            --background: #0A0A0A;
+            --surface: #111111;
+            --surface-elevated: #1A1A1A;
+            --surface-hover: #222222;
+            --text-primary: #E6E6E6;
+            --text-secondary: #A0A0A0;
+            --text-tertiary: #6B6B6B;
+            --border: #222222;
+            --border-light: #2C2C2C;
+            --success: #2E8B57;
+            --error: #E06C6C;
+            --warning: #E0A000;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
+            --transition: all 0.2s cubic-bezier(0.2,0,0,1);
+        }
+
         body {
             font-family: 'Inter', system-ui, sans-serif;
-            background: #0A0A0A;
-            color: #E6E6E6;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
+
         .version {
             position: fixed;
-            bottom: 12px;
-            right: 12px;
-            font-size: 0.65rem;
-            color: #3B6E4F;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
             background: rgba(0,0,0,0.5);
-            padding: 2px 6px;
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
             z-index: 100;
+            backdrop-filter: blur(4px);
         }
+
+        /* Status Bar */
         .status-bar {
-            background: #111;
-            border-bottom: 1px solid #222;
-            padding: 0.5rem 1.5rem;
+            background: rgba(17, 17, 17, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 0.8rem;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
+
         .status-left {
             display: flex;
             align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
         }
+
         .online-indicator {
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: #1A1A1A;
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            font-size: 0.75rem;
+            gap: 0.5rem;
+            background: var(--surface-elevated);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
             font-weight: 500;
         }
+
         .online-dot {
             width: 8px;
             height: 8px;
-            background: #2E8B57;
+            background: var(--success);
             border-radius: 50%;
+            animation: pulse 2s infinite;
         }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
         .balance-badge {
-            background: #1A1A1A;
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            font-size: 0.75rem;
+            background: var(--surface-elevated);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
             font-weight: 500;
-            color: #FFD966;
+            color: var(--warning);
         }
+
         .status-right {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
+
         .nav-link {
             background: none;
             border: none;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            color: #E6E6E6;
+            color: var(--text-secondary);
             cursor: pointer;
-            padding: 0.3rem 0.6rem;
-            border-radius: 30px;
-            transition: 0.2s;
+            padding: 0.4rem 0.8rem;
+            border-radius: 40px;
+            transition: var(--transition);
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
         }
+
         .nav-link:hover {
-            background: #1A1A1A;
+            background: var(--surface-elevated);
+            color: var(--text-primary);
         }
+
         .notif-icon {
             position: relative;
         }
+
         .notif-badge {
             position: absolute;
             top: -4px;
-            right: -6px;
-            background: #3B6E4F;
+            right: -4px;
+            background: var(--primary);
             color: white;
             font-size: 0.6rem;
             border-radius: 20px;
@@ -99,166 +160,169 @@
             min-width: 14px;
             text-align: center;
         }
+
         .notif-dropdown {
             display: none;
             position: absolute;
-            top: 32px;
+            top: 40px;
             right: 0;
-            width: 260px;
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 16px;
+            width: 280px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             z-index: 20;
-            max-height: 280px;
+            max-height: 320px;
             overflow-y: auto;
+            box-shadow: var(--shadow-md);
         }
+
         .notif-dropdown.show { display: block; }
+
         .notif-item {
-            padding: 0.6rem;
-            border-bottom: 1px solid #222;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
+            transition: var(--transition);
         }
-        .notif-item.unread { background: #1A2A1A; }
+
+        .notif-item:hover { background: var(--surface-hover); }
+        .notif-item.unread { background: var(--primary-light); }
+        .notif-item:last-child { border-bottom: none; }
+
         .container {
             max-width: 1100px;
-            margin: 1.5rem auto;
+            margin: 2rem auto;
             padding: 0 1.5rem;
         }
+
+        /* Cards */
         .card {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 20px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
         }
+
+        .card:hover {
+            border-color: var(--border-light);
+        }
+
         .poll-card {
-            background: #1A1A1A;
-            border-left: 3px solid #3B6E4F;
+            background: var(--surface-elevated);
+            border-left: 3px solid var(--primary);
         }
+
         .poll-option {
             display: block;
             margin: 0.5rem 0;
-            padding: 0.3rem 0.5rem;
-            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: 0.1s;
+            transition: var(--transition);
         }
+
         .poll-option:hover {
-            background: #252525;
+            background: var(--surface-hover);
         }
+
         .poll-results {
-            font-size: 0.75rem;
-            color: #A0A0A0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
             margin-top: 0.5rem;
         }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 0.8rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
         }
+
         .character-item {
-            background: #1A1A1A;
-            border-radius: 16px;
-            padding: 0.8rem;
-            border-left: 3px solid #3B6E4F;
+            background: var(--surface-elevated);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+            transition: var(--transition);
             word-wrap: break-word;
-            overflow-wrap: break-word;
-            overflow: auto;
-            max-height: 200px;
         }
-        button, .download-btn {
-            background: #3B6E4F;
+
+        .character-item:hover {
+            transform: translateY(-2px);
+            background: var(--surface-hover);
+        }
+
+        button, .btn {
+            background: var(--primary);
             border: none;
             border-radius: 40px;
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             color: white;
             font-weight: 500;
             cursor: pointer;
+            transition: var(--transition);
             font-size: 0.85rem;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
         }
-        .download-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-top: 0.8rem;
+
+        button:hover, .btn:hover {
+            background: var(--primary-hover);
+            transform: scale(1.02);
         }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface-elevated);
+            color: var(--text-primary);
+            transform: scale(1.02);
+        }
+
         .copy-btn {
-            background: #1A1A1A;
-            border: 1px solid #333;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
         }
+
+        .copy-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
         .social-links {
             display: flex;
             justify-content: center;
             gap: 1rem;
-            margin: 0.8rem 0;
+            margin: 1rem 0;
         }
+
         .social-links a {
-            color: #A0A0A0;
+            color: var(--text-tertiary);
             text-decoration: none;
             font-size: 0.8rem;
+            transition: var(--transition);
         }
+
+        .social-links a:hover {
+            color: var(--text-primary);
+        }
+
         .admin-link {
             text-align: center;
             margin-top: 0.8rem;
         }
-        .info-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
+
+        .admin-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.8rem;
         }
-        .info-modal-content {
-            background: #111;
-            border: 1px solid #3B6E4F;
-            border-radius: 28px;
-            padding: 2rem;
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            color: #E6E6E6;
-            position: relative;
-        }
-        .info-modal-content h2 {
-            font-weight: 500;
-            margin-bottom: 1rem;
-            color: #3B6E4F;
-        }
-        .info-modal-content p {
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-        .info-modal-close {
-            position: absolute;
-            top: 12px;
-            right: 18px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #888;
-        }
-        .info-modal-close:hover {
-            color: #E6E6E6;
-        }
-        .info-btn {
-            background: #3B6E4F;
-            border: none;
-            border-radius: 40px;
-            padding: 0.5rem 1.5rem;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
+
         .modal {
             display: none;
             position: fixed;
@@ -272,48 +336,103 @@
             align-items: center;
             z-index: 1000;
         }
+
         .modal-content {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 28px;
-            padding: 1.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            padding: 1.8rem;
             max-width: 450px;
             width: 90%;
+            animation: fadeInUp 0.2s ease;
         }
-        .modal-content input, .modal-content textarea {
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
             width: 100%;
-            background: #1A1A1A;
-            border: 1px solid #333;
-            border-radius: 14px;
-            padding: 0.6rem;
+            background: var(--surface-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 0.7rem;
             margin: 0.5rem 0;
-            color: white;
+            color: var(--text-primary);
+            font-family: inherit;
         }
+
+        .modal-content textarea {
+            resize: vertical;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 0.8rem;
             margin-top: 1rem;
         }
+
         .modal-buttons button {
             flex: 1;
-            background: #3B6E4F;
-            border: none;
-            border-radius: 40px;
-            padding: 0.5rem;
-            cursor: pointer;
-            color: white;
         }
+
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .info-modal-content {
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.2s ease;
+        }
+
+        .info-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-tertiary);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 680px) {
             .status-bar { flex-direction: column; align-items: stretch; }
             .status-left { justify-content: space-between; }
             .container { padding: 0 1rem; }
-            .download-group { flex-direction: column; }
-            .character-item { max-height: none; }
+            .grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-<div class="version">v3.4.1</div>
+<div class="version">v4.0.0</div>
 
 <div class="status-bar">
     <div class="status-left">
@@ -327,7 +446,7 @@
     </div>
     <div class="status-right">
         <a href="shop.html" class="nav-link">Магазин</a>
-        <a href="apply.html" class="nav-link">В команду проекта</a>
+        <a href="apply.html" class="nav-link">В команду</a>
         <button id="ticket-btn" class="nav-link">Поддержка</button>
         <a href="#" id="my-profile-link" class="nav-link">Профиль</a>
         <div class="notif-icon">
@@ -335,7 +454,7 @@
             <span id="notif-badge" class="notif-badge" style="display:none;">0</span>
             <div id="notif-dropdown" class="notif-dropdown"></div>
         </div>
-        <button id="logout-btn" class="nav-link">Выход</button>
+        <button id="logout-btn" class="nav-link">Выйти</button>
     </div>
 </div>
 
@@ -343,34 +462,34 @@
     <div id="poll-widget"></div>
 
     <div class="card">
-        <a href="character.html" style="text-decoration: none;"><button id="create-char-btn" style="width:100%;">Создать персонажа</button></a>
+        <a href="character.html" style="text-decoration: none;"><button style="width:100%;">Создать персонажа</button></a>
     </div>
 
     <div class="card">
-        <h3 style="font-weight:500; margin-bottom:0.6rem;">Мои персонажи</h3>
+        <h3 style="font-weight:600; margin-bottom:1rem;">Мои персонажи</h3>
         <div id="my-characters" class="grid"></div>
-        <div id="char-counter" style="font-size:0.75rem; margin-top:0.5rem; color:#888;"></div>
+        <div id="char-counter" style="font-size:0.75rem; margin-top:0.8rem; color:var(--text-tertiary);"></div>
     </div>
 
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span>play.rp-minecraft.ru</span>
-            <button id="copy-ip-btn" class="copy-btn">Копировать</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <span style="font-weight:500;">play.rp-minecraft.ru</span>
+            <button id="copy-ip-btn" class="btn-outline" style="padding:0.4rem 1rem;">Копировать</button>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="font-weight:500;">Сборка модов</h3>
-        <p style="font-size:0.8rem; margin-top:0.2rem;">Forge 1.20.1 | Omega RolePlay Modpack</p>
-        <div class="download-group">
-            <a href="https://drive.google.com/your-google-drive-link" class="download-btn" target="_blank">Google Диск</a>
-            <a href="https://disk.yandex.ru/your-yandex-link" class="download-btn" target="_blank">Яндекс.Диск</a>
-            <a href="https://www.mediafire.com/your-mediafire-link" class="download-btn" target="_blank">MediaFire</a>
+        <h3 style="font-weight:600; margin-bottom:0.3rem;">Сборка модов</h3>
+        <p style="font-size:0.8rem; color:var(--text-tertiary); margin-bottom:1rem;">Forge 1.20.1</p>
+        <div style="display:flex; flex-wrap:wrap; gap:0.8rem;">
+            <a href="#" class="btn-outline" style="padding:0.4rem 1rem; text-decoration:none;">Google Диск</a>
+            <a href="#" class="btn-outline" style="padding:0.4rem 1rem; text-decoration:none;">Яндекс.Диск</a>
+            <a href="#" class="btn-outline" style="padding:0.4rem 1rem; text-decoration:none;">MediaFire</a>
         </div>
     </div>
 
     <div class="card" style="text-align:center;">
-        <a href="lore.html" style="color:#3B6E4F; text-decoration:none;">Лор проекта</a>
+        <a href="lore.html" style="color:var(--primary); text-decoration:none;">Лор проекта</a>
     </div>
 
     <div class="social-links">
@@ -380,30 +499,26 @@
     <div id="admin-link-place" class="admin-link"></div>
 </div>
 
-<!-- Информационное окно (один раз) -->
 <div id="info-modal" class="info-modal">
     <div class="info-modal-content">
         <span class="info-modal-close" id="close-info-modal">&times;</span>
-        <h2>Omega RolePlay</h2>
-        <p><strong>Minecraft RolePlay проект</strong></p>
-        <p>Игра проходит сессиями несколько раз в неделю. Мы ценим качественный отыгрыш, умение создавать историю для себя и других.</p>
-        <p>Формат: <strong>голосовой чат + текст</strong> (по ситуации).</p>
-        <p>Присоединяйся, создай персонажа и начни свою историю в Хаймфеле.</p>
-        <button class="info-btn" id="info-got-it">Понятно</button>
+        <h2 style="margin-bottom:1rem;">Omega RolePlay</h2>
+        <p style="margin-bottom:0.8rem;">Minecraft RP проект</p>
+        <p style="margin-bottom:0.8rem; color:var(--text-secondary);">Сессионный формат, голосовой чат + текст, упор на качественный отыгрыш</p>
+        <button id="info-got-it" style="margin-top:0.5rem;">Понятно</button>
     </div>
 </div>
 
-<!-- модалка тикета -->
 <div id="ticket-modal" class="modal">
     <div class="modal-content">
-        <h3>Обращение в поддержку</h3>
+        <h3>Поддержка</h3>
         <input type="text" id="ticket-subject" placeholder="Тема">
         <textarea id="ticket-message" rows="4" placeholder="Опишите проблему"></textarea>
         <div class="modal-buttons">
             <button id="submit-ticket">Отправить</button>
             <button id="close-ticket-modal">Отмена</button>
         </div>
-        <div id="ticket-error" style="color:#e06c6c; margin-top:0.5rem;"></div>
+        <div id="ticket-error" style="color:var(--error); margin-top:0.5rem;"></div>
     </div>
 </div>
 
@@ -537,7 +652,7 @@
     document.addEventListener('click', () => notifDropdown.classList.remove('show'));
     logoutBtn.onclick = async () => { await setOnlineStatus(false); await signOut(auth); window.location.href = 'index.html'; };
 
-    // Информационное окно (один раз)
+    // Info modal (один раз)
     const infoModal = document.getElementById('info-modal');
     const closeInfo = document.getElementById('close-info-modal');
     const gotItBtn = document.getElementById('info-got-it');
@@ -565,7 +680,7 @@
                 adminLink.textContent = 'Админ-панель';
                 adminLink.style.display = 'block';
                 adminLink.style.marginTop = '0.8rem';
-                adminLink.style.color = '#3B6E4F';
+                adminLink.style.color = 'var(--primary)';
                 document.getElementById('admin-link-place').appendChild(adminLink);
             }
         }
