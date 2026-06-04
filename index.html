@@ -3,556 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Omega RolePlay — вход в систему">
-    <title>Omega RolePlay — вход</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <title>Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #3B6E4F;
-            --primary-hover: #4D8A66;
-            --primary-light: rgba(59, 110, 79, 0.12);
-            --background: #0A0A0A;
-            --surface: #111111;
-            --surface-elevated: #1A1A1A;
-            --text-primary: #E6E6E6;
-            --text-secondary: #A0A0A0;
-            --text-tertiary: #6B6B6B;
-            --border: #222222;
-            --border-light: #2C2C2C;
-            --error: #E06C6C;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --radius-xl: 28px;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
-            --transition: all 0.2s cubic-bezier(0.2,0,0,1);
+            --bg:          #141618;
+            --bg-deep:     #0f1011;
+            --surface:     #1c1e21;
+            --surface-2:   #222528;
+            --surface-3:   #2a2d31;
+            --border:      rgba(255,255,255,0.07);
+            --border-mid:  rgba(255,255,255,0.11);
+            --border-hi:   rgba(255,255,255,0.18);
+            --accent:      #4ade80;
+            --accent-dim:  #22c55e;
+            --accent-mute: rgba(74,222,128,0.10);
+            --text:        #f0f0f0;
+            --text-2:      #9ca3af;
+            --text-3:      #4b5563;
+            --red:         #f87171;
+            --radius:      14px;
+            --radius-lg:   20px;
+            --ease-out:    cubic-bezier(.16,1,.3,1);
         }
-        
+        html { height: 100%; }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+        }
+        /* ── LEFT ── */
+        .left-panel {
             position: relative;
-            background-image: radial-gradient(circle at 15% 30%, rgba(59,110,79,0.03) 0%, transparent 50%);
-        }
-        
-        .version {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
-            background: rgba(0,0,0,0.5);
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            z-index: 100;
-        }
-        
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-xl);
-            padding: 2rem;
-            width: 100%;
-            max-width: 440px;
-            box-shadow: var(--shadow-md);
-            transition: transform 0.2s;
-        }
-        
-        .card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .logo p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.3rem;
-        }
-        
-        .google-btn {
-            width: 100%;
-            background: var(--surface-elevated);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-lg);
-            padding: 0.75rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: var(--transition);
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1.2rem;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3rem;
+            background: var(--bg-deep);
+            overflow: hidden;
         }
-        
-        .google-btn:hover {
-            border-color: var(--primary);
-            background: rgba(59,110,79,0.08);
-            transform: scale(1.01);
-        }
-        
-        .divider {
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            margin: 1rem 0;
-            position: relative;
-        }
-        
-        .divider::before,
-        .divider::after {
+        .left-panel::before {
             content: '';
             position: absolute;
-            top: 50%;
-            width: 35%;
-            height: 1px;
-            background: var(--border);
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 20% 10%, rgba(74,222,128,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 80% 90%, rgba(74,222,128,0.03) 0%, transparent 55%);
+            pointer-events: none;
         }
-        
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
-        
-        .field {
-            margin-bottom: 1.2rem;
+        .left-brand { position: relative; z-index: 1; animation: fadeUp .7s var(--ease-out) both; }
+        .brand-logo { display: flex; align-items: center; gap: .6rem; }
+        .brand-mark {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 0 1px rgba(74,222,128,0.3), 0 8px 24px rgba(74,222,128,0.18);
         }
-        
-        label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 0.4rem;
+        .brand-mark svg { width: 18px; height: 18px; fill: #0f1011; }
+        .brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.35rem; color: var(--text); }
+        .left-hero { position: relative; z-index: 1; animation: fadeUp .7s .12s var(--ease-out) both; }
+        .left-hero h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: clamp(2rem, 3.2vw, 3rem);
+            font-weight: 400; line-height: 1.15; letter-spacing: -.02em;
+            color: var(--text); margin-bottom: 1.2rem;
         }
-        
-        input {
-            width: 100%;
-            background: var(--surface-elevated);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            outline: none;
-            transition: var(--transition);
+        .left-hero h2 em { font-style: italic; color: var(--accent); }
+        .left-hero p { font-size: .95rem; line-height: 1.7; color: var(--text-2); max-width: 380px; font-weight: 300; }
+        .features { position: relative; z-index: 1; display: flex; flex-direction: column; gap: .7rem; animation: fadeUp .7s .22s var(--ease-out) both; }
+        .feature { display: flex; align-items: center; gap: .8rem; }
+        .feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .6; flex-shrink: 0; }
+        .feature span { font-size: .82rem; color: var(--text-3); font-weight: 400; }
+        /* ── RIGHT ── */
+        .right-panel {
+
+
+position: relative;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2.5rem 3rem;
+            background: var(--bg);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
         }
-        
-        input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+        .right-panel::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            pointer-events: none;
         }
-        
-        .error {
-            color: var(--error);
-            font-size: 0.7rem;
-            margin-top: 0.3rem;
-            display: none;
+        .form-wrap { width: 100%; max-width: 380px; animation: fadeUp .6s .1s var(--ease-out) both; }
+        .form-header { margin-bottom: 2rem; }
+        .form-header h1 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.85rem; font-weight: 400; letter-spacing: -.025em;
+            color: var(--text); margin-bottom: .4rem; line-height: 1.2;
         }
-        
-        button[type="submit"] {
-            width: 100%;
-            background: var(--primary);
-            border: none;
-            border-radius: var(--radius-lg);
-            padding: 0.75rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: var(--transition);
+        .form-header p { font-size: .875rem; color: var(--text-2); font-weight: 300; }
+        .google-btn {
+            width: 100%; background: var(--surface); border: 1px solid var(--border-mid);
+            border-radius: var(--radius); padding: .8rem 1rem;
+            font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500;
+            color: var(--text); cursor: pointer;
+            transition: background .18s, border-color .18s, transform .15s;
+            display: flex; align-items: center; justify-content: center; gap: .55rem;
+            margin-bottom: 1.4rem;
         }
-        
-        button[type="submit"]:hover {
-            background: var(--primary-hover);
-            transform: scale(1.01);
+        .google-btn:hover { background: var(--surface-2); border-color: var(--border-hi); transform: translateY(-1px); }
+        .google-btn:active { transform: translateY(0); }
+        .divider {
+            display: flex; align-items: center; gap: .9rem;
+            margin: 0 0 1.4rem; font-size: .78rem; color: var(--text-3);
         }
-        
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .field { margin-bottom: 1rem; }
+        label { display: block; font-size: .8rem; font-weight: 500; color: var(--text-2); margin-bottom: .45rem; }
+        input[type="text"], input[type="password"] {
+            width: 100%; background: var(--surface); border: 1px solid var(--border-mid);
+            border-radius: var(--radius); padding: .78rem 1rem;
+            font-family: 'DM Sans', sans-serif; font-size: .925rem; color: var(--text);
+            outline: none; transition: border-color .18s, background .18s, box-shadow .18s;
+            -webkit-appearance: none;
+        }
+        input[type="text"]::placeholder, input[type="password"]::placeholder { color: var(--text-3); }
+        input[type="text"]:hover, input[type="password"]:hover { border-color: var(--border-hi); background: var(--surface-2); }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: rgba(74,222,128,.45); background: var(--surface-2);
+            box-shadow: 0 0 0 3px var(--accent-mute);
+        }
+        .error { color: var(--red); font-size: .75rem; margin-top: .35rem; display: none; }
+        .btn-primary {
+            width: 100%; background: var(--accent); border: none;
+            border-radius: var(--radius); padding: .82rem 1rem;
+            font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
+            color: #0f1011; cursor: pointer;
+            transition: background .18s, transform .15s, box-shadow .18s;
+            margin-top: .3rem; box-shadow: 0 4px 16px rgba(74,222,128,.22);
+        }
+        .btn-primary:hover { background: #6bef96; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(74,222,128,.32); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        .toggle-line { text-align: center; font-size: .83rem; color: var(--text-2); margin-top: 1.3rem; }
         .register-link {
-            color: var(--primary);
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
+            color: var(--accent); cursor: pointer; font-weight: 500;
+
+
+border-bottom: 1px solid transparent; transition: border-color .15s;
         }
-        
-        .register-link:hover {
-            color: var(--primary-hover);
+        .register-link:hover { border-bottom-color: var(--accent-dim); }
+        #register-block { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .4s var(--ease-out), opacity .3s ease; }
+        #register-block.open { max-height: 600px; opacity: 1; }
+        .register-inner { padding-top: 1.2rem; border-top: 1px solid var(--border); margin-top: 1.2rem; }
+        .register-inner h3 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.1rem; font-weight: 400; color: var(--text); margin-bottom: 1rem; }
+        .captcha-row {
+            display: flex; align-items: center; gap: .8rem;
+            background: var(--surface); border: 1px solid var(--border-mid);
+            border-radius: var(--radius); padding: .65rem 1rem; margin-bottom: .25rem;
         }
-        
-        .captcha-block {
-            background: var(--surface-elevated);
-            border-radius: var(--radius-md);
-            padding: 0.6rem;
-            margin: 1rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        
-        .captcha-block span {
-            font-size: 0.9rem;
-        }
-        
-        .captcha-block input {
-            width: 70px;
-            text-align: center;
-            padding: 0.5rem;
-        }
-        
+        .captcha-expr { font-size: .9rem; font-weight: 500; color: var(--text-2); white-space: nowrap; }
+        .captcha-row input { width: 70px; border: none; background: var(--surface-3); border-radius: 8px; padding: .45rem .6rem; text-align: center; font-size: .9rem; box-shadow: none; }
+        .captcha-row input:focus { box-shadow: 0 0 0 2px var(--accent-mute); border-color: transparent; }
+        .version { position: fixed; bottom: 1rem; right: 1.2rem; font-size: .68rem; color: var(--text-3); z-index: 100; }
+        /* Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.7); backdrop-filter: blur(16px);
+            z-index: 1000; justify-content: center; align-items: center; padding: 1.5rem;
         }
-        
-        .modal-content {
-            background: var(--surface);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-xl);
-            padding: 1.8rem;
-            max-width: 380px;
-            width: 90%;
-            text-align: center;
-            animation: fadeInUp 0.2s ease;
+        .modal-card {
+            background: var(--surface); border: 1px solid var(--border-hi);
+            border-radius: var(--radius-lg); padding: 2rem; max-width: 360px; width: 100%;
+            text-align: center; animation: scaleIn .25s var(--ease-out) both;
+            box-shadow: 0 32px 80px rgba(0,0,0,.5);
         }
-        
-        .modal-content h3 {
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-        
-        .modal-content input {
-            margin: 1rem 0;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-        
-        .modal-buttons button {
-            padding: 0.5rem 1.2rem;
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-        }
-        
-        #modal-submit {
-            background: var(--primary);
-            border: none;
-            color: white;
-        }
-        
+        .modal-card h3 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.3rem; font-weight: 400; color: var(--text); margin-bottom: .5rem; }
+        .modal-card p { font-size: .83rem; color: var(--text-2); margin-bottom: 1.3rem; font-weight: 300; }
+        .modal-card input { margin-bottom: .4rem; }
+        .modal-btns { display: flex; gap: .7rem; margin-top: 1.2rem; }
+        .modal-btns .btn-primary { flex: 1; }
         #modal-cancel {
-            background: none;
-            border: 1px solid var(--border-light);
-            color: var(--text-secondary);
+            flex: 1; background: transparent; border: 1px solid var(--border-mid);
+            border-radius: var(--radius); padding: .82rem 1rem;
+            font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500;
+            color: var(--text-2); cursor: pointer; transition: background .15s, border-color .15s;
         }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        #modal-cancel:hover { background: var(--surface-2); border-color: var(--border-hi); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        max-width: 860px {
+            body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow-y: auto; }
+            .left-panel { padding: 2rem 2rem 2.5rem; border-bottom: 1px solid var(--border); }
+            .left-hero h2 { font-size: 1.9rem; }
+            .right-panel { border-left: none; padding: 2.5rem 1.5rem 3rem; }
         }
-        
-        @media (max-width: 480px) {
-            .card { padding: 1.5rem; }
+        max-width: 480px {
+            .left-panel { padding: 1.5rem 1.25rem 2rem; }
+            .right-panel { padding: 2rem 1.25rem 2.5rem; }
         }
     </style>
 </head>
 <body>
+<div class="left-panel">
+    <div class="left-brand">
+        <div class="brand-logo">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.8 1.56 5.24 3.87 6.54L8 20h2.5v-1c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v1H16l-.87-4.46C17.44 14.
+
+
+24 19 11.8 19 9c0-3.87-3.13-7-7-7z"/></svg>
+            </div>
+            <span class="brand-name">Omega</span>
+        </div>
+    </div>
+    <div class="left-hero">
+        <h2>Твоя история
+начинается <em>здесь</em></h2>
+        <p>Погрузись в живой мир ролевого сервера. Создай персонажа, найди своё место и стань частью сообщества.</p>
+    </div>
+    <div class="features">
+        <div class="feature"><div class="feature-dot"></div><span>Живое сообщество игроков</span></div>
+        <div class="feature"><div class="feature-dot"></div><span>Глубокий лор и атмосфера</span></div>
+        <div class="feature"><div class="feature-dot"></div><span>Уникальные роли и персонажи</span></div>
+    </div>
+</div>
+<div class="right-panel">
+    <div class="form-wrap">
+        <div class="form-header">
+            <h1>Войти</h1>
+            <p>Введите ник и пароль или войдите через Google</p>
+        </div>
+        <button id="google-login" class="google-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Продолжить с Google
+        </button>
+        <div class="divider">или</div>
+        <div id="login-form">
+            <div class="field">
+                <label>Ник в Minecraft</label>
+                <input type="text" id="login-nick" placeholder="ваш ник" autocomplete="username">
+                <div class="error" id="nick-error"></div>
+            </div>
+            <div class="field">
+                <label>Пароль</label>
+                <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+                <div class="error" id="pass-error"></div>
+            </div>
+            <button id="login-btn" class="btn-primary">Войти</button>
+        </div>
+        <div class="toggle-line">
+            Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span>
+        </div>
+        <div id="register-block">
+            <div class="register-inner">
+                <h3>Создать аккаунт</h3>
+                <div class="field">
+                    <label>Придумайте ник</label>
+                    <input type="text" id="reg-nick" placeholder="латиница, цифры, _">
+                    <div class="error" id="reg-nick-error"></div>
+                </div>
+                <div class="field">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-pass" placeholder="минимум 8 символов">
+                    <div class="error" id="reg-pass-error"></div>
+                </div>
+                <div class="field">
+                    <label>Подтверждение</label>
+                    <div class="captcha-row">
+                        <span class="captcha-expr" id="captcha-question"></span>
+                        <input type="text" id="captcha-answer" placeholder="?">
+                    </div>
+                    <div class="error" id="captcha-error">Неверный ответ</div>
+                </div>
+                <button id="register-btn" class="btn-primary">Создать аккаунт</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="version">v4.0.0</div>
-<div class="card">
-    <div class="logo">
-        <h1>Omega</h1>
-        <p>Твоя история начинается здесь</p>
-    </div>
-
-    <button id="google-login" class="google-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Google
-    </button>
-
-    <div class="divider">или</div>
-
-    <div>
-        <div class="field">
-            <label>Ник в Minecraft</label>
-            <input type="text" id="login-nick" placeholder="ваш ник">
-            <div class="error" id="nick-error"></div>
-        </div>
-        <div class="field">
-            <label>Пароль</label>
-            <input type="password" id="login-pass" placeholder="••••••••">
-            <div class="error" id="pass-error"></div>
-        </div>
-        <button type="submit" id="login-btn">Войти</button>
-    </div>
-
-    <div class="divider" style="margin-top:1.2rem;">
-        Нет аккаунта? <span id="show-register" class="register-link">Регистрация</span>
-    </div>
-
-    <div id="register-block" style="display:none; margin-top:1rem;">
-        <div class="field">
-            <label>Придумайте ник</label>
-            <input type="text" id="reg-nick" placeholder="ник">
-            <div class="error" id="reg-nick-error"></div>
-        </div>
-        <div class="field">
-            <label>Пароль (мин. 8 символов)</label>
-            <input type="password" id="reg-pass" placeholder="••••••••">
-            <div class="error" id="reg-pass-error"></div>
-        </div>
-        <div class="captcha-block">
-            <span id="captcha-question"></span>
-            <input type="text" id="captcha-answer" placeholder="?">
-        </div>
-        <div class="error" id="captcha-error"></div>
-        <button id="register-btn">Зарегистрироваться</button>
-    </div>
-</div>
-
 <div id="nickname-modal" class="modal">
-    <div class="modal-content">
-        <h3>Введите ваш ник в Minecraft</h3>
-        <input type="text" id="modal-nick" placeholder="ник" autocomplete="off">
-        <div class="error" id="modal-error" style="margin-top:0.5rem;"></div>
-        <div class="modal-buttons">
-            <button id="modal-submit">Подтвердить</button>
-            <button id="modal-cancel">Отмена</button>
-        </div>
-    </div>
-</div>
+    <div class="modal-card">
+        <h3>Один момент</h3>
+        <p>Укажите ваш ник в Minecraft для привязки аккаунта Google</p>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",
-        authDomain: "omega-5de05.firebaseapp.com",
-        projectId: "omega-5de05",
-        storageBucket: "omega-5de05.firebasestorage.app",
-        messagingSenderId: "438319801454",
-        appId: "1:438319801454:web:775924ab8ef4417760b27f"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-
-    let captchaNum1, captchaNum2;
-    function generateCaptcha() {
-        captchaNum1 = Math.floor(Math.random() * 10) + 1;
-        captchaNum2 = Math.floor(Math.random() * 10) + 1;
-        document.getElementById('captcha-question').textContent = `${captchaNum1} + ${captchaNum2} = ?`;
-        document.getElementById('captcha-answer').value = '';
-    }
-    generateCaptcha();
-
-    document.getElementById('show-register').onclick = () => {
-        const block = document.getElementById('register-block');
-        block.style.display = block.style.display === 'none' ? 'block' : 'none';
-    };
-
-    async function createProfile(userId, nickname, email) {
-        await setDoc(doc(db, "profiles", userId), {
-            nickname: nickname,
-            nickname_lower: nickname.toLowerCase(),
-            email: email,
-            createdAt: new Date(),
-            role: "user",
-            rp_points: 0,
-            settings: { email_notifications: true, theme: "dark" },
-            isOnline: false,
-            lastSeen: serverTimestamp()
-        });
-    }
-
-    document.getElementById('register-btn').addEventListener('click', async () => {
-        const nick = document.getElementById('reg-nick').value.trim();
-        const pass = document.getElementById('reg-pass').value;
-        const answer = document.getElementById('captcha-answer').value.trim();
-        const nickErr = document.getElementById('reg-nick-error');
-        const passErr = document.getElementById('reg-pass-error');
-        const captchaErr = document.getElementById('captcha-error');
-        nickErr.style.display = 'none';
-        passErr.style.display = 'none';
-        captchaErr.style.display = 'none';
-
-        if (parseInt(answer) !== captchaNum1 + captchaNum2) {
-            captchaErr.style.display = 'block';
-            generateCaptcha();
-            return;
-        }
-        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
-        if (pass.length < 8) { passErr.style.display = 'block'; return; }
-
-        const btn = document.getElementById('register-btn');
-        btn.disabled = true;
-        btn.textContent = 'Проверка...';
-        try {
-            const profilesRef = collection(db, "profiles");
-            const q = query(profilesRef, where("nickname_lower", "==", nick.toLowerCase()));
-            const existing = await getDocs(q);
-            if (!existing.empty) {
-                nickErr.textContent = 'Ник уже занят';
-                nickErr.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Зарегистрироваться';
-                generateCaptcha();
-                return;
-            }
-            const email = `user_${nick.toLowerCase()}@rp.local`;
-            const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-            await createProfile(userCred.user.uid, nick, email);
-        } catch (error) {
-            nickErr.textContent = error.message;
-            nickErr.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Зарегистрироваться';
-            generateCaptcha();
-        }
-    });
-
-    document.getElementById('login-btn').addEventListener('click', async () => {
-        const nick = document.getElementById('login-nick').value.trim();
-        const pass = document.getElementById('login-pass').value;
-        const nickErr = document.getElementById('nick-error');
-        const passErr = document.getElementById('pass-error');
-        nickErr.style.display = 'none';
-        passErr.style.display = 'none';
-        if (!nick) { nickErr.textContent = 'Введите ник'; nickErr.style.display = 'block'; return; }
-        if (!pass) { passErr.textContent = 'Введите пароль'; passErr.style.display = 'block'; return; }
-        const email = `user_${nick.toLowerCase()}@rp.local`;
-        try {
-            const userCred = await signInWithEmailAndPassword(auth, email, pass);
-            const profileRef = doc(db, "profiles", userCred.user.uid);
-            const profileSnap = await getDoc(profileRef);
-            if (!profileSnap.exists()) {
-                await createProfile(userCred.user.uid, nick, email);
-            } else {
-                await updateDoc(profileRef, { lastSeen: serverTimestamp() });
-            }
-        } catch (error) {
-            if (error.code === 'auth/user-not-found') {
-                nickErr.textContent = 'Пользователь не найден';
-                nickErr.style.display = 'block';
-            } else if (error.code === 'auth/wrong-password') {
-                passErr.style.display = 'block';
-            } else {
-                nickErr.textContent = error.message;
-                nickErr.style.display = 'block';
-            }
-        }
-    });
-
-    let pendingGoogleUser = null;
-    document.getElementById('google-login').addEventListener('click', async () => {
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            const profileRef = doc(db, "profiles", user.uid);
-            const profileSnap = await getDoc(profileRef);
-            if (profileSnap.exists()) {
-                await updateDoc(profileRef, { lastSeen: serverTimestamp() });
-                return;
-            }
-            pendingGoogleUser = user;
-            const modal = document.getElementById('nickname-modal');
-            const input = document.getElementById('modal-nick');
-            const errorSpan = document.getElementById('modal-error');
-            input.value = '';
-            errorSpan.style.display = 'none';
-            modal.style.display = 'flex';
-        } catch (error) {
-            alert("Ошибка: " + error.message);
-        }
-    });
-
-    document.getElementById('modal-submit').addEventListener('click', async () => {
-        const nickname = document.getElementById('modal-nick').value.trim();
-        const errorSpan = document.getElementById('modal-error');
-        errorSpan.style.display = 'none';
-        if (!nickname) {
-            errorSpan.textContent = 'Введите ник';
-            errorSpan.style.display = 'block';
-            return;
-        }
-        if (!/^[a-zA-Z0-9_]{3,16}$/.test(nickname)) {
-            errorSpan.textContent = 'От 3 до 16 символов (латиница, цифры, _)';
-            errorSpan.style.display = 'block';
-            return;
-        }
-        const profilesRef = collection(db, "profiles");
-        const q = query(profilesRef, where("nickname_lower", "==", nickname.toLowerCase()));
-        const existing = await getDocs(q);
-        if (!existing.empty) {
-            errorSpan.textContent = 'Этот ник уже занят';
-            errorSpan.style.display = 'block';
-            return;
-        }
-        if (!pendingGoogleUser) return;
-        await createProfile(pendingGoogleUser.uid, nickname, pendingGoogleUser.email);
-        document.getElementById('nickname-modal').style.display = 'none';
-        pendingGoogleUser = null;
-    });
-
-    document.getElementById('modal-cancel').addEventListener('click', async () => {
-        if (pendingGoogleUser) await signOut(auth);
-        document.getElementById('nickname-modal').style.display = 'none';
-        pendingGoogleUser = null;
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            await updateDoc(doc(db, "profiles", user.uid), { lastSeen: serverTimestamp() }).catch(() => {});
-            window.location.href = 'server.html';
-        }
-    });
-</script>
-</body>
-</html>
