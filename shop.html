@@ -3,7 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Магазин — Omega RolePlay</title><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Магазин — Omega RolePlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg:#141618; --surface:#1c1e21; --surface-2:#222528; --surface-3:#2a2d31;
+            --border:rgba(255,255,255,0.07); --border-mid:rgba(255,255,255,0.11); --border-hi:rgba(255,255,255,0.18);
+            --accent:#4ade80; --accent-dim:#22c55e; --accent-mute:rgba(74,222,128,0.10);
+            --text:#f0f0f0; --text-2:#9ca3af; --text-3:#4b5563;
+            --yellow:#fbbf24; --red:#f87171; --radius:14px; --radius-lg:20px; --ease-out:cubic-bezier(.16,1,.3,1);
+        }
+        body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+        .navbar { background:rgba(20,22,24,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:.75rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; position:sticky; top:0; z-index:50; flex-wrap:wrap; }
+        .brand-logo { display:flex; align-items:center; gap:.55rem; text-decoration:none; }
+        .brand-mark { width:30px; height:30px; background:linear-gradient(135deg,var(--accent),var(--accent-dim)); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+        .brand-mark svg { width:15px; height:15px; fill:#0f1011; }
+        .brand-name { font-family:'DM Serif Display',Georgia,serif; font-size:1.15rem; color:var(--text); }
+        .navbar-right { display:flex; align-items:center; gap:.8rem; }
+        .balance-pill { background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:.35rem .9rem; font-size:.8rem; color:var(--yellow); font-weight:500; display:flex; align-items:center; gap:.4rem; }
+        .back-link { color:var(--text-2); text-decoration:none; font-size:.85rem; transition:color .15s; }
+        .back-link:hover { color:var(--text); }
+        .container { max-width:1040px; margin:2.5rem auto; padding:0 1.5rem; }
+        .page-header { margin-bottom:2rem; }
+        .page-header h1 { font-family:'DM Serif Display',Georgia,serif; font-size:2rem; font-weight:400; letter-spacing:-.02em; color:var(--text); margin-bottom:.4rem; }
+        .page-header p { font-size:.88rem; color:var(--text-2); font-weight:300; }
+        .shop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+        .item-card {
+            background:var(--surface); border:1px solid var(--border);
+            border-radius:var(--radius-lg); padding:1.5rem;
+            transition:border-color .18s, transform .18s;
+            display:flex; flex-direction:column;
+        }
+        .item-card:hover { border-color:var(--border-mid); transform:translateY(-2px); }
+        .item-name { font-size:1rem; font-weight:500; color:var(--text); margin-bottom:.4rem; }
+        .item-desc { font-size:.78rem; color:var(--text-3); line-height:1.6; flex:1; margin-bottom:1rem; }
+        .item-footer { display:flex; align-items:center; justify-content:space-between; gap:.8rem; }
+        .item-price { font-size:.95rem; font-weight:600; color:var(--yellow); }
+        .btn-buy {
+            background:var(--accent); border:none; border-radius:999px;
+            padding:.45rem 1.1rem; font-family:'DM Sans',sans-serif;
+            font-size:.82rem; font-weight:600; color:#0f1011; cursor:pointer;
+            transition:background .18s,transform .15s; box-shadow:0 2px 8px rgba(74,222,128,.2);
+            flex-shrink:0;
+        }
+        .btn-buy:hover { background:#6bef96; transform:translateY(-1px); }
+        .btn-buy:disabled { background:var(--surface-3); color:var(--text-3); cursor:not-allowed; box-shadow:none; transform:none; }
+        .empty-state { grid-column:1/-1; text-align:center; padding:4rem 2rem; color:var(--text-3); font-size:.9rem; }
+        /* Toast */
+        .toast {
+            position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(10px);
+            background:var(--surface); border:1px solid var(--border-hi);
+            border-radius:999px; padding:.6rem 1.4rem; font-size:.85rem; font-weight:500;
+            box-shadow:0 8px 32px rgba(0,0,0,.4); z-index:200;
+            opacity:0; transition:all .3s var(--ease-out); pointer-events:none;
+        }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.success { color:var(--accent); border-color:rgba(74,222,128,.25); }
+        .toast.error { color:var(--red); border-color:rgba(248,113,113,.2); }
+        .version { position:fixed; bottom:1rem; right:1.2rem; font-size:.68rem; color:var(--text-3); z-index:100; }
+        @media(max-width:640px) { .container{padding:0 1rem;} .shop-grid{grid-template-columns:1fr 1fr;} }
+        @media(max-width:400px) { .shop-grid{grid-template-columns:1fr;} }
+    </style>
+</head>
+<body>
+<div class="version">v4.0.0</div>
+<nav class="navbar">
+    <a href="server.html" class="brand-logo">
+        <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.8 1.56 5.24 3.87 6.54L8 20h2.5v-1c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v1H16l-.87-4.46C17.44 14.24 19 11.8 19 9c0-3.87-3.13-7-7-7z"/></svg></div>
+        <span class="brand-name">Omega</span>
+    </a>
+    <div class="navbar-right">
+        <div class="balance-pill">⬡ <span id="user-points">0</span></div>
+        <a href="server.html" class="back-link">← Назад</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Магазин</h1>
+        <p>Тратьте заработанные монеты на улучшения и привилегии</p>
+    </div>
+    <div id="shop-items" class="shop-grid">
+        <div class="empty-state">Загрузка товаров…</div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, addDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    const firebaseConfig={apiKey:"AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",authDomain:"omega-5de05.firebaseapp.com",projectId:"omega-5de05",storageBucket:"omega-5de05.firebasestorage.app",messagingSenderId:"438319801454",appId:"1:438319801454:web:775924ab8ef4417760b27f"};
+    const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app);
+    let currentUser=null;
+    function showToast(text,type='success'){const t=document.getElementById('toast');t.textContent=text;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);}
+    function esc(s){return s?s.replace(/[&<>]/g,m=>m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'):'';}
+    async function loadBalance(){if(!currentUser)return;const p=await getDoc(doc(db,"profiles",currentUser.uid));document.getElementById('user-points').innerText=p.exists()?(p.data().rp_points||0):0;}
+    async function loadShop(){
+        const snap=await getDocs(collection(db,"shop_items")),container=document.getElementById('shop-items');
+        if(snap.empty){container.innerHTML='<div class="empty-state">Товаров пока нет</div>';return;}
+        container.innerHTML='';
+        for(const ds of snap.docs){
+            const item=ds.data(),div=document.createElement('div');div.className='item-card';
+            div.innerHTML=`<div class="item-name">${esc(item.name)}</div><div class="item-desc">${esc(item.description)}</div><div class="item-footer"><span class="item-price">⬡ ${item.price}</span><button class="btn-buy" data-id="${ds.id}" data-price="${item.price}" data-name="${esc(item.name)}">Купить</button></div>`;
+            container.appendChild(div);
+        }
+        container.querySelectorAll('.btn-buy').forEach(btn=>{
+            btn.addEventListener('click',async()=>{
+                const price=parseInt(btn.dataset.price),itemId=btn.dataset.id,itemName=btn.dataset.name;
+                const profileRef=doc(db,"profiles",currentUser.uid),p=await getDoc(profileRef),pts=p.data().rp_points||0;
+                if(pts<price){showToast('Недостаточно монет','error');return;}
+                btn.disabled=true;
+                await updateDoc(profileRef,{rp_points:increment(-price)});
+                await addDoc(collection(db,"purchases"),{userId:currentUser.uid,itemId,purchasedAt:serverTimestamp(),used:false});
+                showToast(`Куплено: ${itemName}`,'success');
+                loadBalance();btn.disabled=false;
+            });
+        });
+    }
+    onAuthStateChanged(auth,(user)=>{if(!user){window.location.href='index.html';return;}currentUser=user;loadBalance();loadShop();});
+</script>
+</body>
+</html>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
