@@ -6,223 +6,91 @@
     <title>Omega RolePlay</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --bg:          #141618;
-            --bg-deep:     #0f1011;
-            --surface:     #1c1e21;
-            --surface-2:   #222528;
-            --surface-3:   #2a2d31;
-            --border:      rgba(255,255,255,0.07);
-            --border-mid:  rgba(255,255,255,0.11);
-            --border-hi:   rgba(255,255,255,0.18);
-            --accent:      #4ade80;
-            --accent-dim:  #22c55e;
-            --accent-mute: rgba(74,222,128,0.10);
-            --text:        #f0f0f0;
-            --text-2:      #9ca3af;
-            --text-3:      #4b5563;
-            --red:         #f87171;
-            --radius:      14px;
-            --radius-lg:   20px;
-            --ease-out:    cubic-bezier(.16,1,.3,1);
+            --bg:#141618; --bg-deep:#0f1011; --surface:#1c1e21; --surface-2:#222528; --surface-3:#2a2d31;
+            --border:rgba(255,255,255,0.07); --border-mid:rgba(255,255,255,0.11); --border-hi:rgba(255,255,255,0.18);
+            --accent:#4ade80; --accent-dim:#22c55e; --accent-mute:rgba(74,222,128,0.10);
+            --text:#f0f0f0; --text-2:#9ca3af; --text-3:#4b5563;
+            --red:#f87171; --radius:14px; --radius-lg:20px; --ease-out:cubic-bezier(.16,1,.3,1);
         }
-        html { height: 100%; }
-        body {
-            font-family: 'DM Sans', system-ui, sans-serif;
-            background: var(--bg-deep);
-            color: var(--text);
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            overflow: hidden;
-        }
-        /* ── LEFT ── */
-        .left-panel {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 3rem;
-            background: var(--bg-deep);
-            overflow: hidden;
-        }
-        .left-panel::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 70% 60% at 20% 10%, rgba(74,222,128,0.06) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 50% at 80% 90%, rgba(74,222,128,0.03) 0%, transparent 55%);
-            pointer-events: none;
-        }
-        .left-brand { position: relative; z-index: 1; animation: fadeUp .7s var(--ease-out) both; }
-        .brand-logo { display: flex; align-items: center; gap: .6rem; }
-        .brand-mark {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dim));
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 0 1px rgba(74,222,128,0.3), 0 8px 24px rgba(74,222,128,0.18);
-        }
-        .brand-mark svg { width: 18px; height: 18px; fill: #0f1011; }
-        .brand-name { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.35rem; color: var(--text); }
-        .left-hero { position: relative; z-index: 1; animation: fadeUp .7s .12s var(--ease-out) both; }
-        .left-hero h2 {
-            font-family: 'DM Serif Display', Georgia, serif;
-            font-size: clamp(2rem, 3.2vw, 3rem);
-            font-weight: 400; line-height: 1.15; letter-spacing: -.02em;
-            color: var(--text); margin-bottom: 1.2rem;
-        }
-        .left-hero h2 em { font-style: italic; color: var(--accent); }
-        .left-hero p { font-size: .95rem; line-height: 1.7; color: var(--text-2); max-width: 380px; font-weight: 300; }
-        .features { position: relative; z-index: 1; display: flex; flex-direction: column; gap: .7rem; animation: fadeUp .7s .22s var(--ease-out) both; }
-        .feature { display: flex; align-items: center; gap: .8rem; }
-        .feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .6; flex-shrink: 0; }
-        .feature span { font-size: .82rem; color: var(--text-3); font-weight: 400; }
-        /* ── RIGHT ── */
-        .right-panel {
-
-
-position: relative;
-            display: flex; align-items: center; justify-content: center;
-            padding: 2.5rem 3rem;
-            background: var(--bg);
-            border-left: 1px solid var(--border);
-            overflow-y: auto;
-        }
-        .right-panel::before {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            pointer-events: none;
-        }
-        .form-wrap { width: 100%; max-width: 380px; animation: fadeUp .6s .1s var(--ease-out) both; }
-        .form-header { margin-bottom: 2rem; }
-        .form-header h1 {
-            font-family: 'DM Serif Display', Georgia, serif;
-            font-size: 1.85rem; font-weight: 400; letter-spacing: -.025em;
-            color: var(--text); margin-bottom: .4rem; line-height: 1.2;
-        }
-        .form-header p { font-size: .875rem; color: var(--text-2); font-weight: 300; }
-        .google-btn {
-            width: 100%; background: var(--surface); border: 1px solid var(--border-mid);
-            border-radius: var(--radius); padding: .8rem 1rem;
-            font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500;
-            color: var(--text); cursor: pointer;
-            transition: background .18s, border-color .18s, transform .15s;
-            display: flex; align-items: center; justify-content: center; gap: .55rem;
-            margin-bottom: 1.4rem;
-        }
-        .google-btn:hover { background: var(--surface-2); border-color: var(--border-hi); transform: translateY(-1px); }
-        .google-btn:active { transform: translateY(0); }
-        .divider {
-            display: flex; align-items: center; gap: .9rem;
-            margin: 0 0 1.4rem; font-size: .78rem; color: var(--text-3);
-        }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        .field { margin-bottom: 1rem; }
-        label { display: block; font-size: .8rem; font-weight: 500; color: var(--text-2); margin-bottom: .45rem; }
-        input[type="text"], input[type="password"] {
-            width: 100%; background: var(--surface); border: 1px solid var(--border-mid);
-            border-radius: var(--radius); padding: .78rem 1rem;
-            font-family: 'DM Sans', sans-serif; font-size: .925rem; color: var(--text);
-            outline: none; transition: border-color .18s, background .18s, box-shadow .18s;
-            -webkit-appearance: none;
-        }
-        input[type="text"]::placeholder, input[type="password"]::placeholder { color: var(--text-3); }
-        input[type="text"]:hover, input[type="password"]:hover { border-color: var(--border-hi); background: var(--surface-2); }
-        input[type="text"]:focus, input[type="password"]:focus {
-            border-color: rgba(74,222,128,.45); background: var(--surface-2);
-            box-shadow: 0 0 0 3px var(--accent-mute);
-        }
-        .error { color: var(--red); font-size: .75rem; margin-top: .35rem; display: none; }
-        .btn-primary {
-            width: 100%; background: var(--accent); border: none;
-            border-radius: var(--radius); padding: .82rem 1rem;
-            font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 600;
-            color: #0f1011; cursor: pointer;
-            transition: background .18s, transform .15s, box-shadow .18s;
-            margin-top: .3rem; box-shadow: 0 4px 16px rgba(74,222,128,.22);
-        }
-        .btn-primary:hover { background: #6bef96; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(74,222,128,.32); }
-        .btn-primary:active { transform: translateY(0); }
-        .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-        .toggle-line { text-align: center; font-size: .83rem; color: var(--text-2); margin-top: 1.3rem; }
-        .register-link {
-            color: var(--accent); cursor: pointer; font-weight: 500;
-
-
-border-bottom: 1px solid transparent; transition: border-color .15s;
-        }
-        .register-link:hover { border-bottom-color: var(--accent-dim); }
-        #register-block { overflow: hidden; max-height: 0; opacity: 0; transition: max-height .4s var(--ease-out), opacity .3s ease; }
-        #register-block.open { max-height: 600px; opacity: 1; }
-        .register-inner { padding-top: 1.2rem; border-top: 1px solid var(--border); margin-top: 1.2rem; }
-        .register-inner h3 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.1rem; font-weight: 400; color: var(--text); margin-bottom: 1rem; }
-        .captcha-row {
-            display: flex; align-items: center; gap: .8rem;
-            background: var(--surface); border: 1px solid var(--border-mid);
-            border-radius: var(--radius); padding: .65rem 1rem; margin-bottom: .25rem;
-        }
-        .captcha-expr { font-size: .9rem; font-weight: 500; color: var(--text-2); white-space: nowrap; }
-        .captcha-row input { width: 70px; border: none; background: var(--surface-3); border-radius: 8px; padding: .45rem .6rem; text-align: center; font-size: .9rem; box-shadow: none; }
-        .captcha-row input:focus { box-shadow: 0 0 0 2px var(--accent-mute); border-color: transparent; }
-        .version { position: fixed; bottom: 1rem; right: 1.2rem; font-size: .68rem; color: var(--text-3); z-index: 100; }
-        /* Modal */
-        .modal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,.7); backdrop-filter: blur(16px);
-            z-index: 1000; justify-content: center; align-items: center; padding: 1.5rem;
-        }
-        .modal-card {
-            background: var(--surface); border: 1px solid var(--border-hi);
-            border-radius: var(--radius-lg); padding: 2rem; max-width: 360px; width: 100%;
-            text-align: center; animation: scaleIn .25s var(--ease-out) both;
-            box-shadow: 0 32px 80px rgba(0,0,0,.5);
-        }
-        .modal-card h3 { font-family: 'DM Serif Display', Georgia, serif; font-size: 1.3rem; font-weight: 400; color: var(--text); margin-bottom: .5rem; }
-        .modal-card p { font-size: .83rem; color: var(--text-2); margin-bottom: 1.3rem; font-weight: 300; }
-        .modal-card input { margin-bottom: .4rem; }
-        .modal-btns { display: flex; gap: .7rem; margin-top: 1.2rem; }
-        .modal-btns .btn-primary { flex: 1; }
-        #modal-cancel {
-            flex: 1; background: transparent; border: 1px solid var(--border-mid);
-            border-radius: var(--radius); padding: .82rem 1rem;
-            font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 500;
-            color: var(--text-2); cursor: pointer; transition: background .15s, border-color .15s;
-        }
-        #modal-cancel:hover { background: var(--surface-2); border-color: var(--border-hi); }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(.95) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        max-width: 860px {
-            body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow-y: auto; }
-            .left-panel { padding: 2rem 2rem 2.5rem; border-bottom: 1px solid var(--border); }
-            .left-hero h2 { font-size: 1.9rem; }
-            .right-panel { border-left: none; padding: 2.5rem 1.5rem 3rem; }
-        }
-        max-width: 480px {
-            .left-panel { padding: 1.5rem 1.25rem 2rem; }
-            .right-panel { padding: 2rem 1.25rem 2.5rem; }
-        }
+        html { height:100%; }
+        body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg-deep); color:var(--text); min-height:100vh; display:grid; grid-template-columns:1fr 1fr; overflow:hidden; }
+        /* LEFT */
+        .left-panel { position:relative; display:flex; flex-direction:column; justify-content:space-between; padding:3rem; background:var(--bg-deep); overflow:hidden; }
+        .left-panel::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 20% 10%,rgba(74,222,128,.06) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 80% 90%,rgba(74,222,128,.03) 0%,transparent 55%); pointer-events:none; }
+        .left-brand { position:relative; z-index:1; animation:fadeUp .7s var(--ease-out) both; }
+        .brand-logo { display:flex; align-items:center; gap:.6rem; }
+        .brand-mark { width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--accent-dim)); border-radius:10px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 1px rgba(74,222,128,.3),0 8px 24px rgba(74,222,128,.18); }
+        .brand-mark svg { width:18px; height:18px; fill:#0f1011; }
+        .brand-name { font-family:'DM Serif Display',Georgia,serif; font-size:1.35rem; color:var(--text); }
+        .left-hero { position:relative; z-index:1; animation:fadeUp .7s .12s var(--ease-out) both; }
+        .left-hero h2 { font-family:'DM Serif Display',Georgia,serif; font-size:clamp(2rem,3.2vw,3rem); font-weight:400; line-height:1.15; letter-spacing:-.02em; color:var(--text); margin-bottom:1.2rem; }
+        .left-hero h2 em { font-style:italic; color:var(--accent); }
+        .left-hero p { font-size:.95rem; line-height:1.7; color:var(--text-2); max-width:380px; font-weight:300; }
+        .features { position:relative; z-index:1; display:flex; flex-direction:column; gap:.7rem; animation:fadeUp .7s .22s var(--ease-out) both; }
+        .feature { display:flex; align-items:center; gap:.8rem; }
+        .feature-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); opacity:.6; flex-shrink:0; }
+        .feature span { font-size:.82rem; color:var(--text-3); }
+        /* RIGHT */
+        .right-panel { position:relative; display:flex; align-items:center; justify-content:center; padding:2.5rem 3rem; background:var(--bg); border-left:1px solid var(--border); overflow-y:auto; }
+        .right-panel::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent); pointer-events:none; }
+        .form-wrap { width:100%; max-width:380px; animation:fadeUp .6s .1s var(--ease-out) both; }
+        .form-header { margin-bottom:2rem; }
+        .form-header h1 { font-family:'DM Serif Display',Georgia,serif; font-size:1.85rem; font-weight:400; letter-spacing:-.025em; color:var(--text); margin-bottom:.4rem; line-height:1.2; }
+        .form-header p { font-size:.875rem; color:var(--text-2); font-weight:300; }
+        .google-btn { width:100%; background:var(--surface); border:1px solid var(--border-mid); border-radius:var(--radius); padding:.8rem 1rem; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:500; color:var(--text); cursor:pointer; transition:background .18s,border-color .18s,transform .15s; display:flex; align-items:center; justify-content:center; gap:.55rem; margin-bottom:1.4rem; }
+        .google-btn:hover { background:var(--surface-2); border-color:var(--border-hi); transform:translateY(-1px); }
+        .google-btn:active { transform:translateY(0); }
+        .divider { display:flex; align-items:center; gap:.9rem; margin:0 0 1.4rem; font-size:.78rem; color:var(--text-3); }
+        .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+        .field { margin-bottom:1rem; }
+        label { display:block; font-size:.8rem; font-weight:500; color:var(--text-2); margin-bottom:.45rem; }
+        input[type="text"], input[type="password"] { width:100%; background:var(--surface); border:1px solid var(--border-mid); border-radius:var(--radius); padding:.78rem 1rem; font-family:'DM Sans',sans-serif; font-size:.925rem; color:var(--text); outline:none; transition:border-color .18s,background .18s,box-shadow .18s; -webkit-appearance:none; }
+        input[type="text"]::placeholder, input[type="password"]::placeholder { color:var(--text-3); }
+        input[type="text"]:hover, input[type="password"]:hover { border-color:var(--border-hi); background:var(--surface-2); }
+        input[type="text"]:focus, input[type="password"]:focus { border-color:rgba(74,222,128,.45); background:var(--surface-2); box-shadow:0 0 0 3px var(--accent-mute); }
+        .error { color:var(--red); font-size:.75rem; margin-top:.35rem; display:none; }
+        .btn-primary { width:100%; background:var(--accent); border:none; border-radius:var(--radius); padding:.82rem 1rem; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600; color:#0f1011; cursor:pointer; transition:background .18s,transform .15s,box-shadow .18s; margin-top:.3rem; box-shadow:0 4px 16px rgba(74,222,128,.22); }
+        .btn-primary:hover { background:#6bef96; transform:translateY(-1px); box-shadow:0 6px 24px rgba(74,222,128,.32); }
+        .btn-primary:active { transform:translateY(0); }
+        .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+        .toggle-line { text-align:center; font-size:.83rem; color:var(--text-2); margin-top:1.3rem; }
+        .register-link { color:var(--accent); cursor:pointer; font-weight:500; border-bottom:1px solid transparent; transition:border-color .15s; }
+        .register-link:hover { border-bottom-color:var(--accent-dim); }
+        #register-block { overflow:hidden; max-height:0; opacity:0; transition:max-height .4s var(--ease-out),opacity .3s ease; }
+        #register-block.open { max-height:600px; opacity:1; }
+        .register-inner { padding-top:1.2rem; border-top:1px solid var(--border); margin-top:1.2rem; }
+        .register-inner h3 { font-family:'DM Serif Display',Georgia,serif; font-size:1.1rem; font-weight:400; color:var(--text); margin-bottom:1rem; }
+        .captcha-row { display:flex; align-items:center; gap:.8rem; background:var(--surface); border:1px solid var(--border-mid); border-radius:var(--radius); padding:.65rem 1rem; margin-bottom:.25rem; }
+        .captcha-expr { font-size:.9rem; font-weight:500; color:var(--text-2); white-space:nowrap; }
+        .captcha-row input { width:70px; border:none; background:var(--surface-3); border-radius:8px; padding:.45rem .6rem; text-align:center; font-size:.9rem; box-shadow:none; }
+        .captcha-row input:focus { box-shadow:0 0 0 2px var(--accent-mute); border-color:transparent; }
+        .version { position:fixed; bottom:1rem; right:1.2rem; font-size:.68rem; color:var(--text-3); z-index:100; }
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(16px); z-index:1000; justify-content:center; align-items:center; padding:1.5rem; }
+        .modal-card { background:var(--surface); border:1px solid var(--border-hi); border-radius:var(--radius-lg); padding:2rem; max-width:360px; width:100%; text-align:center; animation:scaleIn .25s var(--ease-out) both; box-shadow:0 32px 80px rgba(0,0,0,.5); }
+        .modal-card h3 { font-family:'DM Serif Display',Georgia,serif; font-size:1.3rem; font-weight:400; color:var(--text); margin-bottom:.5rem; }
+        .modal-card p { font-size:.83rem; color:var(--text-2); margin-bottom:1.3rem; font-weight:300; }
+        .modal-btns { display:flex; gap:.7rem; margin-top:1.2rem; }
+        .modal-btns .btn-primary { flex:1; }
+        #modal-cancel { flex:1; background:transparent; border:1px solid var(--border-mid); border-radius:var(--radius); padding:.82rem 1rem; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:500; color:var(--text-2); cursor:pointer; transition:background .15s,border-color .15s; }
+        #modal-cancel:hover { background:var(--surface-2); border-color:var(--border-hi); }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);} }
+        @keyframes scaleIn { from{opacity:0;transform:scale(.95) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);} }
+        @media(max-width:860px) { body{grid-template-columns:1fr;grid-template-rows:auto 1fr;overflow-y:auto;} .left-panel{padding:2rem 2rem 2.5rem;border-bottom:1px solid var(--border);} .left-hero h2{font-size:1.9rem;} .right-panel{border-left:none;padding:2.5rem 1.5rem 3rem;} }
+        @media(max-width:480px) { .left-panel{padding:1.5rem 1.25rem 2rem;} .right-panel{padding:2rem 1.25rem 2.5rem;} }
     </style>
 </head>
 <body>
 <div class="left-panel">
     <div class="left-brand">
         <div class="brand-logo">
-            <div class="brand-mark">
-                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.8 1.56 5.24 3.87 6.54L8 20h2.5v-1c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v1H16l-.87-4.46C17.44 14.
-
-
-24 19 11.8 19 9c0-3.87-3.13-7-7-7z"/></svg>
-            </div>
+            <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.8 1.56 5.24 3.87 6.54L8 20h2.5v-1c0-.55.45-1 1-1h1c.55 0 1 .45 1 1v1H16l-.87-4.46C17.44 14.24 19 11.8 19 9c0-3.87-3.13-7-7-7z"/></svg></div>
             <span class="brand-name">Omega</span>
         </div>
     </div>
     <div class="left-hero">
-        <h2>Твоя история
-начинается <em>здесь</em></h2>
+        <h2>Твоя история<br>начинается <em>здесь</em></h2>
         <p>Погрузись в живой мир ролевого сервера. Создай персонажа, найди своё место и стань частью сообщества.</p>
     </div>
     <div class="features">
@@ -238,52 +106,22 @@ border-bottom: 1px solid transparent; transition: border-color .15s;
             <p>Введите ник и пароль или войдите через Google</p>
         </div>
         <button id="google-login" class="google-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Продолжить с Google
         </button>
         <div class="divider">или</div>
         <div id="login-form">
-            <div class="field">
-                <label>Ник в Minecraft</label>
-                <input type="text" id="login-nick" placeholder="ваш ник" autocomplete="username">
-                <div class="error" id="nick-error"></div>
-            </div>
-            <div class="field">
-                <label>Пароль</label>
-                <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-                <div class="error" id="pass-error"></div>
-            </div>
+            <div class="field"><label>Ник в Minecraft</label><input type="text" id="login-nick" placeholder="ваш ник" autocomplete="username"><div class="error" id="nick-error"></div></div>
+            <div class="field"><label>Пароль</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"><div class="error" id="pass-error"></div></div>
             <button id="login-btn" class="btn-primary">Войти</button>
         </div>
-        <div class="toggle-line">
-            Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span>
-        </div>
+        <div class="toggle-line">Нет аккаунта? <span id="show-register" class="register-link">Зарегистрироваться</span></div>
         <div id="register-block">
             <div class="register-inner">
                 <h3>Создать аккаунт</h3>
-                <div class="field">
-                    <label>Придумайте ник</label>
-                    <input type="text" id="reg-nick" placeholder="латиница, цифры, _">
-                    <div class="error" id="reg-nick-error"></div>
-                </div>
-                <div class="field">
-                    <label>Пароль</label>
-                    <input type="password" id="reg-pass" placeholder="минимум 8 символов">
-                    <div class="error" id="reg-pass-error"></div>
-                </div>
-                <div class="field">
-                    <label>Подтверждение</label>
-                    <div class="captcha-row">
-                        <span class="captcha-expr" id="captcha-question"></span>
-                        <input type="text" id="captcha-answer" placeholder="?">
-                    </div>
-                    <div class="error" id="captcha-error">Неверный ответ</div>
-                </div>
+                <div class="field"><label>Придумайте ник</label><input type="text" id="reg-nick" placeholder="латиница, цифры, _"><div class="error" id="reg-nick-error"></div></div>
+                <div class="field"><label>Пароль</label><input type="password" id="reg-pass" placeholder="минимум 8 символов"><div class="error" id="reg-pass-error"></div></div>
+                <div class="field"><label>Подтверждение</label><div class="captcha-row"><span class="captcha-expr" id="captcha-question"></span><input type="text" id="captcha-answer" placeholder="?"></div><div class="error" id="captcha-error">Неверный ответ</div></div>
                 <button id="register-btn" class="btn-primary">Создать аккаунт</button>
             </div>
         </div>
@@ -294,5 +132,57 @@ border-bottom: 1px solid transparent; transition: border-color .15s;
     <div class="modal-card">
         <h3>Один момент</h3>
         <p>Укажите ваш ник в Minecraft для привязки аккаунта Google</p>
-
-
+        <input type="text" id="modal-nick" placeholder="ник (латиница, цифры, _)" autocomplete="off">
+        <div class="error" id="modal-error" style="text-align:left;"></div>
+        <div class="modal-btns"><button id="modal-cancel">Отмена</button><button id="modal-submit" class="btn-primary">Подтвердить</button></div>
+    </div>
+</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    const cfg={apiKey:"AIzaSyBlJZW0my5-k5b2sINpsAfg-u43AyV1Dlo",authDomain:"omega-5de05.firebaseapp.com",projectId:"omega-5de05",storageBucket:"omega-5de05.firebasestorage.app",messagingSenderId:"438319801454",appId:"1:438319801454:web:775924ab8ef4417760b27f"};
+    const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),provider=new GoogleAuthProvider();
+    let cn1,cn2;
+    function gc(){cn1=Math.floor(Math.random()*10)+1;cn2=Math.floor(Math.random()*10)+1;document.getElementById('captcha-question').textContent=`${cn1} + ${cn2} = ?`;document.getElementById('captcha-answer').value='';}
+    gc();
+    document.getElementById('show-register').onclick=()=>{const b=document.getElementById('register-block');b.classList.toggle('open');document.getElementById('show-register').textContent=b.classList.contains('open')?'Войти':'Зарегистрироваться';};
+    async function createProfile(uid,nick,email){await setDoc(doc(db,"profiles",uid),{nickname:nick,nickname_lower:nick.toLowerCase(),email,createdAt:new Date(),role:"user",rp_points:0,settings:{email_notifications:true,theme:"dark"},isOnline:false,lastSeen:serverTimestamp()});}
+    function se(id,msg){const el=document.getElementById(id);if(msg){el.textContent=msg;el.style.display='block';}else el.style.display='none';}
+    document.getElementById('register-btn').addEventListener('click',async()=>{
+        const nick=document.getElementById('reg-nick').value.trim(),pass=document.getElementById('reg-pass').value,ans=document.getElementById('captcha-answer').value.trim();
+        se('reg-nick-error','');se('reg-pass-error','');se('captcha-error','');
+        if(parseInt(ans)!==cn1+cn2){se('captcha-error','Неверный ответ');gc();return;}
+        if(!nick){se('reg-nick-error','Введите ник');return;}
+        if(!/^[a-zA-Z0-9_]{3,16}$/.test(nick)){se('reg-nick-error','3–16 символов: латиница, цифры, _');return;}
+        if(pass.length<8){se('reg-pass-error','Минимум 8 символов');return;}
+        const btn=document.getElementById('register-btn');btn.disabled=true;btn.textContent='Проверка…';
+        try{if(!(await getDocs(query(collection(db,"profiles"),where("nickname_lower","==",nick.toLowerCase())))).empty){se('reg-nick-error','Ник уже занят');btn.disabled=false;btn.textContent='Создать аккаунт';gc();return;}
+        const email=`user_${nick.toLowerCase()}@rp.local`;await createProfile((await createUserWithEmailAndPassword(auth,email,pass)).user.uid,nick,email);}
+        catch(e){se('reg-nick-error',e.message);btn.disabled=false;btn.textContent='Создать аккаунт';gc();}
+    });
+    document.getElementById('login-btn').addEventListener('click',async()=>{
+        const nick=document.getElementById('login-nick').value.trim(),pass=document.getElementById('login-pass').value;
+        se('nick-error','');se('pass-error','');
+        if(!nick){se('nick-error','Введите ник');return;}if(!pass){se('pass-error','Введите пароль');return;}
+        try{const cred=await signInWithEmailAndPassword(auth,`user_${nick.toLowerCase()}@rp.local`,pass);const ref=doc(db,"profiles",cred.user.uid);const snap=await getDoc(ref);if(!snap.exists())await createProfile(cred.user.uid,nick,`user_${nick.toLowerCase()}@rp.local`);else await updateDoc(ref,{lastSeen:serverTimestamp()});}
+        catch(e){if(e.code==='auth/user-not-found')se('nick-error','Пользователь не найден');else if(e.code==='auth/wrong-password')se('pass-error','Неверный пароль');else se('nick-error',e.message);}
+    });
+    let pu=null;
+    document.getElementById('google-login').addEventListener('click',async()=>{
+        try{const r=await signInWithPopup(auth,provider),user=r.user,ref=doc(db,"profiles",user.uid),snap=await getDoc(ref);if(snap.exists()){await updateDoc(ref,{lastSeen:serverTimestamp()});return;}
+        pu=user;document.getElementById('modal-nick').value='';document.getElementById('modal-error').style.display='none';document.getElementById('nickname-modal').style.display='flex';}
+        catch(e){alert("Ошибка: "+e.message);}
+    });
+    document.getElementById('modal-submit').addEventListener('click',async()=>{
+        const nick=document.getElementById('modal-nick').value.trim();se('modal-error','');
+        if(!nick){se('modal-error','Введите ник');return;}
+        if(!/^[a-zA-Z0-9_]{3,16}$/.test(nick)){se('modal-error','3–16 символов: латиница, цифры, _');return;}
+        if(!(await getDocs(query(collection(db,"profiles"),where("nickname_lower","==",nick.toLowerCase())))).empty){se('modal-error','Ник уже занят');return;}
+        if(!pu)return;await createProfile(pu.uid,nick,pu.email);document.getElementById('nickname-modal').style.display='none';pu=null;
+    });
+    document.getElementById('modal-cancel').addEventListener('click',async()=>{if(pu)await signOut(auth);document.getElementById('nickname-modal').style.display='none';pu=null;});
+    onAuthStateChanged(auth,async(user)=>{if(user){await updateDoc(doc(db,"profiles",user.uid),{lastSeen:serverTimestamp()}).catch(()=>{});window.location.href='server.html';}});
+</script>
+</body>
+</html>
